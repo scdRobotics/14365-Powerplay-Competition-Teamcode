@@ -82,6 +82,12 @@ public class Delivery extends Subsystem {
         return 0;
     }
 
+    public void slideHigh(){
+        slide.setTargetPosition(4000);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setPower(0.8);
+    }
+
     public void resetEncoders(){
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
@@ -99,6 +105,15 @@ public class Delivery extends Subsystem {
 
     public void runGripper(double pos){
         gripper.setPosition(pos);
+    }
+
+    public void openGripper(){
+        gripper.setPosition(0.225);
+    }
+
+
+    public void closeGripper(){
+        gripper.setPosition(0);
     }
 
 
