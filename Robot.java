@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -31,6 +32,7 @@ public class Robot {
     public Delivery delivery;
     public Vision vision;
     public SampleMecanumDrive drive;
+    public Sensors sensors;
 
     //THESE MOTORS ARE ONLY USED IN TELE-OP; Roadrunner takes care of Auto drive motors
     public DcMotorEx frontLeftM; //Front Left Drive Motor initial declaration
@@ -47,6 +49,10 @@ public class Robot {
 
     public OpenCvCamera webcam2;
 
+
+    public DistanceSensor front;
+    public DistanceSensor right;
+    public DistanceSensor left;
 
     //NOTE: These are all basic, required aspects of the robot
     public final ElapsedTime timer;
@@ -102,6 +108,12 @@ public class Robot {
 
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        //Map Sensor System
+        front = hardwareMap.get(DistanceSensor.class, "front");
+        left = hardwareMap.get(DistanceSensor.class, "left");
+        right = hardwareMap.get(DistanceSensor.class, "right");
+
+
         //Map Vision System
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -111,6 +123,8 @@ public class Robot {
         delivery = new Delivery(slide, gripper, telemetry, hardwareMap, timer);
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
+
+        sensors = new Sensors(front, left, right, telemetry, hardwareMap, timer);
 
 
 
@@ -127,7 +141,7 @@ public class Robot {
     //Simple pause function-- basic, necessary function for all aspects of robot
     public void pause(double secs){
         ElapsedTime mRuntime = new ElapsedTime();
-        while(mRuntime.time()< secs){
+        while(mRuntime.time()< secs && !opMode.isStopRequested()){
 
         }
     }

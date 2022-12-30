@@ -14,7 +14,7 @@ public class DeliveryTeleOp extends LinearOpMode {
         Delivery delivery;
 
         ElapsedTime timer = new ElapsedTime();
-        RobotDelivery robot = new RobotDelivery(this, hardwareMap, telemetry, timer, true);
+        Robot robot = new Robot(this, hardwareMap, telemetry, timer, true);
 
         delivery = robot.delivery;
 

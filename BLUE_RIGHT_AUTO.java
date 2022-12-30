@@ -33,28 +33,50 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
         Vision vision = robot.vision;
         Delivery delivery = robot.delivery;
+        Sensors sensors = robot.sensors;
+
+        double dist = 0.1;
 
 
 
-        vision.activateAprilTagPipelineCamera1();
+        vision.activateAprilTagYellowPipelineCamera1();
 
         robot.drive.setPoseEstimate(new Pose2d(0,0,0));
 
         TrajectorySequence approachPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
 
 
-                .forward(57)
+                .forward(55)
                 //.lineToLinearHeading(new Pose2d(57, 0, Math.toRadians(45)))
-                .turn(Math.toRadians(45)) //315?
+                .turn(Math.toRadians(-55)) //315?
+
+                .forward(10)
 
                 .build();
 
+
+        TrajectorySequence turnCheckPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
+
+                .turn(Math.toRadians(-3)) //315?
+
+                .build();
+
+        TrajectorySequence driveIntoPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
+
+                .turn(Math.toRadians(-3))
+
+                .forward(Math.toRadians(dist)) //315?
+
+                .build();
+
+        delivery.closeGripper();
 
         waitForStart();
 
         int park = vision.readAprilTagCamera1() + 1;
 
-        delivery.closeGripper();
+        vision.activateYellowPipelineCamera2();
+
 
         telemetry.addData("April Tag Detected: ", park);
         telemetry.update();
@@ -63,9 +85,21 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
         robot.drive.followTrajectorySequence(approachPole);
 
-        robot.pause(5);
+        int failsafeCount = 0;
+        while(sensors.getFrontDist()<10 && sensors.getFrontDist()>1.5 && failsafeCount<=7){
+            robot.drive.followTrajectorySequence(turnCheckPole);
+            failsafeCount++;
+        }
+
+        dist = sensors.getFrontDist()-6;
+
+        robot.drive.followTrajectorySequence(driveIntoPole);
+
+
 
         delivery.openGripper();
+
+        robot.pause(5);
 
 
 

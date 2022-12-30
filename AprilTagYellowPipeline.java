@@ -1,13 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.opencv.imgproc.Imgproc.THRESH_BINARY_INV;
+
 import org.opencv.calib3d.Calib3d;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
 import org.opencv.core.Point3;
+import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
@@ -15,8 +20,10 @@ import org.openftc.apriltag.AprilTagDetectorJNI;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class AprilTagPipeline extends OpenCvPipeline {
+public class AprilTagYellowPipeline extends OpenCvPipeline {
     private long nativeApriltagPtr;
     private Mat grey = new Mat();
     private ArrayList<AprilTagDetection> detections = new ArrayList<>();
@@ -45,7 +52,36 @@ public class AprilTagPipeline extends OpenCvPipeline {
     private boolean needToSetDecimation;
     private final Object decimationSync = new Object();
 
-    public AprilTagPipeline(double tagsize, double fx, double fy, double cx, double cy)
+    List<MatOfPoint> contoursList = new ArrayList<>();
+
+    enum Stage
+    {
+        YCbCr,
+        YCbCr_CHAN1,
+        YCbCr_CHAN2,
+        THRESHOLD,
+        CONTOURS_OVERLAYED_ON_FRAME,
+        RAW_IMAGE
+    }
+
+    Mat ycbcrMat = new Mat();
+
+    Mat ycbcrChan2Mat = new Mat();
+
+    Mat thresholdMat = new Mat();
+
+    Mat contoursMat = new Mat();
+
+    Mat ycbcrChan1Mat = new Mat();
+
+    ArrayList<RectData> rects = new ArrayList<RectData>();
+
+    int numContoursFound;
+
+    private YellowPipeline.Stage stageToRenderToViewport = YellowPipeline.Stage.CONTOURS_OVERLAYED_ON_FRAME;
+    private YellowPipeline.Stage[] stages = YellowPipeline.Stage.values();
+
+    public AprilTagYellowPipeline(double tagsize, double fx, double fy, double cx, double cy)
     {
         this.tagsize = tagsize;
         this.tagsizeX = tagsize;
@@ -59,6 +95,37 @@ public class AprilTagPipeline extends OpenCvPipeline {
 
         // Allocate a native context object. See the corresponding deletion in the finalizer
         nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector(AprilTagDetectorJNI.TagFamily.TAG_36h11.string, 3, 3);
+    }
+
+    @Override
+    public void onViewportTapped()
+    {
+        /*
+         * Note that this method is invoked from the UI thread
+         * so whatever we do here, we must do quickly.
+         */
+
+        int currentStageNum = stageToRenderToViewport.ordinal();
+
+        int nextStageNum = currentStageNum + 1;
+
+        if(nextStageNum >= stages.length)
+        {
+            nextStageNum = 0;
+        }
+
+        stageToRenderToViewport = stages[nextStageNum];
+    }
+
+    public static void drawRotatedRect(Mat image, RotatedRect rotatedRect, Scalar color, int thickness) {
+        Point[] vertices = new Point[4];
+        rotatedRect.points(vertices);
+        MatOfPoint points = new MatOfPoint(vertices);
+        Imgproc.drawContours(image, Arrays.asList(points), -1, color, thickness);
+    }
+
+    public ArrayList<RectData> getRects(){
+        return rects;
     }
 
     @Override
@@ -109,7 +176,104 @@ public class AprilTagPipeline extends OpenCvPipeline {
             draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
         }
 
-        return input;
+        //return input;
+
+
+
+        Scalar white = new Scalar(255, 255, 255);
+
+        contoursList.clear();
+
+        Imgproc.cvtColor(input, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
+
+        Core.extractChannel(ycbcrMat, ycbcrChan2Mat, 2);
+
+        Imgproc.threshold(ycbcrChan2Mat, thresholdMat, 95, 255, THRESH_BINARY_INV);
+
+        Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        input.copyTo(contoursMat);
+
+        Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 8);
+
+        numContoursFound = contoursList.size();
+
+        for (MatOfPoint contour: contoursList){
+            Imgproc.fillPoly(thresholdMat, Arrays.asList(contour), white);
+        }
+
+        Scalar black = new Scalar(0, 0, 0);
+
+        rects.clear();
+
+        for (MatOfPoint contour: contoursList) {
+            RotatedRect rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
+
+            double fixedAngle;
+
+            if(rotatedRect.size.width < rotatedRect.size.height){
+                fixedAngle = rotatedRect.angle+180;
+            }else{
+                fixedAngle = rotatedRect.angle+90;
+            }
+
+            if(fixedAngle>=170 && fixedAngle<=190){
+                if(rotatedRect.size.width>5 && rotatedRect.size.height>25){
+                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
+                    if(rotatedRect.size.width>rotatedRect.size.height) {
+                        rects.add(new RectData(rotatedRect.size.height, rotatedRect.size.width));
+                    }
+                    else{
+                        rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height));
+                    }
+                }
+            }
+        }
+
+
+
+
+
+        switch (stageToRenderToViewport)
+        {
+            case YCbCr:
+            {
+                return ycbcrMat;
+            }
+
+            case YCbCr_CHAN1:
+            {
+                return ycbcrChan1Mat;
+            }
+
+            case YCbCr_CHAN2:
+            {
+                return ycbcrChan2Mat;
+            }
+
+            case THRESHOLD:
+            {
+                return thresholdMat;
+            }
+
+            case CONTOURS_OVERLAYED_ON_FRAME:
+            {
+                return contoursMat;
+            }
+
+            case RAW_IMAGE:
+            {
+                return input;
+            }
+
+            default:
+            {
+                return input;
+            }
+        }
+
+
+
     }
 
     public void setDecimation(float decimation)

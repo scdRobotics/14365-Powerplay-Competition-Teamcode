@@ -85,7 +85,7 @@ public class Delivery extends Subsystem {
     public void slideHigh(){
         slide.setTargetPosition(4000);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide.setPower(0.8);
+        slide.setPower(0.65);
     }
 
     public void resetEncoders(){
