@@ -61,14 +61,6 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 .build();
 
-        TrajectorySequence driveIntoPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
-
-                .turn(Math.toRadians(-3))
-
-                .forward(Math.toRadians(dist)) //315?
-
-                .build();
-
         delivery.closeGripper();
 
         waitForStart();
@@ -91,9 +83,18 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
             failsafeCount++;
         }
 
-        dist = sensors.getFrontDist()-6;
+        dist = sensors.getFrontDist()-3;
+
+        TrajectorySequence driveIntoPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
+
+                .turn(Math.toRadians(-3))
+
+                .forward(Math.toRadians(dist)) //315?
+
+                .build();
 
         robot.drive.followTrajectorySequence(driveIntoPole);
+
 
 
 
