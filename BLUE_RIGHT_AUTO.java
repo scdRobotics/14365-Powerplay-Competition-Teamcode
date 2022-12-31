@@ -1,23 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.MinAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TranslationalVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @Autonomous(name="BLUE_RIGHT_AUTO", group="Autonomous")
 public class BLUE_RIGHT_AUTO extends LinearOpMode {
@@ -35,70 +26,150 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
         Delivery delivery = robot.delivery;
         Sensors sensors = robot.sensors;
 
-        double dist = 0.1;
-
-
+        delivery.initEncoders();
 
         vision.activateAprilTagYellowPipelineCamera1();
 
         robot.drive.setPoseEstimate(new Pose2d(0,0,0));
 
-        TrajectorySequence approachPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
+        //AtomicReference<Double> dist = new AtomicReference<>(5.0);
 
 
-                .forward(55)
-                //.lineToLinearHeading(new Pose2d(57, 0, Math.toRadians(45)))
-                .turn(Math.toRadians(-55)) //315?
 
-                .forward(10)
+        TrajectorySequence poleApproach = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
+                .forward(51)
+                .strafeRight(10)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+
+                    delivery.slideHigh();
+
+                    telemetry.addData("Approach Pole Complete! ", "");
+                    telemetry.update();
+
+                    int failsafeCount = 0;
+
+
+
+                    while( (sensors.getFrontDist()>11 || sensors.getFrontDist()<6) && failsafeCount<10 && !isStopRequested()){
+                        robot.drive.turn(Math.toRadians(-9));
+                        failsafeCount++;
+                        telemetry.addData("In sensors loop with failsafe count of:  ", failsafeCount);
+                        telemetry.addData("Distance sensor reads:  ", sensors.getFrontDist());
+                        telemetry.update();
+                    }
+
+
+
+                })
+
 
                 .build();
 
 
-        TrajectorySequence turnCheckPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
 
-                .turn(Math.toRadians(-3)) //315?
-
-                .build();
 
         delivery.closeGripper();
 
         waitForStart();
 
         int park = vision.readAprilTagCamera1() + 1;
-
         vision.activateYellowPipelineCamera2();
-
 
         telemetry.addData("April Tag Detected: ", park);
         telemetry.update();
 
-        delivery.slideHigh();
+        robot.drive.followTrajectorySequence(poleApproach);
 
-        robot.drive.followTrajectorySequence(approachPole);
+        //dist.set(sensors.getFrontDist());
+        double dist = sensors.getFrontDist() - 4;
 
-        int failsafeCount = 0;
-        while(sensors.getFrontDist()<10 && sensors.getFrontDist()>1.5 && failsafeCount<=7){
-            robot.drive.followTrajectorySequence(turnCheckPole);
-            failsafeCount++;
-        }
+        //double dist = (sensors.getFrontDist() * (Math.sin(Math.abs(robot.drive.getRawExternalHeading())))) - 0.25;
 
-        dist = sensors.getFrontDist()-3;
+        telemetry.addData("Final distance readout to pole: ", dist);
+        telemetry.addData("Heading: ", Math.abs(robot.drive.getRawExternalHeading()));
+        telemetry.update();
 
-        TrajectorySequence driveIntoPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
+        TrajectorySequence poleDrop = robot.drive.trajectorySequenceBuilder(poleApproach.end())
 
-                .turn(Math.toRadians(-3))
+                .forward(dist)
 
-                .forward(Math.toRadians(dist)) //315?
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+
+                    telemetry.addData("Drive into pole traj sequence done! ", "");
+                    telemetry.update();
+
+                    robot.pause(1);
+
+                    delivery.openGripper();
+
+                    telemetry.addData("Gripper opened! ", "");
+                    telemetry.update();
+
+                    robot.pause(1);
+
+
+                })
+
+                .lineTo(new Vector2d((51+dist)-10, 0))
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    delivery.slidePickupStack();
+                })
+
+                .turn(Math.toRadians(90))
+
+                .lineTo(new Vector2d((51+dist)-10, 10))
+
+                //.strafeLeft(20)
 
                 .build();
 
-        robot.drive.followTrajectorySequence(driveIntoPole);
+
+        robot.drive.followTrajectorySequence(poleDrop);
+
+        /*TrajectorySequence conePickup = robot.drive.trajectorySequenceBuilder(poleDrop.end())
+
+                .build();*/
+
+
+        robot.pause(10);
 
 
 
 
-        delivery.openGripper();
+
+
+
+
+
+
+        //robot.drive.turn(Math.toRadians(-38));
+
+        /*telemetry.addData("Approach Pole Complete! ", "");
+        telemetry.update();*/
+
+        /*while( (sensors.getFrontDist()>10 || sensors.getFrontDist()<6) && failsafeCount<10 && !isStopRequested()){
+            robot.drive.turn(Math.toRadians(-9));
+            failsafeCount++;
+            telemetry.addData("In sensors loop with failsafe count of:  ", failsafeCount);
+            telemetry.addData("Distance sensor reads:  ", sensors.getFrontDist());
+            telemetry.update();
+        }*/
+
+
+
+
+
+
+
+
+
+
+
+        //robot.drive.followTrajectorySequence(driveIntoPole);
+
+
 
         robot.pause(5);
 
