@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-@Autonomous(name="BLUE_RIGHT_AUTO", group="Autonomous")
-public class BLUE_RIGHT_AUTO extends LinearOpMode {
+@Autonomous(name="SIMPLE_BLUE_RIGHT_AUTO", group="Autonomous")
+public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -37,9 +37,6 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
 
         TrajectorySequence poleApproach = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
-                .forward(53)
-                .strafeRight(7.5)
-
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
                     delivery.slideHigh();
@@ -47,52 +44,13 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
                     telemetry.addData("Approach Pole Complete! ", "");
                     telemetry.update();
 
-                    int failsafeCount = 0;
-
-
-
-                    while( (sensors.getFrontDist()>11 || sensors.getFrontDist()<6) && failsafeCount<10 && !isStopRequested()){
-                        robot.drive.turn(Math.toRadians(-9));
-                        failsafeCount++;
-                        telemetry.addData("In sensors loop with failsafe count of:  ", failsafeCount);
-                        telemetry.addData("Distance sensor reads:  ", sensors.getFrontDist());
-                        telemetry.update();
-                    }
-
 
 
                 })
+                .forward(52)
+                .strafeRight(12.75)
 
-
-                .build();
-
-
-
-
-        delivery.closeGripper();
-
-        waitForStart();
-
-        int park = vision.readAprilTagCamera1() + 1;
-        vision.activateYellowPipelineCamera2();
-
-        telemetry.addData("April Tag Detected: ", park);
-        telemetry.update();
-
-        robot.drive.followTrajectorySequence(poleApproach);
-
-        //dist.set(sensors.getFrontDist());
-        double dist = sensors.getFrontDist() - 2;
-
-        //double dist = (sensors.getFrontDist() * (Math.sin(Math.abs(robot.drive.getRawExternalHeading())))) - 0.25;
-
-        telemetry.addData("Final distance readout to pole: ", dist);
-        telemetry.addData("Heading: ", Math.abs(robot.drive.getRawExternalHeading()));
-        telemetry.update();
-
-        TrajectorySequence poleDrop = robot.drive.trajectorySequenceBuilder(poleApproach.end())
-
-                .forward(dist)
+                .forward(5)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
@@ -111,7 +69,7 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 })
 
-                .lineTo(new Vector2d((53+dist)-8, 0))
+                .lineTo(new Vector2d(48, -15))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     delivery.slidePickupStack();
@@ -119,14 +77,63 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 .turn(Math.toRadians(90))
 
-                .lineTo(new Vector2d((53+dist)-8, 20))
+                .lineTo(new Vector2d(50, 29.5))
 
-                //.strafeLeft(20)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.pause(1);
+
+                    delivery.closeGripper();
+
+                    robot.pause(1);
+
+                })
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+
+                    delivery.slideHigh();
+
+                })
+
+                .lineTo(new Vector2d(50, -12))
+
+                .turn(Math.toRadians(-90))
+
+                .forward(6)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+
+                    telemetry.addData("Drive into pole traj sequence done! ", "");
+                    telemetry.update();
+
+                    robot.pause(1);
+
+                    delivery.openGripper();
+
+                    telemetry.addData("Gripper opened! ", "");
+                    telemetry.update();
+
+                    robot.pause(1);
+
+
+                })
+
+
 
                 .build();
 
 
-        robot.drive.followTrajectorySequence(poleDrop);
+
+        delivery.closeGripper();
+
+        waitForStart();
+
+        int park = vision.readAprilTagCamera1() + 1;
+        vision.activateYellowPipelineCamera2();
+
+        telemetry.addData("April Tag Detected: ", park);
+        telemetry.update();
+
+        robot.drive.followTrajectorySequence(poleApproach);
 
         /*TrajectorySequence conePickup = robot.drive.trajectorySequenceBuilder(poleDrop.end())
 

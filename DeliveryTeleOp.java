@@ -40,10 +40,10 @@ public class DeliveryTeleOp extends LinearOpMode {
             double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
             double rx = gamepad1.right_stick_x;
 
-            if(gamepad1.left_bumper && rx>0.1){
+            if(gamepad1.left_bumper && (rx>0.1 || rx<-0.1)){
                 slow=5;
             }
-            else if(gamepad1.left_bumper && (y>0.1 || x>0.1)){
+            else if(gamepad1.left_bumper && (y>0.1 || x>0.1 || y<-0.1 || x<-0.1)){
                 slow=2;
             }
             else{

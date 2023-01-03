@@ -72,7 +72,7 @@ public class Vision extends Subsystem {
         });
     }
 
-    public void findClosePole(){
+    public double findClosePoleDTheta(){
         ArrayList<RectData> viewCam1 = dropLowWidths(aprilTagYellowPipeline.getRects(), 3);
         ArrayList<RectData> viewCam2 = dropLowWidths(yellowPipeline.getRects(), 3);
 
@@ -88,8 +88,23 @@ public class Vision extends Subsystem {
         }
 
         if(same.size()>1){
-
+            //TODO: Isolate which equal rects within "same" are the pole we want to be looking at (AKA, the widest pair that still is a pole and not some strange background object/interference)
         }
+
+        /*
+        same.get(0) = cam1 rectangle of pole
+        same.get(1) = cam2 rectangle of pole
+         */
+
+        //TODO: Implement cool Rovio formula to find and return dTheta to turn
+        double theta0 = 110 - (same.get(0).getY()*9/128);
+        double theta1 = 160 - (same.get(1).getY()*9/128);
+
+        double dTheta = 0;
+
+        dTheta = Math.atan((20*Math.sin(theta0)*Math.sin(theta1)/Math.sin(theta0 - theta1) + 10) /(10 + (20*Math.sin(theta0)*Math.cos(theta1)/(Math.sin(theta0 - theta1)))));
+
+        return dTheta;
 
     }
 

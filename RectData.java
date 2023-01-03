@@ -4,6 +4,8 @@ public class RectData {
 
     private double width;
     private double height;
+    private double x;
+    private double y;
 
     public RectData(double width, double height){
         this.width=width;
@@ -21,6 +23,14 @@ public class RectData {
 
     public double getHeight(){
         return height;
+    }
+
+    public double getX(){
+        return x;
+    }
+
+    public double getY(){
+        return y;
     }
 
     public boolean equals(RectData rect){
