@@ -130,6 +130,8 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
         TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(poleApproach.end())
 
+                .lineTo(new Vector2d(48, -15))
+
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     delivery.slidePickupStackSecond();
                 })
@@ -149,7 +151,10 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 .build();
 
+
         TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(poleApproach.end())
+
+                .lineTo(new Vector2d(48, -15))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     delivery.slidePickupStackSecond();
@@ -157,19 +162,21 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 .turn(Math.toRadians(90))
 
-                .lineTo(new Vector2d(50, 17.5))
+                .lineTo(new Vector2d(50, 0))
 
                 .build();
 
         TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(poleApproach.end())
 
+                .lineTo(new Vector2d(48, -15))
+
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     delivery.slidePickupStackSecond();
                 })
 
                 .turn(Math.toRadians(90))
 
-                .lineTo(new Vector2d(50, 5))
+                .lineTo(new Vector2d(50, -22.5))
 
                 .build();
 
