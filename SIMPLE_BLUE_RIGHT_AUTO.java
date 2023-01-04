@@ -49,8 +49,14 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
 
                 })
-                .forward(52)
-                .strafeRight(12)
+
+                .lineTo(new Vector2d(55, 0))
+
+                .lineTo(new Vector2d(50, 0))
+
+                .lineTo(new Vector2d(51.75, -12.75))
+
+                //.strafeRight(12.5)
 
                 .forward(5)
 
@@ -100,7 +106,7 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 .turn(Math.toRadians(-90))
 
-                .forward(6)
+                .forward(8)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
@@ -140,14 +146,14 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 .lineTo(new Vector2d(50, 29.5))
 
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                /*.UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.pause(1);
 
                     delivery.closeGripper();
 
                     robot.pause(1);
 
-                })
+                })*/
 
                 .build();
 
@@ -162,7 +168,7 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 .turn(Math.toRadians(90))
 
-                .lineTo(new Vector2d(50, 0))
+                .lineTo(new Vector2d(50, 3))
 
                 .build();
 
