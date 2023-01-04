@@ -36,6 +36,8 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
 
 
+
+
         TrajectorySequence poleApproach = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
@@ -48,7 +50,7 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 })
                 .forward(52)
-                .strafeRight(12.75)
+                .strafeRight(12)
 
                 .forward(5)
 
@@ -94,7 +96,7 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 })
 
-                .lineTo(new Vector2d(50, -12))
+                .lineTo(new Vector2d(50, -11.25))
 
                 .turn(Math.toRadians(-90))
 
@@ -122,6 +124,55 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
                 .build();
 
 
+        //PARK TRAJECTORY SEQUENCES NEED TESTING AND TUNING
+
+
+
+        TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(poleApproach.end())
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    delivery.slidePickupStackSecond();
+                })
+
+                .turn(Math.toRadians(90))
+
+                .lineTo(new Vector2d(50, 29.5))
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.pause(1);
+
+                    delivery.closeGripper();
+
+                    robot.pause(1);
+
+                })
+
+                .build();
+
+        TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(poleApproach.end())
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    delivery.slidePickupStackSecond();
+                })
+
+                .turn(Math.toRadians(90))
+
+                .lineTo(new Vector2d(50, 17.5))
+
+                .build();
+
+        TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(poleApproach.end())
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    delivery.slidePickupStackSecond();
+                })
+
+                .turn(Math.toRadians(90))
+
+                .lineTo(new Vector2d(50, 5))
+
+                .build();
+
 
         delivery.closeGripper();
 
@@ -134,6 +185,19 @@ public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
         telemetry.update();
 
         robot.drive.followTrajectorySequence(poleApproach);
+
+        if(park==1){
+            robot.drive.followTrajectorySequence(parkOne);
+        }
+        else if(park==2){
+            robot.drive.followTrajectorySequence(parkTwo);
+        }
+        else if(park==3){
+            robot.drive.followTrajectorySequence(parkThree);
+        }
+        else{
+            robot.drive.followTrajectorySequence(parkOne);
+        }
 
         /*TrajectorySequence conePickup = robot.drive.trajectorySequenceBuilder(poleDrop.end())
 
