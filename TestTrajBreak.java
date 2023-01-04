@@ -21,7 +21,7 @@ public class TestTrajBreak extends LinearOpMode {
         // Refer to https://www.learnroadrunner.com/trajectories.html#coordinate-system for a map
         // of the field
         // This example sets the bot at x: -20, y: -35, and facing 90 degrees (turned counter-clockwise)
-        Pose2d startPose = new Pose2d(-20, -35, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
         drive.setPoseEstimate(startPose);
 
         waitForStart();
@@ -30,30 +30,37 @@ public class TestTrajBreak extends LinearOpMode {
 
         // Example spline path from SplineTest.java
         Trajectory traj = drive.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(0, 60), 0)
+                .splineTo(new Vector2d(1000, 0), 0)
+                .build();
+
+        Trajectory back = drive.trajectoryBuilder(startPose, true)
+                .splineTo(new Vector2d(1000, 0), 0)
                 .build();
 
         // We follow the trajectory asynchronously so we can run our own logic
-        drive.followTrajectoryAsync(traj);
+        drive.followTrajectoryAsync(back);
 
         // Start the timer so we know when to cancel the following
         ElapsedTime stopTimer = new ElapsedTime();
 
         while (opModeIsActive() && !isStopRequested()) {
-            // 3 seconds into the opmode, we cancel the following
+            // 2 seconds into the opmode, we cancel the following
             if (stopTimer.seconds() >= 2) {
                 // Cancel following
                 drive.breakFollowing();
 
                 // Stop the motors
                 drive.setDrivePower(new Pose2d());
-                drive.update();
+
+                //drive.update();
                 break;
             }
 
-            // Update drive
+            // Update drive LOCALIZER
             drive.update();
         }
+
+
     }
 
 }
