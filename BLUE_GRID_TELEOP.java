@@ -8,6 +8,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "GridTeleOp", group = "TeleOp")
 public class BLUE_GRID_TELEOP extends LinearOpMode {
 
+    public enum DRIVE_MODE {
+        AUTO,
+        MANUAL
+    }
+
+    DRIVE_MODE drive_mode = DRIVE_MODE.AUTO;
+
     @Override
     public void runOpMode(){
 
@@ -47,49 +54,17 @@ public class BLUE_GRID_TELEOP extends LinearOpMode {
         /*int currentCoordX = 0;
         int currentCoordY = 0;*/
 
+        boolean gamepadAHeld = false;
 
 
 
 
 
 
-        while(!isStopRequested()){
+
+        while(!isStopRequested() && opModeIsActive()){
 
 
-
-            /*double y = -gamepad1.left_stick_y; // Remember, this is reversed!
-            double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-            double rx = gamepad1.right_stick_x;
-
-            if(gamepad1.left_bumper && rx>0.1){
-                slow=5;
-            }
-            else if(gamepad1.left_bumper && (y>0.1 || x>0.1)){
-                slow=2;
-            }
-            else{
-                slow=1;
-            }
-
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-
-            double frontLeftPower = (y + x + rx) / denominator;
-            double backLeftPower = (y - x + rx) / denominator;
-            double frontRightPower = (y - x - rx) / denominator;
-            double backRightPower = (y + x - rx) / denominator;
-
-            if(y<0.075 || x<0.0825 || rx<0.075){ //Account for potential joystick drift
-                robot.frontLeftM.setPower(frontLeftPower/slow);
-                robot.backLeftM.setPower(backLeftPower/slow);
-                robot.frontRightM.setPower(frontRightPower/slow);
-                robot.backRightM.setPower(backRightPower/slow);
-            }
-            else{
-                robot.frontLeftM.setPower(0);
-                robot.frontRightM.setPower(0);
-                robot.backLeftM.setPower(0);
-                robot.backRightM.setPower(0);
-            }*/
 
             /*
 
@@ -113,62 +88,118 @@ public class BLUE_GRID_TELEOP extends LinearOpMode {
              */
 
 
-            //May change to be driver oriented rather than field oriented- AKA, integrated into the big ugly switch case below. Shouldn't be necessary, this seems fairly intuitive with some practice
-            if(gamepad1.right_stick_x>0.1){
-                currentGridOrientation++;
+            switch(drive_mode){
+                case AUTO:
+                    if(gamepad1.a && !gamepadAHeld){
+                        drive_mode=DRIVE_MODE.MANUAL;
+                        gamepadAHeld = true;
+                    }
+
+                    //May change to be driver oriented rather than field oriented- AKA, integrated into the big ugly switch case below. Shouldn't be necessary, this seems fairly intuitive with some practice
+                    if(gamepad1.right_stick_x>0.1){
+                        currentGridOrientation++;
+                    }
+                    else if(gamepad1.right_stick_x<-0.1){
+                        currentGridOrientation--;
+                    }
+
+                    switch(currentGridOrientation){
+                        case 0 & 2:
+                            if(gamepad1.dpad_up){
+                                currentGridY++;
+                            }
+                            else if(gamepad1.dpad_down){
+                                currentGridY--;
+                            }
+
+                            if(gamepad1.dpad_left){
+                                currentGridX--;
+                            }
+                            else if(gamepad1.dpad_right){
+                                currentGridX++;
+                            }
+
+                            break;
+
+                        case 1 & 3:
+                            if(gamepad1.dpad_up){
+                                currentGridX--;
+                            }
+                            else if(gamepad1.dpad_down){
+                                currentGridX++;
+                            }
+
+                            if(gamepad1.dpad_left){
+                                currentGridY--;
+                            }
+                            else if(gamepad1.dpad_right){
+                                currentGridY++;
+                            }
+                            break;
+
+                    }
+
+                    if(currentGridY<0){
+                        currentGridY=3;
+                    }
+                    else if(currentGridY>3){
+                        currentGridY=0;
+                    }
+
+                    if(currentGridX<0){
+                        currentGridX=3;
+                    }
+                    else if(currentGridX>3){
+                        currentGridX=0;
+                    }
+
+
+                case MANUAL:
+                    if(gamepad1.a && !gamepadAHeld){
+                        drive_mode=DRIVE_MODE.AUTO;
+                        gamepadAHeld = true;
+                    }
+
+                    /*double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+                    double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
+                    double rx = gamepad1.right_stick_x;
+
+                    if(gamepad1.left_bumper && rx>0.1){
+                        slow=5;
+                    }
+                    else if(gamepad1.left_bumper && (y>0.1 || x>0.1)){
+                        slow=2;
+                    }
+                    else{
+                        slow=1;
+                    }
+
+                    double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+
+                    double frontLeftPower = (y + x + rx) / denominator;
+                    double backLeftPower = (y - x + rx) / denominator;
+                    double frontRightPower = (y - x - rx) / denominator;
+                    double backRightPower = (y + x - rx) / denominator;
+
+                    if(y<0.075 || x<0.0825 || rx<0.075){ //Account for potential joystick drift
+                        robot.frontLeftM.setPower(frontLeftPower/slow);
+                        robot.backLeftM.setPower(backLeftPower/slow);
+                        robot.frontRightM.setPower(frontRightPower/slow);
+                        robot.backRightM.setPower(backRightPower/slow);
+                    }
+                    else{
+                        robot.frontLeftM.setPower(0);
+                        robot.frontRightM.setPower(0);
+                        robot.backLeftM.setPower(0);
+                        robot.backRightM.setPower(0);
+                    }*/
+
+
+
             }
-            else if(gamepad1.right_stick_x<-0.1){
-                currentGridOrientation--;
-            }
 
-            switch(currentGridOrientation){
-                case 0 & 2:
-                    if(gamepad1.dpad_up){
-                        currentGridY++;
-                    }
-                    else if(gamepad1.dpad_down){
-                        currentGridY--;
-                    }
-
-                    if(gamepad1.dpad_left){
-                        currentGridX--;
-                    }
-                    else if(gamepad1.dpad_right){
-                        currentGridX++;
-                    }
-
-                    break;
-
-                case 1 & 3:
-                    if(gamepad1.dpad_up){
-                        currentGridX--;
-                    }
-                    else if(gamepad1.dpad_down){
-                        currentGridX++;
-                    }
-
-                    if(gamepad1.dpad_left){
-                        currentGridY--;
-                    }
-                    else if(gamepad1.dpad_right){
-                        currentGridY++;
-                    }
-                    break;
-
-            }
-
-            if(currentGridY<0){
-                currentGridY=3;
-            }
-            else if(currentGridY>3){
-                currentGridY=0;
-            }
-
-            if(currentGridX<0){
-                currentGridX=3;
-            }
-            else if(currentGridX>3){
-                currentGridX=0;
+            if(!gamepad1.a){
+                gamepadAHeld=false;
             }
 
 
