@@ -89,8 +89,8 @@ public class Vision extends Subsystem {
 
         if(same.size()==2){
             //TODO: Implement cool Rovio formula to find and return dTheta to turn
-            double theta0 = 110 - (same.get(0).getY()*9/128);
-            double theta1 = 160 - (same.get(1).getY()*9/128);
+            double theta0 = 110 - (same.get(0).getX()*9/128);
+            double theta1 = 160 - (same.get(1).getX()*9/128);
 
             double dTheta = Math.atan((20*Math.sin(theta0)*Math.sin(theta1)/Math.sin(theta0 - theta1) + 10) /(10 + (20*Math.sin(theta0)*Math.cos(theta1)/(Math.sin(theta0 - theta1)))));
 
