@@ -69,6 +69,21 @@ public class BLUE_GRID_TELEOP extends LinearOpMode {
 
 
 
+
+        int passthroughCount = 0;
+
+        TrajectorySequence grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                .forward(1e-6)
+
+                .build();
+
+
+
+
+
+
+
         while(!isStopRequested() && opModeIsActive()){
 
 
@@ -97,6 +112,10 @@ public class BLUE_GRID_TELEOP extends LinearOpMode {
 
             switch(drive_mode){
                 case AUTO:
+                    telemetry.addData("Passthrough Count: ", passthroughCount);
+                    passthroughCount++;
+
+
                     if(gamepad1.a && !gamepadAHeld){
 
                         robot.drive.breakFollowing();
@@ -119,25 +138,107 @@ public class BLUE_GRID_TELEOP extends LinearOpMode {
                     //May change to be driver oriented rather than field oriented- AKA, integrated into the big ugly switch case below. Shouldn't be necessary, this seems fairly intuitive with some practice
                     if(gamepad1.right_stick_x>0.1){
                         currentGridOrientation++;
+                        grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                .turn(orientationToRadians(currentGridOrientation))
+
+                                .build();
                     }
                     else if(gamepad1.right_stick_x<-0.1){
                         currentGridOrientation--;
+                        grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                .turn(orientationToRadians(currentGridOrientation))
+
+                                .build();
                     }
 
-                    switch(currentGridOrientation){
+                    switch(currentGridOrientation){ //Need to incorporate a held boolean for dpads here
                         case 0 & 2:
                             if(gamepad1.dpad_up){
                                 currentGridY++;
+                                if(currentGridY<0){
+                                    currentGridY=0;
+                                }
+                                else if(currentGridY>5){
+                                    currentGridY=5;
+                                }
+
+                                if(currentGridX<0){
+                                    currentGridX=0;
+                                }
+                                else if(currentGridX>5){
+                                    currentGridX=5;
+                                }
+                                grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                        .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
+
+                                        .build();
                             }
                             else if(gamepad1.dpad_down){
                                 currentGridY--;
+                                if(currentGridY<0){
+                                    currentGridY=0;
+                                }
+                                else if(currentGridY>5){
+                                    currentGridY=5;
+                                }
+
+                                if(currentGridX<0){
+                                    currentGridX=0;
+                                }
+                                else if(currentGridX>5){
+                                    currentGridX=5;
+                                }
+                                grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                        .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
+
+                                        .build();
                             }
 
                             if(gamepad1.dpad_left){
                                 currentGridX--;
+                                if(currentGridY<0){
+                                    currentGridY=0;
+                                }
+                                else if(currentGridY>5){
+                                    currentGridY=5;
+                                }
+
+                                if(currentGridX<0){
+                                    currentGridX=0;
+                                }
+                                else if(currentGridX>5){
+                                    currentGridX=5;
+                                }
+                                grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                        .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
+
+                                        .build();
                             }
                             else if(gamepad1.dpad_right){
                                 currentGridX++;
+                                if(currentGridY<0){
+                                    currentGridY=0;
+                                }
+                                else if(currentGridY>5){
+                                    currentGridY=5;
+                                }
+
+                                if(currentGridX<0){
+                                    currentGridX=0;
+                                }
+                                else if(currentGridX>5){
+                                    currentGridX=5;
+                                }
+                                grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                        .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
+
+                                        .build();
                             }
 
                             break;
@@ -145,45 +246,101 @@ public class BLUE_GRID_TELEOP extends LinearOpMode {
                         case 1 & 3:
                             if(gamepad1.dpad_up){
                                 currentGridX--;
+                                if(currentGridY<0){
+                                    currentGridY=0;
+                                }
+                                else if(currentGridY>5){
+                                    currentGridY=5;
+                                }
+
+                                if(currentGridX<0){
+                                    currentGridX=0;
+                                }
+                                else if(currentGridX>5){
+                                    currentGridX=5;
+                                }
+                                grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                        .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
+
+                                        .build();
                             }
                             else if(gamepad1.dpad_down){
                                 currentGridX++;
+                                if(currentGridY<0){
+                                    currentGridY=0;
+                                }
+                                else if(currentGridY>5){
+                                    currentGridY=5;
+                                }
+
+                                if(currentGridX<0){
+                                    currentGridX=0;
+                                }
+                                else if(currentGridX>5){
+                                    currentGridX=5;
+                                }
+                                grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                        .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
+
+                                        .build();
                             }
 
                             if(gamepad1.dpad_left){
                                 currentGridY--;
+                                if(currentGridY<0){
+                                    currentGridY=0;
+                                }
+                                else if(currentGridY>5){
+                                    currentGridY=5;
+                                }
+
+                                if(currentGridX<0){
+                                    currentGridX=0;
+                                }
+                                else if(currentGridX>5){
+                                    currentGridX=5;
+                                }
+                                grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                        .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
+
+                                        .build();
                             }
                             else if(gamepad1.dpad_right){
                                 currentGridY++;
+                                if(currentGridY<0){
+                                    currentGridY=0;
+                                }
+                                else if(currentGridY>5){
+                                    currentGridY=5;
+                                }
+
+                                if(currentGridX<0){
+                                    currentGridX=0;
+                                }
+                                else if(currentGridX>5){
+                                    currentGridX=5;
+                                }
+                                grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                                        .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
+
+                                        .build();
                             }
                             break;
 
                     }
 
-                    if(currentGridY<0){
-                        currentGridY=3;
-                    }
-                    else if(currentGridY>3){
-                        currentGridY=0;
-                    }
-
-                    if(currentGridX<0){
-                        currentGridX=3;
-                    }
-                    else if(currentGridX>3){
-                        currentGridX=0;
-                    }
-
-                    TrajectorySequence grid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
-
-                            .lineTo(new Vector2d(gridToAbsolute(currentGridX), gridToAbsolute(currentGridY)))
-                            .turn(orientationToRadians(currentGridOrientation))
-
-                            .build();
+                    telemetry.addData("Current Grid X: ", currentGridX);
+                    telemetry.addData("Current Grid Y: ", currentGridY);
 
                     robot.drive.followTrajectorySequenceAsync(grid);
 
                     robot.drive.update();
+
+                    telemetry.addData("Is Async Traj Busy? ", robot.drive.isBusy());
 
                     if(!robot.drive.isBusy()){
                         if(gamepad1.left_stick_x>0.2 && -gamepad1.left_stick_y>0.2){ //Front right
@@ -199,6 +356,8 @@ public class BLUE_GRID_TELEOP extends LinearOpMode {
 
                         }
                     }
+
+                    telemetry.update();
 
                     break;
 
