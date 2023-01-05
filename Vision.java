@@ -16,12 +16,14 @@ import java.util.ArrayList;
 
 public class Vision extends Subsystem {
     public OpenCvCamera webcam1;
-
+    //TODO: Figure out which of these is upside down and account for that accordingly in the respective pipeline
     public OpenCvCamera webcam2;
 
     AprilTagYellowPipeline aprilTagYellowPipeline = new AprilTagYellowPipeline(1, 578.272, 578.272, 402.145, 221.506);
 
     YellowPipeline yellowPipeline = new YellowPipeline();
+
+    public ArrayList<RectData> same = new ArrayList<RectData>(); //Only global because I want to access it in VisionTest.java; SHOULD CHANGE TO BE INSIDE FUNCTION findClosePoleDTheta() ONCE TESTING IS DONE !!
 
     //"Constructor" object for Vision
     public Vision(OpenCvCamera webcam1, OpenCvCamera webcam2, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
@@ -72,12 +74,10 @@ public class Vision extends Subsystem {
         });
     }
 
-    public void findClosePole(){
+    public double findClosePoleDTheta(){
         ArrayList<RectData> viewCam1 = dropLowWidths(aprilTagYellowPipeline.getRects(), 3);
         ArrayList<RectData> viewCam2 = dropLowWidths(yellowPipeline.getRects(), 3);
 
-
-        ArrayList<RectData> same = new ArrayList<RectData>();
         for(int i = 0; i< viewCam1.size(); i++){
             for(int j = 0; j<viewCam2.size(); j++){
                 if(viewCam1.get(i).equals(viewCam2.get(j))){
@@ -87,9 +87,21 @@ public class Vision extends Subsystem {
             }
         }
 
-        if(same.size()>1){
+        if(same.size()==2){
+            //TODO: Implement cool Rovio formula to find and return dTheta to turn
+            double theta0 = 110 - (same.get(0).getY()*9/128);
+            double theta1 = 160 - (same.get(1).getY()*9/128);
 
+            double dTheta = Math.atan((20*Math.sin(theta0)*Math.sin(theta1)/Math.sin(theta0 - theta1) + 10) /(10 + (20*Math.sin(theta0)*Math.cos(theta1)/(Math.sin(theta0 - theta1)))));
+
+            return dTheta;
         }
+        else{
+            //TODO: If same.size() is >2, isolate which equal rects within "same" are the pole we want to be looking at (AKA, the widest pair that still is a pole and not some strange background object/interference) so that same.size()==2
+            return -1; //failure case, nothing detected more than likely (or flaw in selecting "same" poles)
+        }
+
+
 
     }
 

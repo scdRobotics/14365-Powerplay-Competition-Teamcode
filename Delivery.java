@@ -83,7 +83,19 @@ public class Delivery extends Subsystem {
     }
 
     public void slideHigh(){
-        slide.setTargetPosition(4000);
+        slide.setTargetPosition(4250);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setPower(0.65);
+    }
+
+    public void slidePickupStack(){
+        slide.setTargetPosition(600);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setPower(0.65);
+    }
+
+    public void slidePickupStackSecond(){
+        slide.setTargetPosition(500);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide.setPower(0.65);
     }
