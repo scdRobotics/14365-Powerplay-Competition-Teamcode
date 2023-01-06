@@ -92,7 +92,7 @@ public class SIMPLE_BLUE_GRID_TELEOP extends LinearOpMode {
             double backRightPower = (y + x - rx) / denominator;
 
             if(!robot.drive.isBusy()){
-                if(y<0.075 || x<0.0825 || rx<0.075){
+                if(y<0.075 || x<0.0825 || rx>0.075 || y<-0.075 || x<-0.0825 || rx<-0.075){
                     robot.drive.setMotorPowers(frontLeftPower/slow, backLeftPower/slow, backRightPower/slow, frontRightPower/slow);
                 }
                 else{
