@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -13,6 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Autonomous(name="VisionTest", group="Autonomous")
 public class VisionTest extends LinearOpMode {
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void runOpMode() {
 
@@ -32,16 +37,21 @@ public class VisionTest extends LinearOpMode {
 
         waitForStart();
 
+        telemetry.addData("Calculate dTheta: ", vision.findClosePoleDTheta());
+        telemetry.update();
+
+
+
         while(opModeIsActive() && !isStopRequested()){
-            telemetry.addData("April Tag ID Detected: ", vision.readAprilTagCamera1());
+            /*telemetry.addData("April Tag ID Detected: ", vision.readAprilTagCamera1());
             for(int i = 0; i<vision.same.size(); i++){
                 telemetry.addData("Same  Value " + i + " X: ", vision.same.get(i).getX());
                 telemetry.addData("Same  Value " + i + " Y: ", vision.same.get(i).getY());
                 telemetry.addData("Same  Value " + i + " Width: ", vision.same.get(i).getWidth());
                 telemetry.addData("Same  Value " + i + " Height: ", vision.same.get(i).getHeight());
-            }
-            telemetry.addData("Calculate dTheta: ", vision.findClosePoleDTheta());
-            telemetry.update();
+            }*/
+
+
         }
 
 
