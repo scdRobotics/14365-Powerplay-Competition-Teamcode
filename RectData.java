@@ -43,6 +43,6 @@ public class RectData {
     }
 
     public String toString(){
-        return "Width: " + getWidth() + "Height: " + getHeight() + "Y: " + getY() + "X" + getX();
+        return "X: " + getX() + " , Width: " + getWidth() + " , Height: " + getHeight() + " , Y: " + getY();
     }
 }
