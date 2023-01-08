@@ -37,6 +37,8 @@ public class VisionTest extends LinearOpMode {
 
         waitForStart();
 
+        vision.runAprilTag(false);
+
         telemetry.addData("Calculate dTheta: ", vision.findClosePoleDTheta());
         telemetry.update();
 

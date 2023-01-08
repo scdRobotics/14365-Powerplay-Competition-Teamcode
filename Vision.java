@@ -80,6 +80,10 @@ public class Vision extends Subsystem {
         });
     }
 
+    public void runAprilTag(boolean runAprilTag){
+        aprilTagYellowPipeline.setRunAprilTag(runAprilTag);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public double findClosePoleDTheta(){
         ArrayList<RectData> viewCam1 = aprilTagYellowPipeline.getRects();
@@ -125,8 +129,8 @@ public class Vision extends Subsystem {
         double dx;
         double dy;
         double phi;
-        double a = 6.75;
-        double b = 2.25;
+        double a = 6.825;
+        double b = 2;
 
         c1 = theta1;
         c2 = theta2;
