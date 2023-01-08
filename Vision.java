@@ -126,15 +126,15 @@ public class Vision extends Subsystem {
         double dy;
         double phi;
         double a = 13.5;
-        double b = 2.25;
+        double b = -2.25;
 
         c1 = theta1;
         c2 = theta2;
 
         dx = a * (Math.tan(c1) + Math.tan(c2))/(Math.tan(c1)-Math.tan(c2));
         dy = a * (Math.tan(c1) * Math.tan(c2))/(Math.tan(c1)-Math.tan(c2));
-        
-        c3 = Math.atan(dy = b) / dx;
+
+        c3 = Math.atan((dy - b)/dx);
 
         //double dTheta = Math.atan((13.5*Math.sin(theta2)*Math.sin(theta1)/Math.sin(theta1 - theta2) - 2.25) /(6.75 + (13.5*Math.sin(theta2)*Math.cos(theta1)/(Math.sin(theta1 - theta2))))) - (3.14159265358979323846264338327950/2);
         double dTheta = Math.PI/2 - c3;
