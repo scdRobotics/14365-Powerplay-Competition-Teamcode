@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 //Package is a VERY important step! Required to do basically anything with the robot
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -10,6 +14,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 //Most imports are automatically handled by Android Studio as you program
 
 
@@ -41,7 +47,7 @@ public class Vision extends Subsystem {
             @Override
             public void onOpened()
             {
-                webcam1.startStreaming(1280,720, OpenCvCameraRotation.UPSIDE_DOWN);
+                webcam1.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
                 telemetry.addData("Camera Opened! ", "");
                 telemetry.update();
             }
@@ -61,7 +67,7 @@ public class Vision extends Subsystem {
             @Override
             public void onOpened()
             {
-                //webcam2.startStreaming(1280,720, OpenCvCameraRotation.UPSIDE_DOWN);
+                webcam2.startStreaming(1280,720, OpenCvCameraRotation.UPSIDE_DOWN);
                 telemetry.addData("Camera Opened! ", "");
                 telemetry.update();
             }
@@ -74,66 +80,65 @@ public class Vision extends Subsystem {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public double findClosePoleDTheta(){
-        ArrayList<RectData> viewCam1 = dropLowWidths(aprilTagYellowPipeline.getRects(), 3);
-        ArrayList<RectData> viewCam2 = dropLowWidths(yellowPipeline.getRects(), 3);
+        ArrayList<RectData> viewCam1 = aprilTagYellowPipeline.getRects();
+        ArrayList<RectData> viewCam2 = yellowPipeline.getRects();
 
-        for(int i = 0; i< viewCam1.size(); i++){
-            for(int j = 0; j<viewCam2.size(); j++){
-                if(viewCam1.get(i).equals(viewCam2.get(j))){
-                    same.add(viewCam1.get(i));
-                    same.add(viewCam2.get(j));
-                }
-            }
+        if(!viewCam1.isEmpty() && !viewCam2.isEmpty()){
+
+            viewCam1.sort(Comparator.comparing(RectData::getWidth));
+
+            viewCam2.sort(Comparator.comparing(RectData::getWidth));
+
+
+
+            RectData widest1 = null;
+            RectData widest2 = null;
+
+            widest1 = viewCam1.get(viewCam1.size()-1);
+            widest2 = viewCam2.get(viewCam2.size()-1);
+            telemetry.addData("Widest 1: ", widest1);
+            telemetry.addData("Widest 2: ", widest2);
+            same.add(widest1);
+            same.add(widest2);
+
+
         }
 
-        if(same.size()==2){
-            //TODO: Implement cool Rovio formula to find and return dTheta to turn
-            double theta0 = 110 - (same.get(0).getX()*9/128);
-            double theta1 = 160 - (same.get(1).getY()*9/128);
 
-            double dTheta = Math.atan((20*Math.sin(theta0)*Math.sin(theta1)/Math.sin(theta0 - theta1) + 10) /(10 + (20*Math.sin(theta0)*Math.cos(theta1)/(Math.sin(theta0 - theta1)))));
-
-            return dTheta;
-        }
         else{
             //TODO: If same.size() is >2, isolate which equal rects within "same" are the pole we want to be looking at (AKA, the widest pair that still is a pole and not some strange background object/interference) so that same.size()==2
             return -1; //failure case, nothing detected more than likely (or flaw in selecting "same" poles)
         }
 
+        //TODO: Implement cool Rovio formula to find and return dTheta to turn
+        double theta1 = Math.toRadians(142.5  - (same.get(0).getX()*5.5/128)); //Camera 1 Theta
+        double theta2 = Math.toRadians(92.5 - (same.get(1).getX()*5.5/128)); //Camera 2 Theta
 
+        telemetry.addData("Theta 1 (Radians): ", theta1);
+        telemetry.addData("Theta 2 (Radians): ", theta2);
 
-    }
+        double c1;
+        double c2;
+        double c3;
+        double dx;
+        double dy;
+        double phi;
+        double a = 13.5;
+        double b = -2.25;
 
-    public ArrayList<RectData> dropLowWidths(ArrayList<RectData> rects, int numToKeep){
-        //Sort Array
-        int i;
-        double key;
-        int j;
+        c1 = theta1;
+        c2 = theta2;
 
-        for (i = 1; i < rects.size(); i++) {
-            key = rects.get(i).getWidth();
-            j = i - 1;
+        dx = a * (Math.tan(c1) + Math.tan(c2))/(Math.tan(c1)-Math.tan(c2));
+        dy = a * (Math.tan(c1) * Math.tan(c2))/(Math.tan(c1)-Math.tan(c2));
 
-            // Move elements of arr[0..i-1],
-            // that are greater than key, to one
-            // position ahead of their
-            // current position
-            while (j >= 0 && (rects.get(j).getWidth() > key)) {
-                rects.get(j+1).setWidth(rects.get(j).getWidth());
-                j = j - 1;
-            }
-            rects.get(j + 1).setWidth(key);
-        }
+        c3 = Math.atan((dy - b)/dx);
 
-        for(int k = rects.size()-numToKeep-1; k>=0; k--){
-            /*if(k<0){
-                return rects;
-            }*/
-            rects.remove(k);
-        }
-
-        return rects;
+        //double dTheta = Math.atan((13.5*Math.sin(theta2)*Math.sin(theta1)/Math.sin(theta1 - theta2) - 2.25) /(6.75 + (13.5*Math.sin(theta2)*Math.cos(theta1)/(Math.sin(theta1 - theta2))))) - (3.14159265358979323846264338327950/2);
+        double dTheta = Math.PI/2 - c3;
+        return dTheta;
 
     }
 
@@ -177,7 +182,6 @@ public class Vision extends Subsystem {
         ArrayList<AprilTagDetection> currentDetections = aprilTagYellowPipeline.getLatestDetections();
 
         if (currentDetections.size() != 0) {
-            boolean tagFound = false;
 
             for (AprilTagDetection tag : currentDetections) {
                 return tag.id;
