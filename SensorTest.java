@@ -35,6 +35,8 @@ public class SensorTest extends LinearOpMode {
         waitForStart();
 
         while(!isStopRequested()){
+            telemetry.addData("Right sensor readout: ", sensors.getRightDist());
+            telemetry.addData("Left sensor readout: ", sensors.getLeftDist());
             telemetry.addData("Front sensor readout: ", sensors.getFrontDist());
             telemetry.update();
         }

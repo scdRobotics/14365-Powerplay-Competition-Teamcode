@@ -123,10 +123,10 @@ public class YellowPipeline extends OpenCvPipeline {
                 if(rotatedRect.size.width>5 && rotatedRect.size.height>25){
                     drawRotatedRect(contoursMat, rotatedRect, black, 10);
                     if(rotatedRect.size.width>rotatedRect.size.height) {
-                        rects.add(new RectData(rotatedRect.size.height, rotatedRect.size.width));
+                        rects.add(new RectData(rotatedRect.size.height, rotatedRect.size.width, rotatedRect.center.x, rotatedRect.center.y));
                     }
                     else{
-                        rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height));
+                        rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height, rotatedRect.center.x, rotatedRect.center.y));
                     }
                 }
             }

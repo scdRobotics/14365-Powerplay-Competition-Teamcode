@@ -7,9 +7,11 @@ public class RectData {
     private double x;
     private double y;
 
-    public RectData(double width, double height){
+    public RectData(double width, double height, double x, double y){
         this.width=width;
         this.height=height;
+        this.x=x;
+        this.y=y;
     }
 
     public double getWidth(){
@@ -38,5 +40,9 @@ public class RectData {
             return true;
         }
         return false;
+    }
+
+    public String toString(){
+        return "X: " + getX() + " , Width: " + getWidth() + " , Height: " + getHeight() + " , Y: " + getY();
     }
 }

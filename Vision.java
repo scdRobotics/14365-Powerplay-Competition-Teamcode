@@ -88,7 +88,7 @@ public class Vision extends Subsystem {
         if(!viewCam1.isEmpty() && !viewCam2.isEmpty()){
 
             viewCam1.sort(Comparator.comparing(RectData::getWidth));
-
+            
             viewCam2.sort(Comparator.comparing(RectData::getWidth));
 
 
