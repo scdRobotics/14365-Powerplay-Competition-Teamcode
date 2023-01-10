@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 //Package is a VERY important step! Required to do basically anything with the robot
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -84,12 +85,14 @@ public class Vision extends Subsystem {
         aprilTagYellowPipeline.setRunAprilTag(runAprilTag);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @SuppressLint("NewApi")
     public double findClosePoleDTheta(){
         ArrayList<RectData> viewCam1 = aprilTagYellowPipeline.getRects();
         ArrayList<RectData> viewCam2 = yellowPipeline.getRects();
 
         if(!viewCam1.isEmpty() && !viewCam2.isEmpty()){
+
+            //MAY cause errors on controller app?? Will have to see
 
             viewCam1.sort(Comparator.comparing(RectData::getWidth));
             

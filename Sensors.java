@@ -30,11 +30,11 @@ public class Sensors extends Subsystem {
         return front.getDistance(DistanceUnit.INCH);
     }
 
-    public double getLeftDist(){
+    public double getFrontLeftDist(){
         return left.getDistance(DistanceUnit.INCH);
     }
 
-    public double getRightDist(){
+    public double getFrontRightDist(){
         return right.getDistance(DistanceUnit.INCH);
     }
 

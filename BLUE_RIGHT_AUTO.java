@@ -29,9 +29,13 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
         vision.activateAprilTagYellowPipelineCamera1();
 
-        robot.drive.setPoseEstimate(new Pose2d(0,0,0));
+        // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
-        TrajectorySequence approachPole = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
+        Pose2d startPose = new Pose2d(36, 65, Math.toRadians(270));
+
+        robot.drive.setPoseEstimate(startPose);
+
+        TrajectorySequence approachPole = robot.drive.trajectorySequenceBuilder(startPose)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
@@ -44,10 +48,9 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 })
 
-                .lineTo(new Vector2d(55, 0))
+                .lineTo(new Vector2d(36, 7))
 
-                .lineToLinearHeading(new Pose2d(50, 0, Math.toRadians(45))) //TODO: 315?
-
+                .lineToLinearHeading(new Pose2d(50, 12, Math.toRadians(247.5)))
 
                 .build();
 
@@ -67,10 +70,11 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy() && !robotDetected){ //Should leave loop when async function is done or robot is detected
 
-            if(sensors.getFrontDist()<50 && sensors.getFrontDist()>10){ //Meaning a robot is approaching the same direction
+            if((sensors.getFrontLeftDist()<50 && sensors.getFrontLeftDist()>10) || (sensors.getFrontRightDist()<50 && sensors.getFrontRightDist()>10)){ //Meaning a robot is approaching the same direction
                 robot.drive.breakFollowing();
                 robot.drive.setDrivePower(new Pose2d());
                 robotDetected=true;
+                break;
             }
 
             // Update drive localization
@@ -91,6 +95,9 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
         }
         else{
             //Continue with normal version
+
+            Vector2d highPole = new Vector2d(24, 0); //X and Y of high pole we stack on
+
             double dTheta = vision.findClosePoleDTheta();
             TrajectorySequence turnToPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
                     .turn(dTheta)
@@ -100,6 +107,25 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
             double distToPole = sensors.getFrontDist();
             TrajectorySequence dropPolePickupNewCone = robot.drive.trajectorySequenceBuilder(turnToPole.end())
                     .forward(distToPole-0.5)
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+
+                        telemetry.addData("Drive into pole traj sequence done! ", "");
+                        telemetry.update();
+
+                        robot.pause(1);
+
+                        delivery.openGripper();
+
+                        telemetry.addData("Gripper opened! ", "");
+                        telemetry.update();
+
+                        robot.pause(1);
+
+
+                    })
+
+                    .lineToLinearHeading(new Pose2d(24, 12, Math.toRadians(0)))
 
                     //TODO: Program trajectory for picking up new cone and returning to same spot as approachPole.end()
 
