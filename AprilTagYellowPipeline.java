@@ -71,6 +71,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
     }*/
     enum Stage
     {
+        RAW_IMAGE,
         YCbCr,
         CR_THRESH,
         CB_THRESH,
@@ -95,8 +96,8 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
     int numContoursFound;
 
-    private YellowPipeline.Stage stageToRenderToViewport = YellowPipeline.Stage.CONTOURS_OVERLAYED_ON_FRAME;
-    private YellowPipeline.Stage[] stages = YellowPipeline.Stage.values();
+    Stage stageToRenderToViewport = AprilTagYellowPipeline.Stage.CONTOURS_OVERLAYED_ON_FRAME;
+    Stage[] stages = AprilTagYellowPipeline.Stage.values();
 
     public AprilTagYellowPipeline(double tagsize, double fx, double fy, double cx, double cy)
     {
@@ -215,11 +216,13 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
         Imgproc.threshold(weighted, thresholdMat, 128, 255, THRESH_BINARY_INV);*/
 
-        Core.extractChannel(ycbcrMat, crMat, 1);
+        Core.extractChannel(ycbcrMat, crMat, 1); //
         Core.extractChannel(ycbcrMat, crMat2, 1);
 
-        Imgproc.threshold(crMat, crMat, 140, 255, THRESH_BINARY);
-        Imgproc.threshold(crMat2, crMat, 160,255, THRESH_BINARY_INV);
+        //TODO: Make values around 140, short range (around 5)
+
+        Imgproc.threshold(crMat, crMat, 130, 255, THRESH_BINARY_INV);
+        Imgproc.threshold(crMat2, crMat, 135,255, THRESH_BINARY);
 
         Core.addWeighted(crMat, 0.5, crMat2, 0.5, 0, crMatThresh);
         Imgproc.threshold(crMatThresh, crMatThresh, 130, 255, THRESH_BINARY);
@@ -307,6 +310,10 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         }*/
         switch (stageToRenderToViewport)
         {
+            case RAW_IMAGE:
+            {
+                return input;
+            }
             case YCbCr:
             {
                 return ycbcrMat;
