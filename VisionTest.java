@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,7 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @Autonomous(name="VisionTest", group="Autonomous")
 public class VisionTest extends LinearOpMode {
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void runOpMode() {
 
@@ -30,6 +30,7 @@ public class VisionTest extends LinearOpMode {
         Vision vision = robot.vision;
 
         vision.activateAprilTagYellowPipelineCamera1();
+        //vision.activateYellowPipelineCamera1();
 
         vision.activateYellowPipelineCamera2();
 

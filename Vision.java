@@ -61,6 +61,26 @@ public class Vision extends Subsystem {
         });
     }
 
+    public void activateYellowPipelineCamera1(){
+        webcam1.setPipeline(yellowPipeline);
+        webcam1.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                webcam1.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
+                telemetry.addData("Camera Opened! ", "");
+                telemetry.update();
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+
+            }
+        });
+    }
+
     public void activateYellowPipelineCamera2(){
         webcam2.setPipeline(yellowPipeline);
         webcam2.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()

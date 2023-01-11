@@ -62,42 +62,42 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
     List<MatOfPoint> contoursList = new ArrayList<>();
 
-    /*enum Stage
-    {
-        YCbCr,
-        THRESHOLD,
-        CONTOURS_OVERLAYED_ON_FRAME,
-        RAW_IMAGE
-    }*/
     enum Stage
     {
-        RAW_IMAGE,
         YCbCr,
+        CR,
+        CB,
+        CR_THRESH_1,
+        CR_THRESH_2,
         CR_THRESH,
         CB_THRESH,
         THRESHOLD,
-        CONTOURS_OVERLAYED_ON_FRAME
+        CONTOURS_OVERLAYED_ON_FRAME,
+        RAW_IMAGE
     }
 
-
     Mat ycbcrMat = new Mat();
+
     Mat cbMat = new Mat();
-    Mat crMat = new Mat();
+    Mat crMat1 = new Mat();
     Mat crMat2 = new Mat();
     Mat crMatThresh = new Mat();
+    Mat crMatThresh1 = new Mat();
+    Mat crMatThresh2 = new Mat();
     Mat cbMatThresh = new Mat();
 
     Mat contoursMat = new Mat();
 
     Mat weighted = new Mat();
-    Mat thresholdMat = new Mat();
 
     ArrayList<RectData> rects = new ArrayList<RectData>();
 
+    Mat thresholdMat = new Mat();
+
     int numContoursFound;
 
-    Stage stageToRenderToViewport = AprilTagYellowPipeline.Stage.CONTOURS_OVERLAYED_ON_FRAME;
-    Stage[] stages = AprilTagYellowPipeline.Stage.values();
+    private Stage stageToRenderToViewport = Stage.CONTOURS_OVERLAYED_ON_FRAME;
+    private Stage[] stages = Stage.values();
 
     public AprilTagYellowPipeline(double tagsize, double fx, double fy, double cx, double cy)
     {
@@ -216,32 +216,31 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
         Imgproc.threshold(weighted, thresholdMat, 128, 255, THRESH_BINARY_INV);*/
 
-        Core.extractChannel(ycbcrMat, crMat, 1); //
+        Core.extractChannel(ycbcrMat, crMat1, 1);
         Core.extractChannel(ycbcrMat, crMat2, 1);
 
-        //TODO: Make values around 140, short range (around 5)
+        Imgproc.threshold(crMat1, crMatThresh1, 145, 255, THRESH_BINARY); //140
+        Imgproc.threshold(crMat2, crMatThresh2, 160,255, THRESH_BINARY_INV); //163
 
-        Imgproc.threshold(crMat, crMat, 130, 255, THRESH_BINARY_INV);
-        Imgproc.threshold(crMat2, crMat, 135,255, THRESH_BINARY);
-
-        Core.addWeighted(crMat, 0.5, crMat2, 0.5, 0, crMatThresh);
+        Core.addWeighted(crMatThresh1, 0.5, crMatThresh2, 0.5, 0, crMatThresh);
         Imgproc.threshold(crMatThresh, crMatThresh, 130, 255, THRESH_BINARY);
 
+
         Core.extractChannel(ycbcrMat, cbMat, 2);
-        Imgproc.threshold(cbMat, cbMatThresh, 110, 255, THRESH_BINARY_INV);
+        Imgproc.threshold(cbMat, cbMatThresh, 82, 255, THRESH_BINARY_INV); //82
 
         Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
         Imgproc.threshold(weighted, thresholdMat, 130, 255, THRESH_BINARY);
 
 
-        //Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
 
 
 
         input.copyTo(contoursMat);
 
-        Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 8);
+        Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
 
         numContoursFound = contoursList.size();
 
@@ -281,47 +280,31 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
 
 
-        /*switch (stageToRenderToViewport)
-        {
-            case YCbCr:
-            {
-                return ycbcrMat;
-            }
-
-            case THRESHOLD:
-            {
-                return thresholdMat;
-            }
-
-            case CONTOURS_OVERLAYED_ON_FRAME:
-            {
-                return contoursMat;
-            }
-
-            case RAW_IMAGE:
-            {
-                return input;
-            }
-
-            default:
-            {
-                return input;
-            }
-        }*/
         switch (stageToRenderToViewport)
         {
-            case RAW_IMAGE:
-            {
-                return input;
-            }
             case YCbCr:
             {
                 return ycbcrMat;
             }
 
-            case CB_THRESH:
+            case CR:
             {
-                return cbMatThresh;
+                return crMat1;
+            }
+
+            case CB:
+            {
+                return cbMat;
+            }
+
+            case CR_THRESH_1:
+            {
+                return crMatThresh1;
+            }
+
+            case CR_THRESH_2:
+            {
+                return crMatThresh2;
             }
 
             case CR_THRESH:
@@ -329,6 +312,11 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
                 return crMatThresh;
             }
 
+            case CB_THRESH:
+            {
+                return cbMatThresh;
+            }
+
             case THRESHOLD:
             {
                 return thresholdMat;
@@ -338,9 +326,15 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
             {
                 return contoursMat;
             }
+
+            case RAW_IMAGE:
+            {
+                return input;
+            }
+
             default:
             {
-                return contoursMat;
+                return input;
             }
         }
 
