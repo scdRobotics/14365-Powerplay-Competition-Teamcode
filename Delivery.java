@@ -76,7 +76,7 @@ public class Delivery extends Subsystem {
             return 2900;
         }
         else if(idx==3){
-            return 4000;
+            return 3800;
         }
 
         return 0;

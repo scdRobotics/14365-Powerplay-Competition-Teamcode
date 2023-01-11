@@ -49,7 +49,7 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
                 })
 
-                .lineTo(new Vector2d(36, 5))
+                .lineTo(new Vector2d(36, 4))
 
                 .lineToLinearHeading(new Pose2d(36, 12, Math.toRadians(225)))
 
@@ -100,7 +100,7 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
         else{
             //Continue with normal version
 
-            Vector2d highPole = new Vector2d(24, 0); //X and Y of high pole we stack on
+            //Vector2d highPole = new Vector2d(24, 0); //X and Y of high pole we stack on
 
             //double dTheta = vision.findClosePoleDTheta();
             TrajectorySequence turnToPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
@@ -112,36 +112,89 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
             double distToPole = sensors.getFrontDist();
             if(distToPole>20){
-                distToPole=5;
+                distToPole=6;
             }
             TrajectorySequence dropPolePickupNewCone = robot.drive.trajectorySequenceBuilder(turnToPole.end())
-                    .forward(distToPole-0.5)
+                    .forward(distToPole)
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
-                        telemetry.addData("Drive into pole traj sequence done! ", "");
-                        telemetry.update();
-
-                        robot.pause(1);
-
                         delivery.openGripper();
-
-                        telemetry.addData("Gripper opened! ", "");
-                        telemetry.update();
-
-                        robot.pause(1);
 
 
                     })
 
-                    .lineToLinearHeading(new Pose2d(36, 12, Math.toRadians(0)))
+                    .lineToConstantHeading(new Vector2d(30, 13))
 
-                    //TODO: Program trajectory for picking up new cone and returning to same spot as approachPole.end()
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        delivery.slidePickupStack();
+                    })
+
+                    .turn(Math.toRadians(135))
+
+                    .lineToConstantHeading(new Vector2d(68, 13))
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        //robot.pause(1);
+
+                        delivery.closeGripper();
+
+                        //robot.pause(1);
+
+
+
+                    })
+
+                    .lineTo(new Vector2d(67, 13))
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        delivery.slideHigh();
+                    })
+
+
+
+                    .lineTo(new Vector2d(36, 13))
+
+                    .turn(Math.toRadians(-135))
+
 
                     .build();
 
 
+
             robot.drive.followTrajectorySequence(dropPolePickupNewCone);
+
+            //double dTheta2 = vision.findClosePoleDTheta();
+
+            TrajectorySequence turnToPole2 = robot.drive.trajectorySequenceBuilder(approachPole.end())
+                    //.turn(dTheta2)
+                    .turn(Math.toRadians(1))
+                    .build();
+
+            robot.drive.followTrajectorySequence(turnToPole2);
+
+            double distToPole2 = sensors.getFrontDist();
+            if(distToPole2>20){
+                distToPole2=6;
+            }
+
+            TrajectorySequence dropLastCone = robot.drive.trajectorySequenceBuilder(dropPolePickupNewCone.end())
+                    .forward(distToPole2)
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+
+                        delivery.openGripper();
+
+
+                    })
+
+                    .lineToConstantHeading(new Vector2d(30, 12))
+
+                    .build();
+
+            robot.drive.followTrajectorySequence(dropLastCone);
+
+
 
             /*double dTheta2 = vision.findClosePoleDTheta();
             TrajectorySequence turnToPole2 = robot.drive.trajectorySequenceBuilder(dropPolePickupNewCone.end())
