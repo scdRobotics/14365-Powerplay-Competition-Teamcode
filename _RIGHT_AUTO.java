@@ -2,18 +2,14 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 
-import java.util.concurrent.atomic.AtomicReference;
-
-@Autonomous(name="BLUE_RIGHT_AUTO", group="Autonomous")
-public class _BLUE_LEFT_AUTO extends LinearOpMode {
+@Autonomous(name="BR_RL_AUTO", group="Autonomous")
+public class _RIGHT_AUTO extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -32,7 +28,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
-        Pose2d startPose = new Pose2d(36, 63.5, Math.toRadians(270));
+        Pose2d startPose = new Pose2d(-36, 63.5, Math.toRadians(270));
 
         robot.drive.setPoseEstimate(startPose);
 
@@ -49,9 +45,9 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
                 })
 
-                .lineTo(new Vector2d(36, 4))
+                .lineTo(new Vector2d(-36, 4))
 
-                .lineToLinearHeading(new Pose2d(36, 12, Math.toRadians(225)))
+                .lineToLinearHeading(new Pose2d(-36, 12, Math.toRadians(315)))
 
                 .build();
 
@@ -88,7 +84,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
             TrajectorySequence altTraj = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
 
-                    .lineToLinearHeading(new Pose2d(36, 39.5, Math.toRadians(270)))
+                    .lineToLinearHeading(new Pose2d(-36, 39.5, Math.toRadians(270)))
 
                     .build();
 
@@ -104,7 +100,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
             //double dTheta = vision.findClosePoleDTheta();
             TrajectorySequence turnToPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
                     //.turn(dTheta)
-                    .turn(Math.toRadians(1))
+                    .turn(Math.toRadians(-1))
                     .build();
 
             robot.drive.followTrajectorySequence(turnToPole);
@@ -123,15 +119,15 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineToConstantHeading(new Vector2d(30, 13))
+                    .lineToConstantHeading(new Vector2d(-30, 13))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         delivery.slidePickupStack();
                     })
 
-                    .turn(Math.toRadians(135))
+                    .turn(Math.toRadians(-135))
 
-                    .lineToConstantHeading(new Vector2d(68, 13))
+                    .lineToConstantHeading(new Vector2d(-68, 13))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         //robot.pause(1);
@@ -144,7 +140,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineTo(new Vector2d(67, 13))
+                    .lineTo(new Vector2d(-67, 13))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         delivery.slideHigh();
@@ -152,9 +148,9 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
 
 
-                    .lineTo(new Vector2d(36, 13))
+                    .lineTo(new Vector2d(-36, 13))
 
-                    .turn(Math.toRadians(-135))
+                    .turn(Math.toRadians(135))
 
 
                     .build();
@@ -167,7 +163,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
             TrajectorySequence turnToPole2 = robot.drive.trajectorySequenceBuilder(approachPole.end())
                     //.turn(dTheta2)
-                    .turn(Math.toRadians(1))
+                    .turn(Math.toRadians(-1))
                     .build();
 
             robot.drive.followTrajectorySequence(turnToPole2);
@@ -187,7 +183,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineToConstantHeading(new Vector2d(30, 13))
+                    .lineToConstantHeading(new Vector2d(-30, 13))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
@@ -197,7 +193,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
 
 
-                    .turn(Math.toRadians(135))
+                    .turn(Math.toRadians(-135))
 
                     .build();
 
@@ -211,7 +207,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
             if(park==2){
                 TrajectorySequence park2 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(36, 13))
+                        .lineToConstantHeading(new Vector2d(-36, 13))
 
                         .build();
 
@@ -223,7 +219,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
             else if(park==3){
                 TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(12, 13))
+                        .lineToConstantHeading(new Vector2d(-60, 13))
 
                         .build();
 
@@ -235,7 +231,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
             else{
                 TrajectorySequence park1 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(60, 13))
+                        .lineToConstantHeading(new Vector2d(-12, 13))
 
                         .build();
 

@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 
-@TeleOp(name = "BLUE_GRID_TELEOP", group = "TeleOp")
+@TeleOp(name = "RED_GRID_TELEOP", group = "TeleOp")
 public class _RED_GRID_TELEOP extends LinearOpMode {
 
     @Override
