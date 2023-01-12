@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 
-@TeleOp(name = "SIMPLE_BLUE_GRID_TELEOP", group = "TeleOp")
-public class SIMPLE_BLUE_GRID_TELEOP extends LinearOpMode {
+@TeleOp(name = "BLUE_GRID_TELEOP", group = "TeleOp")
+public class _BLUE_GRID_TELEOP extends LinearOpMode {
 
     @Override
     public void runOpMode(){
@@ -23,7 +23,7 @@ public class SIMPLE_BLUE_GRID_TELEOP extends LinearOpMode {
 
         double slow = 1;
 
-        double slidePos = 0;
+        double slidePos = 500;
 
         boolean dpadUpHeld = false;
 
@@ -35,14 +35,67 @@ public class SIMPLE_BLUE_GRID_TELEOP extends LinearOpMode {
 
         int slidePosIdx = 0; //0 = bottom, 1 = low, 2 = med, 3 = high
 
+        TrajectorySequence forwardGrid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                .forward(24)
+
+                .build();
+
+        TrajectorySequence backwardGrid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                .forward(-24)
+
+                .build();
+
+        TrajectorySequence strafeRightGrid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                .strafeRight(24)
+
+                .build();
+
+        TrajectorySequence strafeLeftGrid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
+
+                .strafeLeft(24)
+
+                .build();
+
+        TrajectorySequence turnLeft = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
+
+                .turn(Math.toRadians(robot.drive.getPoseEstimate().getHeading()-90))
+
+                .build();
+
+        TrajectorySequence turnRight = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
+
+                .turn(Math.toRadians(robot.drive.getPoseEstimate().getHeading()+90))
+
+                .build();
 
 
 
+        TrajectorySequence upRight = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
 
+                .lineToLinearHeading(robot.drive.getPoseEstimate().minus(new Pose2d(-10, -10, Math.toRadians(225))))
 
+                .build();
 
+        TrajectorySequence upLeft = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
 
+                .lineToLinearHeading(robot.drive.getPoseEstimate().minus(new Pose2d(10, -10, Math.toRadians(315))))
 
+                .build();
+
+        TrajectorySequence downLeft = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
+
+                .lineToLinearHeading(robot.drive.getPoseEstimate().minus(new Pose2d(10, -10, Math.toRadians(45))))
+
+                .build();
+
+        TrajectorySequence downRight = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
+
+                .lineToLinearHeading(robot.drive.getPoseEstimate().minus(new Pose2d(-10, 10, Math.toRadians(135))))
+
+                .build();
 
 
         while(!isStopRequested() && opModeIsActive()){
@@ -91,57 +144,35 @@ public class SIMPLE_BLUE_GRID_TELEOP extends LinearOpMode {
             double frontRightPower = (y - x - rx) / denominator;
             double backRightPower = (y + x - rx) / denominator;
 
+
+
+
             if(!robot.drive.isBusy()){
-                if(y<0.075 || x<0.0825 || rx>0.075 || y<-0.075 || x<-0.0825 || rx<-0.075){
-                    robot.drive.setMotorPowers(frontLeftPower/slow, backLeftPower/slow, backRightPower/slow, frontRightPower/slow);
+                if(gamepad1.a){
+                    if(-y>0.15 && x>0.15){ //Flicked Up Right
+                        robot.drive.followTrajectorySequence(upRight);
+                    }
+                    else if(-y>0.15 && x<-0.15){ //Flicked Up Left
+                        robot.drive.followTrajectorySequence(upLeft);
+                    }
+                    else if(-y<-0.15 && x<-0.15){ //Flicked Down Left
+                        robot.drive.followTrajectorySequence(downLeft);
+                    }
+                    else if(-y<-0.15 && x>0.15){ //Flicked Down Right
+                        robot.drive.followTrajectorySequence(downRight);
+                    }
                 }
+
                 else{
-                    robot.drive.setMotorPowers(0,0,0,0);
+                    //TODO: Disable follower & heading PID here.
+                    if(-y>0.075 || x>0.0825 || rx>0.075 || -y<-0.075 || x<-0.0825 || rx<-0.075){
+                        robot.drive.setMotorPowers(frontLeftPower/slow, backLeftPower/slow, backRightPower/slow, frontRightPower/slow);
+                    }
+                    else{
+                        robot.drive.setMotorPowers(0,0,0,0);
+                    }
                 }
             }
-
-
-            robot.drive.update();
-
-            TrajectorySequence forwardGrid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
-
-                    .forward(24)
-
-                    .build();
-
-            TrajectorySequence backwardGrid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
-
-                    .forward(-24)
-
-                    .build();
-
-            TrajectorySequence strafeRightGrid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
-
-                    .strafeRight(24)
-
-                    .build();
-
-            TrajectorySequence strafeLeftGrid = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate()) //TODO: Make sure we have some way to make getPoseEstimate accurate between switching modes and between auto & teleop
-
-                    .strafeLeft(24)
-
-                    .build();
-
-            TrajectorySequence turnLeft = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
-
-                    .turn(Math.toRadians(robot.drive.getPoseEstimate().getHeading()-90))
-
-                    .build();
-
-            TrajectorySequence turnRight = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
-
-                    .turn(Math.toRadians(robot.drive.getPoseEstimate().getHeading()+90))
-
-                    .build();
-
-
-
-
 
             if(gamepad1.dpad_up){
                 robot.drive.followTrajectorySequence(forwardGrid);
@@ -162,6 +193,22 @@ public class SIMPLE_BLUE_GRID_TELEOP extends LinearOpMode {
             else if(gamepad1.x){
                 robot.drive.followTrajectorySequence(turnLeft);
             }
+
+
+            if(gamepad1.y){
+                robot.drive.setPoseEstimate(new Pose2d(0,0,0));
+                robot.drive.breakFollowing();
+                robot.drive.setDrivePower(new Pose2d());
+            }
+
+
+            robot.drive.update();
+
+
+
+
+
+
 
 
 
@@ -202,6 +249,12 @@ public class SIMPLE_BLUE_GRID_TELEOP extends LinearOpMode {
             }
             else{
                 delivery.runGripper(0);
+            }
+
+            if(gamepad2.y){ //Reset button
+                slidePos=0;
+                slidePosIdx=0;
+                delivery.resetEncoders();
             }
 
 

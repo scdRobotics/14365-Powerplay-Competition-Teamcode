@@ -76,14 +76,14 @@ public class Delivery extends Subsystem {
             return 2900;
         }
         else if(idx==3){
-            return 3800;
+            return 4000;
         }
 
         return 0;
     }
 
     public void slideHigh(){
-        slide.setTargetPosition(4250);
+        slide.setTargetPosition(4000);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide.setPower(0.65);
     }

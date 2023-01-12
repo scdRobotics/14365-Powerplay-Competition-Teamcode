@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -11,11 +12,11 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Autonomous(name="SIMPLE_BLUE_RIGHT_AUTO", group="Autonomous")
-public class SIMPLE_BLUE_RIGHT_AUTO extends LinearOpMode {
+@Disabled
+public class Z_OLD_BLUE_LEFT_AUTO extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
 
 
 

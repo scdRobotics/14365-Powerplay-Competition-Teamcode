@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuild
 import java.util.concurrent.atomic.AtomicReference;
 
 @Autonomous(name="BLUE_RIGHT_AUTO", group="Autonomous")
-public class BLUE_RIGHT_AUTO extends LinearOpMode {
+public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -98,9 +98,8 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
         }
         else{
-            //Continue with normal version
 
-            //Vector2d highPole = new Vector2d(24, 0); //X and Y of high pole we stack on
+            //Vector2d highPole = new Vector2d(24, 0); //X and Y of high pole we stack on. Compare with dTheta and dist sensor to find absolute pos from relative localizer
 
             //double dTheta = vision.findClosePoleDTheta();
             TrajectorySequence turnToPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
@@ -188,50 +187,62 @@ public class BLUE_RIGHT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineToConstantHeading(new Vector2d(30, 12))
+                    .lineToConstantHeading(new Vector2d(30, 13))
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+
+                        delivery.slidePickupStackSecond();
+
+                    })
+
+
+
+                    .turn(Math.toRadians(135))
 
                     .build();
+
+
 
             robot.drive.followTrajectorySequence(dropLastCone);
 
 
 
-            /*double dTheta2 = vision.findClosePoleDTheta();
-            TrajectorySequence turnToPole2 = robot.drive.trajectorySequenceBuilder(dropPolePickupNewCone.end())
-                    .turn(dTheta2)
-                    .build();
-            robot.drive.followTrajectorySequence(turnToPole2);
-
-            double distToPole2 = sensors.getFrontDist();
-            TrajectorySequence dropPole = robot.drive.trajectorySequenceBuilder(turnToPole2.end())
-                    .forward(distToPole2-0.5)
-                    .build();
-            robot.drive.followTrajectorySequence(dropPole);
 
             if(park==2){
-                TrajectorySequence park2 = robot.drive.trajectorySequenceBuilder(dropPole.end())
+                TrajectorySequence park2 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        //TODO: Program trajectory for parking in designated slot
+                        .lineToConstantHeading(new Vector2d(36, 13))
 
                         .build();
+
                 robot.drive.followTrajectorySequence(park2);
+
+
             }
+
             else if(park==3){
-                TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropPole.end())
+                TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        //TODO: Program trajectory for parking in designated slot
+                        .lineToConstantHeading(new Vector2d(12, 13))
 
                         .build();
+
                 robot.drive.followTrajectorySequence(park3);
-            }
-            else{
-                TrajectorySequence park1 = robot.drive.trajectorySequenceBuilder(dropPole.end())
 
-                        //TODO: Program trajectory for parking in designated slot
+
+            }
+
+            else{
+                TrajectorySequence park1 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
+
+                        .lineToConstantHeading(new Vector2d(60, 13))
 
                         .build();
+
                 robot.drive.followTrajectorySequence(park1);
-            }*/
+
+
+            }
 
         }
 
