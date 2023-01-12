@@ -26,7 +26,7 @@ import java.util.List;
 
 public class AprilTagYellowPipeline extends OpenCvPipeline {
 
-    private boolean runAprilTag;
+    private boolean runAprilTag = true;
 
     public void setRunAprilTag(boolean runAprilTag){
         this.runAprilTag=runAprilTag;

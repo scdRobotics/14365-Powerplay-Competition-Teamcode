@@ -32,13 +32,13 @@ public class VisionTest extends LinearOpMode {
         vision.activateAprilTagYellowPipelineCamera1();
         //vision.activateYellowPipelineCamera1();
 
-        vision.activateYellowPipelineCamera2();
+        //vision.activateYellowPipelineCamera2();
 
 
 
         waitForStart();
 
-        vision.runAprilTag(false);
+        //vision.runAprilTag(false);
 
         telemetry.addData("Calculate dTheta: ", vision.findClosePoleDTheta());
         telemetry.update();
@@ -46,8 +46,10 @@ public class VisionTest extends LinearOpMode {
 
 
         while(opModeIsActive() && !isStopRequested()){
-            /*telemetry.addData("April Tag ID Detected: ", vision.readAprilTagCamera1());
-            for(int i = 0; i<vision.same.size(); i++){
+
+            telemetry.addData("April Tag ID Detected: ", vision.readAprilTagCamera1());
+
+            /*for(int i = 0; i<vision.same.size(); i++){
                 telemetry.addData("Same  Value " + i + " X: ", vision.same.get(i).getX());
                 telemetry.addData("Same  Value " + i + " Y: ", vision.same.get(i).getY());
                 telemetry.addData("Same  Value " + i + " Width: ", vision.same.get(i).getWidth());

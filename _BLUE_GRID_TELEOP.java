@@ -176,22 +176,28 @@ public class _BLUE_GRID_TELEOP extends LinearOpMode {
 
             if(gamepad1.dpad_up){
                 robot.drive.followTrajectorySequence(forwardGrid);
+                robot.drive.setPoseEstimate(new Pose2d(0,0,0));
             }
             else if(gamepad1.dpad_right){
                 robot.drive.followTrajectorySequence(strafeRightGrid);
+                robot.drive.setPoseEstimate(new Pose2d(0,0,0));
             }
             else if(gamepad1.dpad_left){
                 robot.drive.followTrajectorySequence(strafeLeftGrid);
+                robot.drive.setPoseEstimate(new Pose2d(0,0,0));
             }
             else if(gamepad1.dpad_down){
                 robot.drive.followTrajectorySequence(backwardGrid);
+                robot.drive.setPoseEstimate(new Pose2d(0,0,0));
             }
 
             if(gamepad1.b){
                 robot.drive.followTrajectorySequence(turnRight);
+                robot.drive.setPoseEstimate(new Pose2d(0,0,0));
             }
             else if(gamepad1.x){
                 robot.drive.followTrajectorySequence(turnLeft);
+                robot.drive.setPoseEstimate(new Pose2d(0,0,0));
             }
 
 

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name="BR_RL_AUTO", group="Autonomous")
+@Autonomous(name="RIGHT_AUTO", group="Autonomous")
 public class _RIGHT_AUTO extends LinearOpMode {
 
     @Override
@@ -47,7 +47,7 @@ public class _RIGHT_AUTO extends LinearOpMode {
 
                 .lineTo(new Vector2d(-36, 4))
 
-                .lineToLinearHeading(new Pose2d(-36, 12, Math.toRadians(315)))
+                .lineToLinearHeading(new Pose2d(-36, 12, Math.toRadians(325))) //Was 315
 
                 .build();
 
@@ -125,7 +125,7 @@ public class _RIGHT_AUTO extends LinearOpMode {
                         delivery.slidePickupStack();
                     })
 
-                    .turn(Math.toRadians(-135))
+                    .turn(Math.toRadians(-145)) //-135
 
                     .lineToConstantHeading(new Vector2d(-68, 13))
 
@@ -150,7 +150,7 @@ public class _RIGHT_AUTO extends LinearOpMode {
 
                     .lineTo(new Vector2d(-36, 13))
 
-                    .turn(Math.toRadians(135))
+                    .turn(Math.toRadians(145)) //135
 
 
                     .build();
@@ -193,7 +193,7 @@ public class _RIGHT_AUTO extends LinearOpMode {
 
 
 
-                    .turn(Math.toRadians(-135))
+                    .turn(Math.toRadians(-145)) //-135
 
                     .build();
 

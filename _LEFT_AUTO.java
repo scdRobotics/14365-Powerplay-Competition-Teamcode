@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name="BL_RR_AUTO", group="Autonomous")
+@Autonomous(name="LEFT_AUTO", group="Autonomous")
 public class _LEFT_AUTO extends LinearOpMode {
 
     @Override
@@ -140,7 +140,7 @@ public class _LEFT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineTo(new Vector2d(67, 13))
+                    .lineTo(new Vector2d(67.5, 13))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         delivery.slideHigh();

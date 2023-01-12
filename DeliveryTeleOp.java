@@ -111,6 +111,12 @@ public class DeliveryTeleOp extends LinearOpMode {
                 delivery.runGripper(0);
             }
 
+            if(gamepad2.y){ //Reset button
+                slidePos=0;
+                slidePosIdx=0;
+                delivery.resetEncoders();
+            }
+
 
 
 
