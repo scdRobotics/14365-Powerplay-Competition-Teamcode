@@ -74,9 +74,14 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
         robot.drive.followTrajectorySequenceAsync(approachPole);
 
-        while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy() && !robotDetected){ //Should leave loop when async function is done or robot is detected
+        while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy()){ //Should leave loop when async function is done or robot is detected
 
-            if((sensors.getFrontLeftDist()<12 && sensors.getFrontLeftDist()>5) || (sensors.getFrontRightDist()<12 && sensors.getFrontRightDist()>5)){ //Meaning a robot is approaching the same direction
+            telemetry.addData("Front Left: ", sensors.getFrontLeftDist());
+            telemetry.addData("Front Right: ", sensors.getFrontRightDist());
+            telemetry.update();
+
+            if((sensors.getFrontRightDist()<10 && sensors.getFrontRightDist()>5)){ //Meaning a robot is approaching the same direction
+
                 robot.drive.breakFollowing();
                 robot.drive.setDrivePower(new Pose2d());
                 robotDetected=true;
@@ -99,14 +104,14 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
                         delivery.slideMed();
 
-                        telemetry.addData("Approach Pole Complete! ", "");
+                        telemetry.addData("Alt Traj Complete! ", "");
                         telemetry.update();
 
 
 
                     })
 
-                    .turn(-45)
+                    .turn(Math.toRadians(-45))
 
                     .build();
 
@@ -285,7 +290,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
             //double dTheta2 = vision.findClosePoleDTheta();
 
-            TrajectorySequence turnToPole2 = robot.drive.trajectorySequenceBuilder(approachPole.end())
+            TrajectorySequence turnToPole2 = robot.drive.trajectorySequenceBuilder(dropPolePickupNewCone.end())
                     //.turn(dTheta2)
                     .turn(Math.toRadians(1))
                     .build();
@@ -297,7 +302,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
                 distToPole2=6;
             }
 
-            TrajectorySequence dropLastCone = robot.drive.trajectorySequenceBuilder(dropPolePickupNewCone.end())
+            TrajectorySequence dropLastCone = robot.drive.trajectorySequenceBuilder(turnToPole2.end())
                     .forward(distToPole2)
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {

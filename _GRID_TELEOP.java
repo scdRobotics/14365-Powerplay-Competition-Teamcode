@@ -272,6 +272,13 @@ public class _GRID_TELEOP extends LinearOpMode {
 
                 case MANUAL:
 
+                    telemetry.addData("Ideal X Coord Grid: ", idealXGridCord);
+                    telemetry.addData("Ideal Y Coord Grid: ", idealYGridCord);
+                    telemetry.addData("Ideal Coord X: ", validRobotPos[idealXGridCord][idealYGridCord][0]);
+                    telemetry.addData("Ideal Coord Y: ", validRobotPos[idealXGridCord][idealYGridCord][1]);
+                    telemetry.addData("Ideal Heading: ", validRobotPos[idealXGridCord][idealYGridCord][1]);
+                    telemetry.update();
+
                     Pose2d poseEstimate = robot.drive.getPoseEstimate();
 
                     if(gamepad1.dpad_up){
@@ -428,8 +435,8 @@ public class _GRID_TELEOP extends LinearOpMode {
                         //MANUAL movements
                         robot.drive.setWeightedDrivePower(
                                 new Pose2d(
-                                        -gamepad1.left_stick_x/slow,
-                                        gamepad1.left_stick_y/slow,
+                                        -gamepad1.left_stick_y/slow,
+                                        gamepad1.left_stick_x/slow,
                                         -gamepad1.right_stick_x/slow
                                 )
                         );
