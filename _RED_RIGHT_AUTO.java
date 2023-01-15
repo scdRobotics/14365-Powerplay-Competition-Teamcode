@@ -24,7 +24,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
         delivery.initEncoders();
 
-        vision.activateAprilTagYellowPipelineCamera1();
+        //vision.activateAprilTagYellowPipelineCamera1();
 
         vision.activateYellowPipelineCamera2();
 
@@ -53,7 +53,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
         TrajectorySequence alignPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
 
-                .lineToLinearHeading(new Pose2d(36, -12, Math.toRadians(135)))
+                .lineToLinearHeading(new Pose2d(36, -15, Math.toRadians(135)))
 
                 .build();
 
@@ -121,9 +121,9 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
             robot.drive.followTrajectorySequence(turnToPole);
 
-            double distToPole = sensors.getFrontDist();
-            if(distToPole>20){
-                distToPole=6;
+            double distToPole = sensors.getFrontDist() - 1;
+            if(distToPole>12){
+                distToPole=7.5;
             }
 
             TrajectorySequence dropPoleMid = robot.drive.trajectorySequenceBuilder(turnToPole.end())
@@ -230,8 +230,8 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
             robot.drive.followTrajectorySequence(turnToPole);
 
             double distToPole = sensors.getFrontDist();
-            if(distToPole>20){
-                distToPole=6;
+            if(distToPole>12){
+                distToPole=7.5;
             }
             TrajectorySequence dropPolePickupNewCone = robot.drive.trajectorySequenceBuilder(turnToPole.end())
                     .forward(distToPole)
@@ -243,7 +243,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineToConstantHeading(new Vector2d(30, -13))
+                    .lineToConstantHeading(new Vector2d(30, -15))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         delivery.slidePickupStack();
@@ -251,7 +251,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                     .turn(Math.toRadians(-135))
 
-                    .lineToConstantHeading(new Vector2d(68, -13))
+                    .lineToConstantHeading(new Vector2d(65, -15))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         //robot.pause(1);
@@ -264,7 +264,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineTo(new Vector2d(67.5, -13))
+                    .lineTo(new Vector2d(64.5, -15))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         delivery.slideHigh();
@@ -272,13 +272,12 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
 
 
-                    .lineTo(new Vector2d(36, -13))
+                    .lineTo(new Vector2d(36, -15))
 
                     .turn(Math.toRadians(135))
 
 
                     .build();
-
 
 
             robot.drive.followTrajectorySequence(dropPolePickupNewCone);
@@ -293,8 +292,8 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
             robot.drive.followTrajectorySequence(turnToPole2);
 
             double distToPole2 = sensors.getFrontDist();
-            if(distToPole2>20){
-                distToPole2=6;
+            if(distToPole2>12){
+                distToPole2=8.25;
             }
 
             TrajectorySequence dropLastCone = robot.drive.trajectorySequenceBuilder(turnToPole2.end())
@@ -307,7 +306,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineToConstantHeading(new Vector2d(30, -13))
+                    .lineToConstantHeading(new Vector2d(30, -15))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
@@ -331,7 +330,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
             if(park==2){
                 TrajectorySequence park2 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(36, -13))
+                        .lineToConstantHeading(new Vector2d(36, -15))
 
                         .build();
 
@@ -342,10 +341,10 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
             }
 
-            else if(park==3){
+            else if(park==1){
                 TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(12, -13))
+                        .lineToConstantHeading(new Vector2d(12, -15))
 
                         .build();
 
@@ -359,7 +358,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
             else{
                 TrajectorySequence park1 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(60, -13))
+                        .lineToConstantHeading(new Vector2d(60, -15))
 
                         .build();
 

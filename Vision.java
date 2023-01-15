@@ -82,7 +82,7 @@ public class Vision extends Subsystem {
     }
 
     public void activateYellowPipelineCamera2(){
-        webcam2.setPipeline(yellowPipeline);
+        webcam2.setPipeline(aprilTagYellowPipeline);
         webcam2.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override
