@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.BLUE_ALIGN_POLE_ANGLE;
-import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.BLUE_START_ANGLE;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.ALIGN_POLE_ANGLE;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.CONE_STACK_TURN_TOWARD_ANGLE;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.CONE_STACK_X;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.CONE_STACK_X_BACKUP;
@@ -18,11 +17,11 @@ import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_POLE_DISTANCE_
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_POLE_DISTANCE_UPPER_LIMIT;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_ROBOT_DISTANCE_LOWER_LIMIT;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_ROBOT_DISTANCE_UPPER_LIMIT;
-import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_1_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_1_X_LEFT;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_1_Y;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_2_X;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_2_Y;
-import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_3_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_3_X_LEFT;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_3_Y;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_ALIGN_POLE_X;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_ALIGN_POLE_Y;
@@ -31,6 +30,7 @@ import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_BACK_OFF_FROM
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_POLE_DEFAULT_TRAVEL_DIST;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_POLE_DISTANCE_SUBTRACTIVE_MODIFIER;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_POLE_DISTANCE_UPPER_LIMIT;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.START_ANGLE;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.START_X;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.START_Y;
 
@@ -64,7 +64,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
-        Pose2d startPose = new Pose2d(START_X, START_Y, Math.toRadians(BLUE_START_ANGLE));
+        Pose2d startPose = new Pose2d(START_X, START_Y, Math.toRadians(START_ANGLE));
 
         robot.drive.setPoseEstimate(startPose);
 
@@ -87,7 +87,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
         TrajectorySequence alignPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
 
-                .lineToLinearHeading(new Pose2d(FIRST_ALIGN_POLE_X, FIRST_ALIGN_POLE_Y, Math.toRadians(BLUE_ALIGN_POLE_ANGLE)))
+                .lineToLinearHeading(new Pose2d(FIRST_ALIGN_POLE_X, FIRST_ALIGN_POLE_Y, Math.toRadians(ALIGN_POLE_ANGLE)))
 
                 .build();
 
@@ -381,7 +381,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
             else if(park==3){
                 TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(PARK_3_X, PARK_3_Y))
+                        .lineToConstantHeading(new Vector2d(PARK_3_X_LEFT, PARK_3_Y))
 
                         .build();
 
@@ -398,7 +398,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
             else{
                 TrajectorySequence park1 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(PARK_1_X, PARK_1_Y))
+                        .lineToConstantHeading(new Vector2d(PARK_1_X_LEFT, PARK_1_Y))
 
                         .build();
 

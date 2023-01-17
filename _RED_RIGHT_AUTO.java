@@ -1,5 +1,39 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.ALIGN_POLE_ANGLE;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.CONE_STACK_TURN_TOWARD_ANGLE;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.CONE_STACK_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.CONE_STACK_X_BACKUP;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.CONE_STACK_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.CONE_STACK_Y_BACKUP;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_ALIGN_POLE_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_ALIGN_POLE_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_APPROACH_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_APPROACH_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_BACK_OFF_FROM_POLE_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_BACK_OFF_FROM_POLE_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_POLE_DEFAULT_TRAVEL_DIST;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_POLE_DISTANCE_SUBTRACTIVE_MODIFIER;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_POLE_DISTANCE_UPPER_LIMIT;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_ROBOT_DISTANCE_LOWER_LIMIT;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.FIRST_ROBOT_DISTANCE_UPPER_LIMIT;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_1_X_RIGHT;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_1_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_2_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_2_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_3_X_RIGHT;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_3_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_ALIGN_POLE_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_ALIGN_POLE_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_BACK_OFF_FROM_POLE_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_BACK_OFF_FROM_POLE_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_POLE_DEFAULT_TRAVEL_DIST;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_POLE_DISTANCE_SUBTRACTIVE_MODIFIER;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_POLE_DISTANCE_UPPER_LIMIT;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.START_ANGLE;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.START_X;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.START_Y;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -30,7 +64,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
-        Pose2d startPose = new Pose2d(36, -63.5, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(START_X, -START_Y, Math.toRadians(START_ANGLE-180));
 
         robot.drive.setPoseEstimate(startPose);
 
@@ -44,7 +78,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                 })
 
-                .lineTo(new Vector2d(36, -4))
+                .lineTo(new Vector2d(FIRST_APPROACH_X, -FIRST_APPROACH_Y))
 
 
 
@@ -53,15 +87,13 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
         TrajectorySequence alignPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
 
-                .lineToLinearHeading(new Pose2d(36, -15, Math.toRadians(135)))
+                .lineToLinearHeading(new Pose2d(FIRST_ALIGN_POLE_X, -FIRST_ALIGN_POLE_Y, Math.toRadians(ALIGN_POLE_ANGLE)))
 
                 .build();
 
         delivery.closeGripper();
 
         waitForStart();
-
-        PoseTransfer.alliance = "RED";
 
         int park = vision.readAprilTagCamera1() + 1;
 
@@ -76,7 +108,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy() && !robotDetected){ //Should leave loop when async function is done or robot is detected
 
-            if((sensors.getFrontRightDist()<10 && sensors.getFrontRightDist()>5)){ //Meaning a robot is approaching the same direction
+            if((sensors.getFrontRightDist()<FIRST_ROBOT_DISTANCE_UPPER_LIMIT && sensors.getFrontRightDist()>FIRST_ROBOT_DISTANCE_LOWER_LIMIT) || (sensors.getFrontLeftDist()<FIRST_ROBOT_DISTANCE_UPPER_LIMIT && sensors.getFrontLeftDist()>FIRST_ROBOT_DISTANCE_LOWER_LIMIT)){ //Meaning a robot is approaching the same direction
                 robot.drive.breakFollowing();
                 robot.drive.setDrivePower(new Pose2d());
                 robotDetected=true;
@@ -88,6 +120,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
         }
 
+        //TODO: Update AUTO_CONSTANTS for Alternate Pathing Values
         if(robotDetected){
             //Run alt version of program (go for middle 4 point)
 
@@ -157,8 +190,6 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                 robot.drive.followTrajectorySequence(park2);
 
-                PoseTransfer.park=2;
-
 
             }
 
@@ -170,8 +201,6 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
                         .build();
 
                 robot.drive.followTrajectorySequence(park3);
-
-                PoseTransfer.park=3;
 
 
             }
@@ -185,12 +214,8 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                 robot.drive.followTrajectorySequence(park1);
 
-                PoseTransfer.park=1;
-
 
             }
-
-            PoseTransfer.alt=true;
 
 
         }
@@ -229,9 +254,9 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
             robot.drive.followTrajectorySequence(turnToPole);
 
-            double distToPole = sensors.getFrontDist();
-            if(distToPole>12){
-                distToPole=7.5;
+            double distToPole = sensors.getFrontDist() - FIRST_POLE_DISTANCE_SUBTRACTIVE_MODIFIER;
+            if(distToPole>FIRST_POLE_DISTANCE_UPPER_LIMIT){
+                distToPole=FIRST_POLE_DEFAULT_TRAVEL_DIST;
             }
             TrajectorySequence dropPolePickupNewCone = robot.drive.trajectorySequenceBuilder(turnToPole.end())
                     .forward(distToPole)
@@ -243,15 +268,15 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineToConstantHeading(new Vector2d(30, -15))
+                    .lineToConstantHeading(new Vector2d(FIRST_BACK_OFF_FROM_POLE_X, -FIRST_BACK_OFF_FROM_POLE_Y))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         delivery.slidePickupStack();
                     })
 
-                    .turn(Math.toRadians(-135))
+                    .turn(Math.toRadians(-CONE_STACK_TURN_TOWARD_ANGLE))
 
-                    .lineToConstantHeading(new Vector2d(65, -15))
+                    .lineToConstantHeading(new Vector2d(CONE_STACK_X, -CONE_STACK_Y))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         //robot.pause(1);
@@ -264,7 +289,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineTo(new Vector2d(64.5, -15))
+                    .lineTo(new Vector2d(CONE_STACK_X_BACKUP, -CONE_STACK_Y_BACKUP))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         delivery.slideHigh();
@@ -272,9 +297,9 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
 
 
-                    .lineTo(new Vector2d(36, -15))
+                    .lineTo(new Vector2d(SECOND_ALIGN_POLE_X, -SECOND_ALIGN_POLE_Y))
 
-                    .turn(Math.toRadians(135))
+                    .turn(Math.toRadians(CONE_STACK_TURN_TOWARD_ANGLE))
 
 
                     .build();
@@ -291,9 +316,9 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
             robot.drive.followTrajectorySequence(turnToPole2);
 
-            double distToPole2 = sensors.getFrontDist();
-            if(distToPole2>12){
-                distToPole2=8.25;
+            double distToPole2 = sensors.getFrontDist() - SECOND_POLE_DISTANCE_SUBTRACTIVE_MODIFIER;
+            if(distToPole2>SECOND_POLE_DISTANCE_UPPER_LIMIT){
+                distToPole2=SECOND_POLE_DEFAULT_TRAVEL_DIST;
             }
 
             TrajectorySequence dropLastCone = robot.drive.trajectorySequenceBuilder(turnToPole2.end())
@@ -306,7 +331,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
                     })
 
-                    .lineToConstantHeading(new Vector2d(30, -15))
+                    .lineToConstantHeading(new Vector2d(SECOND_BACK_OFF_FROM_POLE_X, -SECOND_BACK_OFF_FROM_POLE_Y))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
@@ -316,7 +341,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
 
 
-                    .turn(Math.toRadians(-135))
+                    .turn(Math.toRadians(-CONE_STACK_TURN_TOWARD_ANGLE))
 
                     .build();
 
@@ -330,46 +355,50 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
             if(park==2){
                 TrajectorySequence park2 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(36, -15))
+                        .lineToConstantHeading(new Vector2d(PARK_2_X, -PARK_2_Y))
 
                         .build();
 
                 robot.drive.followTrajectorySequence(park2);
 
-                PoseTransfer.park=2;
-
+                //TODO: Fill with real values
+                PoseTransfer.idealGridCoordX=0;
+                PoseTransfer.idealGridCoordY=0;
+                PoseTransfer.idealGridAngle=0;
 
             }
 
             else if(park==1){
-                TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
-
-                        .lineToConstantHeading(new Vector2d(12, -15))
-
-                        .build();
-
-                robot.drive.followTrajectorySequence(park3);
-
-                PoseTransfer.park=3;
-
-
-            }
-
-            else{
                 TrajectorySequence park1 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
 
-                        .lineToConstantHeading(new Vector2d(60, -15))
+                        .lineToConstantHeading(new Vector2d(PARK_1_X_RIGHT, -PARK_1_Y))
 
                         .build();
 
                 robot.drive.followTrajectorySequence(park1);
 
-                PoseTransfer.park=1;
-
+                //TODO: Fill with real values
+                PoseTransfer.idealGridCoordX=0;
+                PoseTransfer.idealGridCoordY=0;
+                PoseTransfer.idealGridAngle=0;
 
             }
 
-            PoseTransfer.alt=false;
+            else{
+                TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
+
+                        .lineToConstantHeading(new Vector2d(PARK_3_X_RIGHT, -PARK_3_Y))
+
+                        .build();
+
+                robot.drive.followTrajectorySequence(park3);
+
+                //TODO: Fill with real values
+                PoseTransfer.idealGridCoordX=0;
+                PoseTransfer.idealGridCoordY=0;
+                PoseTransfer.idealGridAngle=0;
+
+            }
 
         }
 

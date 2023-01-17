@@ -32,13 +32,15 @@ public class AUTO_CONSTANTS {
     public static final double SECOND_BACK_OFF_FROM_POLE_X = 30;
     public static final double SECOND_BACK_OFF_FROM_POLE_Y = 15;
 
-    public static final double PARK_1_X = 60;
+    public static final double PARK_1_X_LEFT = 60;
+    public static final double PARK_1_X_RIGHT = 12;
     public static final double PARK_1_Y = 15;
 
     public static final double PARK_2_X = 36;
     public static final double PARK_2_Y = 15;
 
-    public static final double PARK_3_X = 12;
+    public static final double PARK_3_X_LEFT = 12;
+    public static final double PARK_3_X_RIGHT = 60;
     public static final double PARK_3_Y = 15;
 
 
@@ -47,9 +49,9 @@ public class AUTO_CONSTANTS {
     BASIC ANGLES (CHANGE BASED ON ALLIANCE, HERE IT'S FOR BLUE; -180 FOR RED, NEEDS TESTING)
      */
 
-    public static final double BLUE_START_ANGLE = 270;
+    public static final double START_ANGLE = 270;
 
-    public static final double BLUE_ALIGN_POLE_ANGLE = 335;
+    public static final double ALIGN_POLE_ANGLE = 315;
 
     public static final double CONE_STACK_TURN_TOWARD_ANGLE = 135;
 

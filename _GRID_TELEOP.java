@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.PoseTransfer.alt;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -25,8 +23,6 @@ public class _GRID_TELEOP extends LinearOpMode {
     int idealXGridCord = 0;
     int idealYGridCord = 0;
 
-    double idealAngle = PoseTransfer.currentPose.getHeading();
-
 
     MODE currentMode = MODE.AUTO;
 
@@ -43,164 +39,17 @@ public class _GRID_TELEOP extends LinearOpMode {
         //0,5 = Red left corner square
         //5,5 = Red right corner square
 
-        int[][][] validRobotPos = new int[6][6][2];
+        int idealGridCoordX = PoseTransfer.idealGridCoordX;
 
-        for(int i = 0; i< validRobotPos.length; i++){
-            for(int j = 0; j< validRobotPos.length; j++){
-                validRobotPos[i][j][0]= ((i*24) + 12) - 72;
-                validRobotPos[i][j][1]= ((i*24) + 12) - 72;
-            }
-        }
+        int idealGridCoordY = PoseTransfer.idealGridCoordY;
 
-        Pose2d idealPose = new Pose2d(0 , 0, Math.toRadians(idealAngle));
-
+        int[] validRobotPosConversion = new int[6];
 
         //TODO: Use new (much simpler) PoseTransfer.java to transfer valid coordinates from auto to teleop
-        if(PoseTransfer.alliance=="BLUE" && PoseTransfer.currentPose.getX()>0){
-            if(!PoseTransfer.alt){
-                switch(PoseTransfer.park){
-                    case 1:
-                        idealXGridCord = 5;
-                        idealYGridCord = 2;
-                        idealPose=new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 2:
-                        idealXGridCord = 4;
-                        idealYGridCord = 2;
-                        idealPose=new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 3:
-                        idealXGridCord = 3;
-                        idealYGridCord = 2;
-                        idealPose=new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                }
-            }
-            else{
-                switch(PoseTransfer.park) {
-                    case 1:
-                        idealXGridCord = 5;
-                        idealYGridCord = 1;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 2:
-                        idealXGridCord = 4;
-                        idealYGridCord = 1;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 3:
-                        idealXGridCord = 3;
-                        idealYGridCord = 1;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                }
-            }
-        }
-        else if(PoseTransfer.alliance=="BLUE" && PoseTransfer.currentPose.getX()<0){
-            if(!PoseTransfer.alt){
-                switch(PoseTransfer.park){
-                    case 1:
-                        idealXGridCord = 3;
-                        idealYGridCord = 2;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 2:
-                        idealXGridCord = 2;
-                        idealYGridCord = 2;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 3:
-                        idealXGridCord = 0;
-                        idealYGridCord = 2;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                }
-            }
-        }
+        Pose2d idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(0));
 
 
 
-        else if(PoseTransfer.alliance=="RED" && PoseTransfer.currentPose.getX()>0){
-            if(!PoseTransfer.alt){
-                switch(PoseTransfer.park){
-                    case 1:
-                        idealXGridCord = 3;
-                        idealYGridCord = 3;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 2:
-                        idealXGridCord = 4;
-                        idealYGridCord = 3;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 3:
-                        idealXGridCord = 5;
-                        idealYGridCord = 3;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                }
-            }
-            else{
-                switch(PoseTransfer.park) {
-                    case 1:
-                        idealXGridCord = 3;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 2:
-                        idealXGridCord = 4;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 3:
-                        idealXGridCord = 5;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                }
-            }
-        }
-
-        else if(PoseTransfer.alliance=="RED" && PoseTransfer.currentPose.getX()<0){
-            if(!PoseTransfer.alt) {
-                switch (PoseTransfer.park) {
-                    case 1:
-                        idealXGridCord = 0;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 2:
-                        idealXGridCord = 1;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 3:
-                        idealXGridCord = 2;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                }
-            }
-            else{
-                switch (PoseTransfer.park) {
-                    case 1:
-                        idealXGridCord = 0;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 2:
-                        idealXGridCord = 1;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                    case 3:
-                        idealXGridCord = 2;
-                        idealYGridCord = 4;
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
-                        break;
-                }
-            }
-        }
 
 
         ElapsedTime timer = new ElapsedTime();
