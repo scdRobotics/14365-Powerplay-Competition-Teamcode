@@ -45,6 +45,14 @@ public class Delivery extends Subsystem {
         //lazySusan.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
+    public void initEncodersNoReset(){
+        //slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide.setTargetPositionTolerance(50);
+        slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //lazySusan.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
     public void runSlide(int pos, double power){
         slide.setTargetPosition(pos);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -83,7 +91,13 @@ public class Delivery extends Subsystem {
     }
 
     public void slideHigh(){
-        slide.setTargetPosition(4000);
+        slide.setTargetPosition(3900);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setPower(0.65);
+    }
+
+    public void slideMed(){
+        slide.setTargetPosition(2700);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide.setPower(0.65);
     }

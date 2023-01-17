@@ -41,7 +41,7 @@ public class DeliveryTeleOp extends LinearOpMode {
             double rx = gamepad1.right_stick_x;
 
             if(gamepad1.left_bumper && (rx>0.1 || rx<-0.1)){
-                slow=5;
+                slow=3;
             }
             else if(gamepad1.left_bumper && (y>0.1 || x>0.1 || y<-0.1 || x<-0.1)){
                 slow=2;
