@@ -55,7 +55,7 @@ public class _GRID_TELEOP extends LinearOpMode {
         Pose2d idealPose = new Pose2d(0 , 0, Math.toRadians(idealAngle));
 
 
-
+        //TODO: Use new (much simpler) PoseTransfer.java to transfer valid coordinates from auto to teleop
         if(PoseTransfer.alliance=="BLUE" && PoseTransfer.currentPose.getX()>0){
             if(!PoseTransfer.alt){
                 switch(PoseTransfer.park){
