@@ -20,8 +20,11 @@ public class _GRID_TELEOP extends LinearOpMode {
         AUTO
     }
 
-    int idealXGridCord = 0;
-    int idealYGridCord = 0;
+    int idealGridCoordX = PoseTransfer.idealGridCoordX;
+
+    int idealGridCoordY = PoseTransfer.idealGridCoordY;
+
+    double idealGridAngle = PoseTransfer.idealGridAngle;
 
 
     MODE currentMode = MODE.AUTO;
@@ -29,28 +32,21 @@ public class _GRID_TELEOP extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-
-
-
-
-
         //0,0 = Blue right corner square
         //0,5 = Blue left corner square
         //0,5 = Red left corner square
         //5,5 = Red right corner square
 
-        int idealGridCoordX = PoseTransfer.idealGridCoordX;
-
-        int idealGridCoordY = PoseTransfer.idealGridCoordY;
-
-        int[] validRobotPosConversion = new int[6];
-
-        //TODO: Use new (much simpler) PoseTransfer.java to transfer valid coordinates from auto to teleop
-        Pose2d idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(0));
 
 
+        int[] validRobotPosConversion = new int[6];;
+
+        for(int i = 0; i< validRobotPosConversion.length; i++){
+            validRobotPosConversion[i]= ((i*24) + 12) - 72;
+        }
 
 
+        Pose2d idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle));
 
         ElapsedTime timer = new ElapsedTime();
         Robot robot = new Robot(this, hardwareMap, telemetry, timer, false);
@@ -109,7 +105,7 @@ public class _GRID_TELEOP extends LinearOpMode {
                     }
 
                     if(!robot.drive.isBusy()){
-                        robot.drive.setPoseEstimate(idealPose);
+                        robot.drive.setPoseEstimate(robot.drive.getPoseEstimate());
                         currentMode= MODE.MANUAL;
                     }
 
@@ -120,26 +116,22 @@ public class _GRID_TELEOP extends LinearOpMode {
 
                 case MANUAL:
 
-                    telemetry.addData("Ideal X Coord Grid: ", idealXGridCord);
-                    telemetry.addData("Ideal Y Coord Grid: ", idealYGridCord);
-                    telemetry.addData("Ideal Coord X: ", validRobotPos[idealXGridCord][idealYGridCord][0]);
-                    telemetry.addData("Ideal Coord Y: ", validRobotPos[idealXGridCord][idealYGridCord][1]);
-                    telemetry.addData("Ideal Heading: ", validRobotPos[idealXGridCord][idealYGridCord][1]);
+                    telemetry.addData("Ideal X Coord Grid: ", idealGridCoordX);
+                    telemetry.addData("Ideal Y Coord Grid: ", idealGridCoordY);
+                    telemetry.addData("Ideal Coord X: ", validRobotPosConversion[idealGridCoordX]);
+                    telemetry.addData("Ideal Coord Y: ", validRobotPosConversion[idealGridCoordY]);
+                    telemetry.addData("Ideal Heading: ", idealGridAngle);
                     telemetry.update();
 
                     Pose2d poseEstimate = robot.drive.getPoseEstimate();
 
                     if(gamepad1.dpad_up){
-                        if(PoseTransfer.alliance=="BLUE"){
-                            idealYGridCord--;
-                        }
-                        else{
-                            idealYGridCord++;
-                        }
+
+                        idealGridCoordY++;
 
                         checkBoundaries();
 
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
+                        idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle));
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
                                 .lineToLinearHeading(idealPose)
@@ -151,16 +143,11 @@ public class _GRID_TELEOP extends LinearOpMode {
 
                     }
                     else if(gamepad1.dpad_right){
-                        if(PoseTransfer.alliance=="BLUE"){
-                            idealXGridCord--;
-                        }
-                        else{
-                            idealXGridCord++;
-                        }
+                        idealGridCoordX++;
 
                         checkBoundaries();
 
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
+                        idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle));
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
                                 .lineToLinearHeading(idealPose)
@@ -171,16 +158,11 @@ public class _GRID_TELEOP extends LinearOpMode {
                         currentMode = MODE.AUTO;
                     }
                     else if(gamepad1.dpad_down){
-                        if(PoseTransfer.alliance=="BLUE"){
-                            idealYGridCord++;
-                        }
-                        else{
-                            idealYGridCord--;
-                        }
+                        idealGridCoordY--;
 
                         checkBoundaries();
 
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
+                        idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle));
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
                                 .lineToLinearHeading(idealPose)
@@ -192,16 +174,11 @@ public class _GRID_TELEOP extends LinearOpMode {
 
                     }
                     else if(gamepad1.dpad_left){
-                        if(PoseTransfer.alliance=="BLUE"){
-                            idealXGridCord++;
-                        }
-                        else{
-                            idealXGridCord--;
-                        }
+                        idealGridCoordX--;
 
                         checkBoundaries();
 
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
+                        idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle));
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
                                 .lineToLinearHeading(idealPose)
@@ -214,17 +191,12 @@ public class _GRID_TELEOP extends LinearOpMode {
                     }
 
                     if(gamepad1.b){
-                        if(PoseTransfer.alliance=="BLUE"){
-                            idealAngle-=90;
-                        }
-                        else{
-                            idealAngle+=90;
-                        }
+                        idealGridAngle+=90;
 
                         checkBoundaries();
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                .turn(Math.toRadians(idealAngle - robot.drive.getPoseEstimate().getHeading()))
+                                .turn(Math.toRadians(idealGridAngle - robot.drive.getPoseEstimate().getHeading()))
                                 .build();
 
                         robot.drive.followTrajectorySequenceAsync(traj);
@@ -234,17 +206,12 @@ public class _GRID_TELEOP extends LinearOpMode {
 
                     }
                     else if(gamepad1.x){
-                        if(PoseTransfer.alliance=="BLUE"){
-                            idealAngle+=90;
-                        }
-                        else{
-                            idealAngle-=90;
-                        }
+                        idealGridAngle-=90;
 
                         checkBoundaries();
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                .turn(Math.toRadians(idealAngle - robot.drive.getPoseEstimate().getHeading()))
+                                .turn(Math.toRadians(idealGridAngle - robot.drive.getPoseEstimate().getHeading()))
                                 .build();
 
                         robot.drive.followTrajectorySequenceAsync(traj);
@@ -254,7 +221,7 @@ public class _GRID_TELEOP extends LinearOpMode {
                     }
 
                     if(gamepad1.left_stick_button){
-                        idealPose = new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle));
+                        idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle));
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
                                 .lineToLinearHeading(idealPose)
@@ -277,92 +244,52 @@ public class _GRID_TELEOP extends LinearOpMode {
                     }
 
                     if(gamepad1.a){
-                        //TODO: AUTONOMOUS POLE movements (should be straightforward. Mostly copied from auto.
+                        //TODO: AUTONOMOUS POLE movements (should be straightforward. Mostly copied from auto.)
 
                         if(gamepad1.left_stick_x>0.25 && -gamepad1.left_stick_y>0.25){
-                            if(PoseTransfer.alliance=="BLUE"){
-                                TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                        .turn(Math.toRadians(-45))
-                                        .forward(8)
-                                        .build();
-
-                                robot.drive.followTrajectorySequenceAsync(traj);
-                                currentMode = MODE.AUTO;
-                            }
-                            else{
-                                TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
+                            TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
                                         .turn(Math.toRadians(45))
-                                        .forward(8)
+                                        .forward(10)
                                         .build();
 
-                                robot.drive.followTrajectorySequenceAsync(traj);
-                                currentMode = MODE.AUTO;
-                            }
+                            robot.drive.followTrajectorySequenceAsync(traj);
+                            currentMode = MODE.AUTO;
                         }
                         else if(gamepad1.left_stick_x<-0.25 && -gamepad1.left_stick_y>0.25){
-                            if(PoseTransfer.alliance=="BLUE"){
-                                TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                        .turn(Math.toRadians(45))
-                                        .forward(8)
-                                        .build();
+                            TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
+                                    .turn(Math.toRadians(-45))
+                                    .forward(10)
+                                    .build();
 
-                                robot.drive.followTrajectorySequenceAsync(traj);
-                                currentMode = MODE.AUTO;
-                            }
-                            else{
-                                TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                        .turn(Math.toRadians(-45))
-                                        .forward(8)
-                                        .build();
-
-                                robot.drive.followTrajectorySequenceAsync(traj);
-                                currentMode = MODE.AUTO;
-                            }
+                            robot.drive.followTrajectorySequenceAsync(traj);
+                            currentMode = MODE.AUTO;
                         }
                         else if(gamepad1.left_stick_x<-0.25 && -gamepad1.left_stick_y<-0.25){
-                            if(PoseTransfer.alliance=="BLUE"){
-                                TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                        .turn(Math.toRadians(-135))
-                                        .forward(8)
-                                        .build();
+                            TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
+                                    .turn(Math.toRadians(-135))
+                                    .forward(10)
+                                    .build();
 
-                                robot.drive.followTrajectorySequenceAsync(traj);
-                                currentMode = MODE.AUTO;
-                            }
-                            else{
-                                TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                        .turn(Math.toRadians(135))
-                                        .forward(8)
-                                        .build();
-
-                                robot.drive.followTrajectorySequenceAsync(traj);
-                                currentMode = MODE.AUTO;
-                            }
+                            robot.drive.followTrajectorySequenceAsync(traj);
+                            currentMode = MODE.AUTO;
                         }
                         else if(gamepad1.left_stick_x>0.25 && -gamepad1.left_stick_y<-0.25){
-                            if(PoseTransfer.alliance=="BLUE"){
-                                TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                        .turn(Math.toRadians(135))
-                                        .forward(8)
-                                        .build();
+                            TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
+                                    .turn(Math.toRadians(135))
+                                    .forward(10)
+                                    .build();
 
-                                robot.drive.followTrajectorySequenceAsync(traj);
-                                currentMode = MODE.AUTO;
-                            }
-                            else{
-                                TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                        .turn(Math.toRadians(-135))
-                                        .forward(8)
-                                        .build();
+                            robot.drive.followTrajectorySequenceAsync(traj);
+                            currentMode = MODE.AUTO;
 
-                                robot.drive.followTrajectorySequenceAsync(traj);
-                                currentMode = MODE.AUTO;
-                            }
                         }
 
                     }
+
+
                     else{
                         //MANUAL movements
+                        //TODO: Figure out how to disable following/heading PID to avoid jerky manual movements
                         robot.drive.setWeightedDrivePower(
                                 new Pose2d(
                                         -gamepad1.left_stick_y/slow,
@@ -372,6 +299,8 @@ public class _GRID_TELEOP extends LinearOpMode {
                         );
                     }
 
+
+
                     if(gamepad1.y){
                         int closestX = 0;
                         double closestTempValX = 100;
@@ -380,33 +309,31 @@ public class _GRID_TELEOP extends LinearOpMode {
                         int closestAngle = 0;
                         double closestTempValAngle = 500;
                         for(int i = 0; i< 6; i++){
-                            if(Math.abs(validRobotPos[i][0][0]-robot.drive.getPoseEstimate().getX()) < closestTempValX){
+                            if(Math.abs(validRobotPosConversion[i]-robot.drive.getPoseEstimate().getX()) < closestTempValX){
                                 closestTempValX = robot.drive.getPoseEstimate().getX();
                                 closestX = i;
                             }
                         }
 
                         for(int i = 0; i< 6; i++){
-                            if(Math.abs(validRobotPos[0][i][0]-robot.drive.getPoseEstimate().getY()) < closestTempValY){
+                            if(Math.abs(validRobotPosConversion[i]-robot.drive.getPoseEstimate().getY()) < closestTempValY){
                                 closestTempValY = robot.drive.getPoseEstimate().getY();
                                 closestY = i;
                             }
                         }
 
                         for(int i = 0; i<360; i+=90){
-                            if(Math.abs(idealAngle - robot.drive.getPoseEstimate().getHeading()) < closestTempValAngle){
+                            if(Math.abs(idealGridAngle - robot.drive.getPoseEstimate().getHeading()) < closestTempValAngle){
                                 closestTempValAngle = robot.drive.getPoseEstimate().getHeading();
                                 closestAngle = i;
                             }
                         }
 
-                        idealXGridCord = closestX;
-                        idealYGridCord = closestY;
-                        idealAngle = closestAngle;
+                        idealGridCoordX = closestX;
+                        idealGridCoordY = closestY;
+                        idealGridAngle = closestAngle;
 
-                        robot.drive.setPoseEstimate(new Pose2d(validRobotPos[idealXGridCord][idealYGridCord][0], validRobotPos[idealXGridCord][idealYGridCord][1], Math.toRadians(idealAngle)));
-
-
+                        robot.drive.setPoseEstimate(new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle)));
                     }
 
 
@@ -424,107 +351,6 @@ public class _GRID_TELEOP extends LinearOpMode {
 
 
 
-            /*
-
-                            (0)--------------(Y)--------------(5)
-            (0,0)
-                            /-----------------------------------\                    (0)
-                            |     *     *     *     *     *     |                     |
-                            |*****o*****o*****o*****o*****o*****|                     |
-                            |     *     *     *     *     *     |                     |                             1
-                            |*****O*****o*****O*****o*****O*****|                     |                             ^
-                            |     *     *     *     *     *     |                     |                             |
-              Blue Side     |*****O*****o*****O*****o*****O*****|     Red Side       (X)                2 <-- (Orientation) --> 0
-                            |     *     *     *     *     *     |                     |                             |
-                            |*****o*****o*****o*****o*****o*****|                     |                             ∨
-                            |     *     *     *     *     *     |                     |                             3
-                            |*****O*****o*****O*****o*****O*****|                     |
-                            |     *     *     *     *     *     |                     |
-                            \-----------------------------------/                    (5)
-                                                                         (5,5)
-
-             */
-
-            /*double y = -gamepad1.left_stick_y; // Remember, this is reversed!
-            double x = gamepad1.left_stick_x * 1.1; // Counteract imperfect strafing
-            double rx = gamepad1.right_stick_x;
-
-
-
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-
-            double frontLeftPower = (y + x + rx) / denominator;
-            double backLeftPower = (y - x + rx) / denominator;
-            double frontRightPower = (y - x - rx) / denominator;
-            double backRightPower = (y + x - rx) / denominator;*/
-
-
-
-
-            /*if(!robot.drive.isBusy()){
-                if(gamepad1.a){
-                    if(-y>0.15 && x>0.15){ //Flicked Up Right
-                        robot.drive.followTrajectorySequence(upRight);
-                    }
-                    else if(-y>0.15 && x<-0.15){ //Flicked Up Left
-                        robot.drive.followTrajectorySequence(upLeft);
-                    }
-                    else if(-y<-0.15 && x<-0.15){ //Flicked Down Left
-                        robot.drive.followTrajectorySequence(downLeft);
-                    }
-                    else if(-y<-0.15 && x>0.15){ //Flicked Down Right
-                        robot.drive.followTrajectorySequence(downRight);
-                    }
-                }
-
-                else{
-                    if(-y>0.075 || x>0.0825 || rx>0.075 || -y<-0.075 || x<-0.0825 || rx<-0.075){
-                        robot.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                        robot.drive.setMotorPowers(frontLeftPower/slow, backLeftPower/slow, backRightPower/slow, frontRightPower/slow);
-                    }
-                    else{
-                        robot.drive.setMotorPowers(0,0,0,0);
-                    }
-                }
-            }
-
-            if(gamepad1.dpad_up){
-                robot.drive.followTrajectorySequence(forwardGrid);
-            }
-            else if(gamepad1.dpad_right){
-                robot.drive.followTrajectorySequence(strafeRightGrid);
-            }
-            else if(gamepad1.dpad_left){
-                robot.drive.followTrajectorySequence(strafeLeftGrid);
-            }
-            else if(gamepad1.dpad_down){
-                robot.drive.followTrajectorySequence(backwardGrid);
-            }
-
-            if(gamepad1.b){
-                robot.drive.followTrajectorySequence(turnRight);
-            }
-            else if(gamepad1.x){
-                robot.drive.followTrajectorySequence(turnLeft);
-            }*/
-
-
-            /*if(gamepad1.y){
-                robot.drive.setPoseEstimate(new Pose2d(0,0,0));
-                robot.drive.breakFollowing();
-                robot.drive.setDrivePower(new Pose2d());
-            }
-
-
-            robot.drive.update();*/
-
-
-
-
-
-
-
-
 
             if(gamepad2.dpad_up && !dpadUpHeld){
                 slidePosIdx++;
@@ -532,6 +358,7 @@ public class _GRID_TELEOP extends LinearOpMode {
 
                 slidePos = delivery.slideIdxToEncoderVal(slidePosIdx);
             }
+
             else if(gamepad2.dpad_down && !dpadDownHeld){
                 slidePosIdx--;
                 dpadDownHeld=true;
@@ -542,6 +369,7 @@ public class _GRID_TELEOP extends LinearOpMode {
             if(!gamepad2.dpad_up){
                 dpadUpHeld=false;
             }
+
             if(!gamepad2.dpad_down){
                 dpadDownHeld=false;
             }
@@ -583,25 +411,25 @@ public class _GRID_TELEOP extends LinearOpMode {
     }
 
     public void checkBoundaries(){
-        if(idealAngle>360){
-            idealAngle-=360;
+        if(idealGridAngle>360){
+            idealGridAngle-=360;
         }
-        else if(idealAngle<0){
-            idealAngle+=360;
-        }
-
-        if(idealXGridCord>5){
-            idealXGridCord=5;
-        }
-        else if(idealXGridCord<0){
-            idealXGridCord=0;
+        else if(idealGridAngle<0){
+            idealGridAngle+=360;
         }
 
-        if(idealYGridCord>5){
-            idealYGridCord=5;
+        if(idealGridCoordX>5){
+            idealGridCoordX=5;
         }
-        else if(idealYGridCord<0){
-            idealYGridCord=0;
+        else if(idealGridCoordX<0){
+            idealGridCoordX=0;
+        }
+
+        if(idealGridCoordY>5){
+            idealGridCoordY=5;
+        }
+        else if(idealGridCoordY<0){
+            idealGridCoordY=0;
         }
     }
 

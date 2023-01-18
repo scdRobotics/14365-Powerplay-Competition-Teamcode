@@ -44,27 +44,39 @@ public class AUTO_CONSTANTS {
     public static final double PARK_3_Y = 15;
 
 
-
-    /*
-    BASIC ANGLES (CHANGE BASED ON ALLIANCE, HERE IT'S FOR BLUE; -180 FOR RED, NEEDS TESTING)
-     */
-
     public static final double START_ANGLE = 270;
 
     public static final double ALIGN_POLE_ANGLE = 315;
 
     public static final double CONE_STACK_TURN_TOWARD_ANGLE = 135;
 
+
     /*
     ALTERNATE MOVEMENTS (UNIVERSAL)
      */
 
+    public static final double ALT_START_X = 36;
+    public static final double ALT_START_Y = 36;
+    public static final double ALT_START_ANGLE = 270;
+
+    public static final double ALT_BACK_OFF_FROM_POLE_X = 30;
+    public static final double ALT_BACK_OFF_FROM_POLE_Y = 37;
 
 
-    /*
-    ALTERNATE ANGLES (CHANGE BASED ON ALLIANCE)
-     */
+    public static final double ALT_ALIGN_POLE_ANGLE = 45;
 
+    public static final double ALT_CONE_STACK_TURN_TOWARD_ANGLE = 135;
+
+    public static final double ALT_PARK_1_X_LEFT = 60;
+    public static final double ALT_PARK_1_X_RIGHT = 12;
+    public static final double ALT_PARK_1_Y = 37;
+
+    public static final double ALT_PARK_2_X = 36;
+    public static final double ALT_PARK_2_Y = 37;
+
+    public static final double ALT_PARK_3_X_LEFT = 12;
+    public static final double ALT_PARK_3_X_RIGHT = 60;
+    public static final double ALT_PARK_3_Y = 37;
 
 
 
@@ -83,6 +95,10 @@ public class AUTO_CONSTANTS {
     public static final double SECOND_POLE_DISTANCE_UPPER_LIMIT = 12;
     public static final double SECOND_POLE_DEFAULT_TRAVEL_DIST = 8.25;
 
+
+    public static final double ALT_POLE_DISTANCE_SUBTRACTIVE_MODIFIER = 0.5;
+    public static final double ALT_POLE_DISTANCE_UPPER_LIMIT = 12;
+    public static final double ALT_POLE_DEFAULT_TRAVEL_DIST = 6;
 
 
 
