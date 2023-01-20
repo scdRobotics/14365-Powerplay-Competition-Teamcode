@@ -8,40 +8,40 @@ public class AUTO_CONSTANTS {
     BASIC MOVEMENTS (UNIVERSAL)
      */
 
-    public static final double START_X = 35;
+    public static final double START_X = 36;
     public static final double START_Y = 63.5;
 
     public static final double FIRST_APPROACH_X = 36;
     public static final double FIRST_APPROACH_Y = 4;
 
     public static final double FIRST_ALIGN_POLE_X = 36;
-    public static final double FIRST_ALIGN_POLE_Y = 15;
+    public static final double FIRST_ALIGN_POLE_Y = 12;
 
-    public static final double FIRST_BACK_OFF_FROM_POLE_X = 30;
-    public static final double FIRST_BACK_OFF_FROM_POLE_Y = 15;
+    public static final double FIRST_BACK_OFF_FROM_POLE_X = 34;
+    public static final double FIRST_BACK_OFF_FROM_POLE_Y = 12;
 
-    public static final double CONE_STACK_X = 65;
-    public static final double CONE_STACK_Y = 65;
+    public static final double CONE_STACK_X = 67;
+    public static final double CONE_STACK_Y = 12;
 
-    public static final double CONE_STACK_X_BACKUP = 64.5;
-    public static final double CONE_STACK_Y_BACKUP = 15;
+    public static final double CONE_STACK_X_BACKUP = 66.5;
+    public static final double CONE_STACK_Y_BACKUP = 12;
 
     public static final double SECOND_ALIGN_POLE_X = 36;
-    public static final double SECOND_ALIGN_POLE_Y = 15;
+    public static final double SECOND_ALIGN_POLE_Y = 12;
 
     public static final double SECOND_BACK_OFF_FROM_POLE_X = 30;
-    public static final double SECOND_BACK_OFF_FROM_POLE_Y = 15;
+    public static final double SECOND_BACK_OFF_FROM_POLE_Y = 12;
 
     public static final double PARK_1_X_LEFT = 60;
     public static final double PARK_1_X_RIGHT = 12;
-    public static final double PARK_1_Y = 15;
+    public static final double PARK_1_Y = 12;
 
     public static final double PARK_2_X = 36;
-    public static final double PARK_2_Y = 15;
+    public static final double PARK_2_Y = 12;
 
     public static final double PARK_3_X_LEFT = 12;
     public static final double PARK_3_X_RIGHT = 60;
-    public static final double PARK_3_Y = 15;
+    public static final double PARK_3_Y = 12;
 
 
     public static final double START_ANGLE = 270;
@@ -59,8 +59,8 @@ public class AUTO_CONSTANTS {
     public static final double ALT_START_Y = 36;
     public static final double ALT_START_ANGLE = 270;
 
-    public static final double ALT_BACK_OFF_FROM_POLE_X = 30;
-    public static final double ALT_BACK_OFF_FROM_POLE_Y = 37;
+    public static final double ALT_BACK_OFF_FROM_POLE_X = 34;
+    public static final double ALT_BACK_OFF_FROM_POLE_Y = 36;
 
 
     public static final double ALT_ALIGN_POLE_ANGLE = 45;
@@ -69,14 +69,14 @@ public class AUTO_CONSTANTS {
 
     public static final double ALT_PARK_1_X_LEFT = 60;
     public static final double ALT_PARK_1_X_RIGHT = 12;
-    public static final double ALT_PARK_1_Y = 37;
+    public static final double ALT_PARK_1_Y = 36;
 
     public static final double ALT_PARK_2_X = 36;
-    public static final double ALT_PARK_2_Y = 37;
+    public static final double ALT_PARK_2_Y = 36;
 
     public static final double ALT_PARK_3_X_LEFT = 12;
     public static final double ALT_PARK_3_X_RIGHT = 60;
-    public static final double ALT_PARK_3_Y = 37;
+    public static final double ALT_PARK_3_Y = 36;
 
 
 
