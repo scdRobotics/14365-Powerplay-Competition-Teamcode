@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.lang.reflect.Array;
 
 
-@TeleOp(name = "RED_GRID_TELEOP", group = "TeleOp")
+@TeleOp(name = "GRID_TELEOP", group = "TeleOp")
 public class _GRID_TELEOP extends LinearOpMode {
 
     enum MODE {
@@ -39,7 +39,7 @@ public class _GRID_TELEOP extends LinearOpMode {
 
 
 
-        int[] validRobotPosConversion = new int[6];;
+        int[] validRobotPosConversion = new int[6];
 
         for(int i = 0; i< validRobotPosConversion.length; i++){
             validRobotPosConversion[i]= ((i*24) + 12) - 72;
@@ -55,7 +55,7 @@ public class _GRID_TELEOP extends LinearOpMode {
 
         double slow = 1;
 
-        double slidePos = 500;
+        double slidePos = PoseTransfer.slidePos;
 
         boolean dpadUpHeld = false;
 
@@ -99,7 +99,7 @@ public class _GRID_TELEOP extends LinearOpMode {
             switch(currentMode){
                 case AUTO:
 
-                    if(gamepad1.a){
+                    if(gamepad1.left_stick_button){
                         robot.drive.breakFollowing();
                         currentMode = MODE.MANUAL;
                     }
@@ -121,6 +121,8 @@ public class _GRID_TELEOP extends LinearOpMode {
                     telemetry.addData("Ideal Coord X: ", validRobotPosConversion[idealGridCoordX]);
                     telemetry.addData("Ideal Coord Y: ", validRobotPosConversion[idealGridCoordY]);
                     telemetry.addData("Ideal Heading: ", idealGridAngle);
+                    telemetry.addData("Gamepad 1 Left Stick X: ", gamepad1.left_stick_x);
+                    telemetry.addData("Gamepad 1 Left Stick Y: ", gamepad1.left_stick_y);
                     telemetry.update();
 
                     Pose2d poseEstimate = robot.drive.getPoseEstimate();
@@ -196,7 +198,7 @@ public class _GRID_TELEOP extends LinearOpMode {
                         checkBoundaries();
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                .turn(Math.toRadians(idealGridAngle - robot.drive.getPoseEstimate().getHeading()))
+                                .turn(Math.toRadians(90))
                                 .build();
 
                         robot.drive.followTrajectorySequenceAsync(traj);
@@ -211,7 +213,7 @@ public class _GRID_TELEOP extends LinearOpMode {
                         checkBoundaries();
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
-                                .turn(Math.toRadians(idealGridAngle - robot.drive.getPoseEstimate().getHeading()))
+                                .turn(Math.toRadians(-90))
                                 .build();
 
                         robot.drive.followTrajectorySequenceAsync(traj);
@@ -220,7 +222,7 @@ public class _GRID_TELEOP extends LinearOpMode {
 
                     }
 
-                    if(gamepad1.left_stick_button){
+                    if(gamepad1.left_bumper){
                         idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle));
 
                         TrajectorySequence traj = robot.drive.trajectorySequenceBuilder(poseEstimate)
@@ -336,6 +338,8 @@ public class _GRID_TELEOP extends LinearOpMode {
                         robot.drive.setPoseEstimate(new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle)));
                     }
 
+                    robot.drive.update();
+
 
                     break;
 
@@ -402,7 +406,7 @@ public class _GRID_TELEOP extends LinearOpMode {
 
 
 
-            delivery.getEncoderValues();
+            //delivery.getEncoderValues();
 
 
 
