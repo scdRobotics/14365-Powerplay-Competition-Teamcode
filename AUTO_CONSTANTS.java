@@ -46,7 +46,10 @@ public class AUTO_CONSTANTS {
 
     public static final double START_ANGLE = 270;
 
-    public static final double ALIGN_POLE_ANGLE = 315;
+    public static final double ALIGN_POLE_ANGLE = 315; //BLUE RIGHT ONLY
+    //BLUE LEFT = 315 - 90 = 225
+    //RED RIGHT = 315 - 180 = 135
+    //RED RIGHT = 315 - 270 = 45
 
     public static final double CONE_STACK_TURN_TOWARD_ANGLE = 135;
 

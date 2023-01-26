@@ -8,6 +8,6 @@ public class PoseTransfer {
     public static int idealGridCoordX = 0;
     public static int idealGridCoordY = 0;
     public static int idealGridAngle = 0;
-    public static int slidePos = 0;
+    public static double slidePos = 0;
 
 }

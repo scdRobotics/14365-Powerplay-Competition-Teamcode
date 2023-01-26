@@ -105,7 +105,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
         TrajectorySequence alignPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
 
-                .lineToLinearHeading(new Pose2d(FIRST_ALIGN_POLE_X, -FIRST_ALIGN_POLE_Y, Math.toRadians(ALIGN_POLE_ANGLE)))
+                .lineToLinearHeading(new Pose2d(FIRST_ALIGN_POLE_X, -FIRST_ALIGN_POLE_Y, Math.toRadians(ALIGN_POLE_ANGLE - 180)))
 
                 .build();
 
@@ -144,7 +144,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
             TrajectorySequence altTraj = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
 
-                    .lineToLinearHeading(new Pose2d(ALT_START_X, -ALT_START_Y, Math.toRadians(ALT_START_ANGLE)))
+                    .lineToLinearHeading(new Pose2d(ALT_START_X, -ALT_START_Y, Math.toRadians(ALT_START_ANGLE-180)))
 
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
@@ -429,7 +429,7 @@ public class _RED_RIGHT_AUTO extends LinearOpMode {
 
         }
 
-
+        PoseTransfer.slidePos = delivery.getSlidePos();
 
         PoseTransfer.currentPose = robot.drive.getPoseEstimate();
 

@@ -103,7 +103,7 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
 
         TrajectorySequence alignPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
 
-                .lineToLinearHeading(new Pose2d(FIRST_ALIGN_POLE_X, FIRST_ALIGN_POLE_Y, Math.toRadians(ALIGN_POLE_ANGLE)))
+                .lineToLinearHeading(new Pose2d(FIRST_ALIGN_POLE_X, FIRST_ALIGN_POLE_Y, Math.toRadians(ALIGN_POLE_ANGLE - 90)))
 
                 .build();
 
