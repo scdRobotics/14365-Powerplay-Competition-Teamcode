@@ -39,6 +39,8 @@ import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_2_X;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_2_Y;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_3_X_LEFT;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.PARK_3_Y;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.POLE_WAIT_DROP;
+import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.POLE_WAIT_RELEASE;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_ALIGN_POLE_X;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_ALIGN_POLE_Y;
 import static org.firstinspires.ftc.teamcode.AUTO_CONSTANTS.SECOND_BACK_OFF_FROM_POLE_X;
@@ -295,6 +297,14 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
             TrajectorySequence dropPolePickupNewCone = robot.drive.trajectorySequenceBuilder(turnToPole.end())
                     .forward(distToPole)
 
+                    .waitSeconds(POLE_WAIT_DROP)
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        delivery.slidePickupStack();
+                    })
+
+                    .waitSeconds(POLE_WAIT_RELEASE)
+
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
                         delivery.openGripper();
@@ -303,10 +313,6 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
                     })
 
                     .lineToConstantHeading(new Vector2d(FIRST_BACK_OFF_FROM_POLE_X, FIRST_BACK_OFF_FROM_POLE_Y))
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        delivery.slidePickupStack();
-                    })
 
                     .turn(Math.toRadians(CONE_STACK_TURN_TOWARD_ANGLE))
 
@@ -328,6 +334,8 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                         delivery.slideHigh();
                     })
+
+                    .waitSeconds(0.175)
 
 
 
@@ -361,6 +369,14 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
             TrajectorySequence dropLastCone = robot.drive.trajectorySequenceBuilder(turnToPole2.end())
                     .forward(distToPole2)
 
+                    .waitSeconds(POLE_WAIT_DROP)
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        delivery.slidePickupStack();
+                    })
+
+                    .waitSeconds(POLE_WAIT_RELEASE)
+
                     .UNSTABLE_addTemporalMarkerOffset(0, () -> {
 
                         delivery.openGripper();
@@ -369,12 +385,6 @@ public class _BLUE_LEFT_AUTO extends LinearOpMode {
                     })
 
                     .lineToConstantHeading(new Vector2d(SECOND_BACK_OFF_FROM_POLE_X, SECOND_BACK_OFF_FROM_POLE_Y))
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-
-                        delivery.slidePickupStackSecond();
-
-                    })
 
 
 
