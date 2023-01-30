@@ -37,6 +37,10 @@ public class Delivery extends Subsystem {
         telemetry.update();
     }
 
+    public double getSlidePos(){
+        return slide.getCurrentPosition();
+    }
+
     public void initEncoders(){
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -103,7 +107,7 @@ public class Delivery extends Subsystem {
     }
 
     public void slidePickupStack(){
-        slide.setTargetPosition(600);
+        slide.setTargetPosition(500);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide.setPower(0.65);
     }

@@ -20,10 +20,9 @@ import java.util.Comparator;
 //Most imports are automatically handled by Android Studio as you program
 
 
-
+//TODO: Have build fix/replace broken webcam and undo camera pipeline switch hotfix
 public class Vision extends Subsystem {
     public OpenCvCamera webcam1;
-    //TODO: Figure out which of these is upside down and account for that accordingly in the respective pipeline
     public OpenCvCamera webcam2;
 
     AprilTagYellowPipeline aprilTagYellowPipeline = new AprilTagYellowPipeline(1, 578.272, 578.272, 402.145, 221.506);
@@ -139,7 +138,7 @@ public class Vision extends Subsystem {
             return -1; //failure case, nothing detected more than likely (or flaw in selecting "same" poles)
         }
 
-        //TODO: Implement cool Rovio formula to find and return dTheta to turn
+        //TODO: Refine formula to ensure accurate dTheta
         double theta1 = Math.toRadians(142.5  - (same.get(0).getX()*5.5/128)); //Camera 1 Theta
         double theta2 = Math.toRadians(92.5 - (same.get(1).getX()*5.5/128)); //Camera 2 Theta
 
