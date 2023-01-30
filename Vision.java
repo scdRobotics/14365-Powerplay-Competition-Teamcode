@@ -21,6 +21,7 @@ import java.util.Comparator;
 
 
 //TODO: Have build fix/replace broken webcam and undo camera pipeline switch hotfix
+//TODO TODO: MAKE ALL NEEDED CHANGES IN VISION BRANCH THEN MERGE HERE. THERES A LOT THAT NEEDS FIXING.
 public class Vision extends Subsystem {
     public OpenCvCamera webcam1;
     public OpenCvCamera webcam2;

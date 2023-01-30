@@ -29,10 +29,7 @@ public class VisionTest extends LinearOpMode {
 
         Vision vision = robot.vision;
 
-        vision.activateAprilTagYellowPipelineCamera1();
-        //vision.activateYellowPipelineCamera1();
-
-        //vision.activateYellowPipelineCamera2();
+        vision.activateYellowPipelineCamera2();
 
 
 
