@@ -46,7 +46,7 @@ public class _BLUE_RIGHT_AUTO extends AUTO_PRIME {
 
         waitForStart();
 
-        int park = robot.vision.readAprilTagCamera1() + 1;
+        int park = robot.vision.readAprilTagCamera2() + 1;
 
         telemetry.addData("April Tag Detected: ", park);
         telemetry.update();

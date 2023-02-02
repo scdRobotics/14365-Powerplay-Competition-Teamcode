@@ -41,26 +41,6 @@ public class Vision extends Subsystem {
 
     }
 
-    public void activateAprilTagYellowPipelineCamera1(){
-        webcam1.setPipeline(aprilTagYellowPipeline);
-        webcam1.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                webcam1.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
-                telemetry.addData("Camera Opened! ", "");
-                telemetry.update();
-            }
-
-            @Override
-            public void onError(int errorCode)
-            {
-
-            }
-        });
-    }
-
     public void activateYellowPipelineCamera1(){
         webcam1.setPipeline(yellowPipeline);
         webcam1.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
@@ -81,7 +61,7 @@ public class Vision extends Subsystem {
         });
     }
 
-    public void activateYellowPipelineCamera2(){
+    public void activateAprilTagYellowPipelineCamera2(){
         webcam2.setPipeline(aprilTagYellowPipeline);
         webcam2.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
@@ -107,8 +87,9 @@ public class Vision extends Subsystem {
 
     @SuppressLint("NewApi")
     public double findClosePoleDTheta(){
-        ArrayList<RectData> viewCam1 = aprilTagYellowPipeline.getRects();
-        ArrayList<RectData> viewCam2 = yellowPipeline.getRects();
+        ArrayList<RectData> viewCam1 = yellowPipeline.getRects();
+        //TODO: THESE MAY HAVE FLIPPED ON THE ROBOT WHEN WE GOT NEW WEBCAMS. I DON'T KNOW YET UNTIL I TEST
+        ArrayList<RectData> viewCam2 = aprilTagYellowPipeline.getRects();
 
         if(!viewCam1.isEmpty() && !viewCam2.isEmpty()){
 
@@ -139,7 +120,7 @@ public class Vision extends Subsystem {
             return -1; //failure case, nothing detected more than likely (or flaw in selecting "same" poles)
         }
 
-        //TODO: Refine formula to ensure accurate dTheta
+        //TODO: Refine formula to ensure accurate dTheta and dist
         double theta1 = Math.toRadians(142.5  - (same.get(0).getX()*5.5/128)); //Camera 1 Theta
         double theta2 = Math.toRadians(92.5 - (same.get(1).getX()*5.5/128)); //Camera 2 Theta
 
@@ -175,43 +156,10 @@ public class Vision extends Subsystem {
 
     }
 
-    /*public void deactivateAprilTagPipelineCamera1(){
-        webcam1.closeCameraDevice();
-    }*/
-
-    /*public void activateYellowPipelineBothCameras(){
-        webcam1.setPipeline(yellowPipeline);
-        webcam1.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                webcam1.startStreaming(1280, 720, OpenCvCameraRotation.UPSIDE_DOWN);
-                telemetry.addData("Camera 1 Opened! ", "");
-            }
-
-            @Override
-            public void onError(int errorCode) {
-
-            }
-        });
-
-        webcam2.setPipeline(yellowPipeline);
-        webcam2.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                webcam2.startStreaming(1280, 720, OpenCvCameraRotation.UPSIDE_DOWN);
-                telemetry.addData("Camera 2 Opened! ", "");
-            }
-
-            @Override
-            public void onError(int errorCode) {
-
-            }
-        });
 
 
-    }*/
 
-    public int readAprilTagCamera1() {
+    public int readAprilTagCamera2() {
         ArrayList<AprilTagDetection> currentDetections = aprilTagYellowPipeline.getLatestDetections();
 
         if (currentDetections.size() != 0) {

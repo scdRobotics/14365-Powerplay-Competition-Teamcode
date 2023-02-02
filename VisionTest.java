@@ -44,7 +44,7 @@ public class VisionTest extends LinearOpMode {
 
         while(opModeIsActive() && !isStopRequested()){
 
-            telemetry.addData("April Tag ID Detected: ", vision.readAprilTagCamera1());
+            telemetry.addData("April Tag ID Detected: ", vision.readAprilTagCamera2());
 
             /*for(int i = 0; i<vision.same.size(); i++){
                 telemetry.addData("Same  Value " + i + " X: ", vision.same.get(i).getX());

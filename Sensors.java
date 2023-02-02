@@ -15,13 +15,20 @@ public class Sensors extends Subsystem {
 
     private DistanceSensor right; //Front Left Dist Sensor initial declaration
 
+    private DistanceSensor frontLeft; //Left Dist Sensor initial declaration
+
+    private DistanceSensor frontRight; //Front Left Dist Sensor initial declaration
+
     //"Constructor" object for Sensors
-    public Sensors(DistanceSensor front, DistanceSensor left, DistanceSensor right, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
+    public Sensors(DistanceSensor front, DistanceSensor left, DistanceSensor right, DistanceSensor frontLeft, DistanceSensor frontRight, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
         super(telemetry,hardwareMap,timer); //Map basic, required aspects of robot
 
         this.front=front;
         this.left=left;
         this.right=right;
+
+        this.frontLeft=frontLeft;
+        this.frontRight=frontRight;
     }
 
     //NOTE: All below functions focus on updating particular distance sensor values. Pretty straightforward.
@@ -31,10 +38,18 @@ public class Sensors extends Subsystem {
     }
 
     public double getFrontLeftDist(){
-        return left.getDistance(DistanceUnit.INCH);
+        return frontLeft.getDistance(DistanceUnit.INCH);
     }
 
     public double getFrontRightDist(){
+        return frontRight.getDistance(DistanceUnit.INCH);
+    }
+
+    public double getLeftDist(){
+        return left.getDistance(DistanceUnit.INCH);
+    }
+
+    public double getRightDist(){
         return right.getDistance(DistanceUnit.INCH);
     }
 
