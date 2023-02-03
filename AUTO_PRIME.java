@@ -16,7 +16,9 @@ public class AUTO_PRIME extends LinearOpMode {
         this.robot = new Robot(this, hardwareMap, telemetry, timer, false);
         robot.delivery.initEncoders();
 
-        robot.vision.activateYellowPipelineCamera2();
+
+        robot.vision.activateYellowPipelineCamera1();
+        robot.vision.activateAprilTagYellowPipelineCamera2();
 
         robot.delivery.closeGripper();
     }
