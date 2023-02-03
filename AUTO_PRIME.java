@@ -34,27 +34,79 @@ public class AUTO_PRIME extends LinearOpMode {
      */
 
     public int START_X = 36;
-    public double START_Y = 63.5;
-    public double START_ANGLE = 180;
-
-    public int FIRST_APPROACH_X = 36;
-    public int FIRST_APPROACH_Y = 0;
-
-    public int FIRST_DROP_X = 32;
-    public int FIRST_DROP_Y = 0;
-
-    public int FIRST_BACKOFF_POLE_X = 36;
-    public int FIRST_BACKOFF_POLE_Y = 12;
-    public int FIRST_BACKOFF_POLE_ANGLE = 360;
+    public double START_Y = 61.25;
+    public double START_ANG = 180;
 
 
-    public double POLE_WAIT_DROP = 1;
+    public int I_APPROACH_X = 36;
+    public int I_APPROACH_Y = 0;
+
+
+    public int I_DROP_X = 32;
+    public int I_DROP_Y = 0;
+
+
+    public int I_BACK_POLE_X = 36;
+    public int I_BACK_POLE_Y = 12;
+    public int I_BACK_POLE_ANG = 360;
+
+
+    public double I_PKUP_X = 61.25;
+    public int I_PKUP_Y = 12;
+
+
+    public double I_PKUP_BKUP_X = 60.75;
+    public int I_PKUP_BKUP_Y = 12;
+
+
+    public int II_APPROACH_X = 36;
+    public int II_APPROACH_Y = 12;
+    public int II_APPROACH_TURN = 135;
+
+
+    public int II_DROP_X = 30;
+    public int II_DROP_Y = 6;
+
+
+
+    public int POLE_WAIT_DROP = 1;
     public double POLE_WAIT_RELEASE = 0.5;
+    public int STACK_WAIT_GRAB = 1;
+    public double STACK_WAIT_UP = 0.5;
+
+    public int II_BACK_POLE_X = 38;
+    public int II_BACK_POLE_Y = 12;
+    public int II_BACK_POLE_ANG = 360;
+
+
+    public double II_PKUP_X = 61.25;
+    public int II_PKUP_Y = 12;
+
+
+    public double II_PKUP_BKUP_X = 60.75;
+    public int II_PKUP_BKUP_Y = 12;
+
+
+
+    public int III_DROP_X = 30;
+    public int III_DROP_Y = 6;
+
+    public int III_APPROACH_X = 36;
+    public int III_APPROACH_Y = 12;
+    public int III_APPROACH_TURN = 135;
+
+
+
+    public int III_BACK_POLE_X = 36;
+    public int III_BACK_POLE_Y = 12;
+    public int III_BACK_POLE_ANG = 360;
+
 
 
     public int HIGH_POLE_DROP_HEIGHT = 3900;
     public int MEDIUM_POLE_DROP_HEIGHT = 2700;
-    public int CONE_STACK_PICKUP_HEIGHT = 500;
+    public int I_CONE_STACK_PICKUP_HEIGHT = 500;
+    public int II_CONE_STACK_PICKUP_HEIGHT = 435;
 
     public double SLIDE_POWER = 0.65;
 

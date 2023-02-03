@@ -17,32 +17,7 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
-        Pose2d startPose = new Pose2d(-START_X, -START_Y, Math.toRadians(START_ANGLE-180));
-
-        robot.drive.setPoseEstimate(startPose);
-
-        TrajectorySequence approachPole = robot.drive.trajectorySequenceBuilder(startPose)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-
-                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
-
-
-
-                })
-
-                .lineTo(new Vector2d(-FIRST_APPROACH_X, -FIRST_APPROACH_Y))
-
-
-
-                .build();
-
-
-        TrajectorySequence alignPole = robot.drive.trajectorySequenceBuilder(approachPole.end())
-
-                .lineToLinearHeading(new Pose2d(-FIRST_ALIGN_POLE_X, -FIRST_ALIGN_POLE_Y, Math.toRadians(ALIGN_POLE_ANGLE-270)))
-
-                .build();
+        Pose2d startPose = new Pose2d(START_X, -START_Y, Math.toRadians(START_ANG));
 
         waitForStart();
 
@@ -55,11 +30,132 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
         boolean robotDetected = false;
 
-        robot.drive.followTrajectorySequenceAsync(approachPole);
+        boolean trajectorySkewFirst = false;
 
-        while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy() && !robotDetected){ //Should leave loop when async function is done or robot is detected
+        boolean trajectorySkewSecond = false;
 
-            if((robot.sensors.getFrontRightDist()<10 && robot.sensors.getFrontRightDist()>5)){ //Meaning a robot is approaching the same direction
+        boolean trajectorySkewThird = false;
+
+        TrajectorySequence firstApproach = robot.drive.trajectorySequenceBuilder(startPose)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
+                })
+
+                .lineTo(new Vector2d(I_APPROACH_X, -I_APPROACH_Y))
+
+                .build();
+
+        TrajectorySequence idealTrajectory = robot.drive.trajectorySequenceBuilder(firstApproach.end())
+
+                .lineTo(new Vector2d(I_DROP_X, -I_DROP_Y))
+
+                //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(POLE_WAIT_DROP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
+
+                .waitSeconds(POLE_WAIT_RELEASE)
+
+                .lineToLinearHeading(new Pose2d(I_BACK_POLE_X, -I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG + 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+
+                .lineTo(new Vector2d(I_PKUP_X, -I_PKUP_Y))
+
+                .waitSeconds(STACK_WAIT_GRAB)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.closeGripper();
+                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(STACK_WAIT_UP)
+
+                //May need to swap these two?? Maybe, play with it a little
+
+                .lineTo(new Vector2d(I_PKUP_BKUP_X, -I_PKUP_BKUP_Y))
+
+                .lineTo(new Vector2d(II_APPROACH_X, -II_APPROACH_Y))
+
+                .turn(Math.toRadians(-II_APPROACH_TURN))
+
+                .lineTo(new Vector2d(II_DROP_X, -II_DROP_Y))
+
+                //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(POLE_WAIT_DROP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
+
+                .waitSeconds(POLE_WAIT_RELEASE)
+
+                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, -II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+
+
+
+                .lineTo(new Vector2d(II_PKUP_X, -II_PKUP_Y))
+
+                .waitSeconds(STACK_WAIT_GRAB)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.closeGripper();
+                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(STACK_WAIT_UP)
+
+                //May need to swap these two?? Maybe, play with it a little
+
+                .lineTo(new Vector2d(II_PKUP_BKUP_X, -II_PKUP_BKUP_Y))
+
+                .waitSeconds(STACK_WAIT_UP)
+
+
+                .lineTo(new Vector2d(III_APPROACH_X, -III_APPROACH_Y))
+
+                .turn(Math.toRadians(-III_APPROACH_TURN))
+
+
+                .lineTo(new Vector2d(III_DROP_X, -III_DROP_Y))
+
+                //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(POLE_WAIT_DROP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
+
+                .waitSeconds(POLE_WAIT_RELEASE)
+
+                .lineToLinearHeading(new Pose2d(III_BACK_POLE_X, -III_BACK_POLE_Y, Math.toRadians(III_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+
+                .build();
+
+
+        double sensorReadout;
+
+        while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy()){ //Should leave loop when async function is done or robot is detected
+
+            sensorReadout = robot.sensors.getLeftDist();
+
+            if((sensorReadout<COLLISION_AVOIDANCE_UPPER_LIMIT && sensorReadout>COLLISION_AVOIDANCE_LOWER_LIMIT)){ //Meaning a robot is approaching the same direction
                 robot.drive.breakFollowing();
                 robot.drive.setDrivePower(new Pose2d());
                 robotDetected=true;
@@ -71,113 +167,9 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
         }
 
+
         if(robotDetected){
             //Run alt version of program (go for middle 4 point)
-
-            TrajectorySequence altTraj = robot.drive.trajectorySequenceBuilder(robot.drive.getPoseEstimate())
-
-                    .lineToLinearHeading(new Pose2d(-ALT_START_X, -ALT_START_Y, Math.toRadians(ALT_START_ANGLE-180)))
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-
-                        robot.delivery.slideControl(MEDIUM_POLE_DROP_HEIGHT, SLIDE_POWER);
-
-                        telemetry.addData("Approach Pole Complete! ", "");
-                        telemetry.update();
-
-
-
-                    })
-
-                    .turn(Math.toRadians(-ALT_ALIGN_POLE_ANGLE))
-
-                    .build();
-
-            robot.drive.followTrajectorySequence(altTraj);
-
-
-            //double dTheta = robot.vision.findClosePoleDTheta();
-            TrajectorySequence turnToPole = robot.drive.trajectorySequenceBuilder(altTraj.end())
-                    //.turn(dTheta)
-                    .turn(Math.toRadians(1))
-                    .build();
-
-            robot.drive.followTrajectorySequence(turnToPole);
-
-            double distToPole = robot.sensors.getFrontDist() - ALT_POLE_DISTANCE_SUBTRACTIVE_MODIFIER;
-            if(distToPole>ALT_POLE_DISTANCE_UPPER_LIMIT){
-                distToPole=ALT_POLE_DEFAULT_TRAVEL_DIST;
-            }
-
-            TrajectorySequence dropPoleMid = robot.drive.trajectorySequenceBuilder(turnToPole.end())
-                    .forward(distToPole)
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-
-                        robot.delivery.openGripper();
-
-
-                    })
-
-                    .lineToConstantHeading(new Vector2d(-ALT_BACK_OFF_FROM_POLE_X, -ALT_BACK_OFF_FROM_POLE_Y))
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        robot.delivery.slideControl(CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                    })
-
-                    .turn(Math.toRadians(ALT_CONE_STACK_TURN_TOWARD_ANGLE))
-
-                    .build();
-
-            robot.drive.followTrajectorySequence(dropPoleMid);
-
-            if(park==2){
-                TrajectorySequence park2 = robot.drive.trajectorySequenceBuilder(dropPoleMid.end())
-
-                        .lineToConstantHeading(new Vector2d(-ALT_PARK_2_X, -ALT_PARK_2_Y))
-
-                        .build();
-
-                robot.drive.followTrajectorySequence(park2);
-
-                PoseTransfer.idealGridCoordX=1;
-                PoseTransfer.idealGridCoordY=1;
-                PoseTransfer.idealGridAngle=180;
-
-
-            }
-
-            else if(park==3){
-                TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropPoleMid.end())
-
-                        .lineToConstantHeading(new Vector2d(-ALT_PARK_3_X_LEFT, -ALT_PARK_3_Y))
-
-                        .build();
-
-                robot.drive.followTrajectorySequence(park3);
-
-                PoseTransfer.idealGridCoordX=2;
-                PoseTransfer.idealGridCoordY=1;
-                PoseTransfer.idealGridAngle=180;
-
-
-            }
-
-            else{
-                TrajectorySequence park1 = robot.drive.trajectorySequenceBuilder(dropPoleMid.end())
-
-                        .lineToConstantHeading(new Vector2d(-ALT_PARK_1_X_LEFT, -ALT_PARK_1_Y))
-
-                        .build();
-
-                robot.drive.followTrajectorySequence(park1);
-
-                PoseTransfer.idealGridCoordX=0;
-                PoseTransfer.idealGridCoordY=1;
-                PoseTransfer.idealGridAngle=180;
-
-
-            }
 
 
         }
@@ -185,198 +177,33 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
 
 
+        else {
 
 
+            robot.drive.followTrajectorySequenceAsync(idealTrajectory);
+            while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy()){ //Should leave loop when async function is done or robot is detected
 
+                if(trajectorySkewFirst || trajectorySkewSecond || trajectorySkewThird){ //Meaning we sense we are off of the trajectory by a significant margin. One for each pole drop
+                    robot.drive.breakFollowing();
+                    robot.drive.setDrivePower(new Pose2d());
+                    break;
+                }
 
-
-
-
-
-
-
-
-
-
-
-
-
-        else{
-
-            //Vector2d highPole = new Vector2d(24, 0); //X and Y of high pole we stack on. Compare with dTheta and dist sensor to find absolute pos from relative localizer
-
-            robot.drive.followTrajectorySequence(alignPole);
-
-            //double dTheta = robot.vision.findClosePoleDTheta();
-
-            TrajectorySequence turnToPole = robot.drive.trajectorySequenceBuilder(alignPole.end())
-                    //.turn(dTheta)
-                    .turn(Math.toRadians(1))
-                    .build();
-
-            robot.drive.followTrajectorySequence(turnToPole);
-
-            double distToPole = robot.sensors.getFrontDist() - FIRST_POLE_DISTANCE_SUBTRACTIVE_MODIFIER;
-            if(distToPole>FIRST_POLE_DISTANCE_UPPER_LIMIT){
-                distToPole=FIRST_POLE_DEFAULT_TRAVEL_DIST;
-            }
-            TrajectorySequence dropPolePickupNewCone = robot.drive.trajectorySequenceBuilder(turnToPole.end())
-                    .forward(distToPole)
-
-                    .waitSeconds(POLE_WAIT_DROP)
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        robot.delivery.slideControl(CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                    })
-
-                    .waitSeconds(POLE_WAIT_RELEASE)
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-
-                        robot.delivery.openGripper();
-
-
-                    })
-
-                    .lineToConstantHeading(new Vector2d(-FIRST_BACK_OFF_FROM_POLE_X, -FIRST_BACK_OFF_FROM_POLE_Y))
-
-                    .turn(Math.toRadians(CONE_STACK_TURN_TOWARD_ANGLE)) //was 135
-
-                    .lineToConstantHeading(new Vector2d(-CONE_STACK_X, -CONE_STACK_Y))
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        //robot.pause(1);
-
-                        robot.delivery.closeGripper();
-
-                        //robot.pause(1);
-
-
-
-                    })
-
-                    .lineTo(new Vector2d(-CONE_STACK_X_BACKUP, -CONE_STACK_Y_BACKUP))
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
-                    })
-
-                    .waitSeconds(0.175)
-
-                    .lineTo(new Vector2d(-SECOND_ALIGN_POLE_X, -SECOND_ALIGN_POLE_Y))
-
-                    .turn(Math.toRadians(-CONE_STACK_TURN_TOWARD_ANGLE)) //-135
-
-
-                    .build();
-
-
-
-            robot.drive.followTrajectorySequence(dropPolePickupNewCone);
-
-            //double dTheta2 = robot.vision.findClosePoleDTheta();
-
-            TrajectorySequence turnToPole2 = robot.drive.trajectorySequenceBuilder(dropPolePickupNewCone.end())
-                    //.turn(dTheta2)
-                    .turn(Math.toRadians(1))
-                    .build();
-
-            robot.drive.followTrajectorySequence(turnToPole2);
-
-            double distToPole2 = robot.sensors.getFrontDist() - SECOND_POLE_DISTANCE_SUBTRACTIVE_MODIFIER;
-            if(distToPole2>SECOND_POLE_DISTANCE_UPPER_LIMIT){
-                distToPole2=SECOND_POLE_DEFAULT_TRAVEL_DIST;
-            }
-
-            TrajectorySequence dropLastCone = robot.drive.trajectorySequenceBuilder(turnToPole2.end())
-                    .forward(distToPole2)
-
-                    .waitSeconds(POLE_WAIT_DROP)
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        robot.delivery.slideControl(CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                    })
-
-                    .waitSeconds(POLE_WAIT_RELEASE)
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-
-                        robot.delivery.openGripper();
-
-
-                    })
-
-                    .lineToConstantHeading(new Vector2d(-SECOND_BACK_OFF_FROM_POLE_X, -SECOND_BACK_OFF_FROM_POLE_Y))
-
-
-
-                    .turn(Math.toRadians(CONE_STACK_TURN_TOWARD_ANGLE))
-
-                    .build();
-
-
-
-            robot.drive.followTrajectorySequence(dropLastCone);
-
-
-
-
-            if(park==2){
-                TrajectorySequence park2 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
-
-                        .lineToConstantHeading(new Vector2d(-PARK_2_X, -PARK_2_Y))
-
-                        .build();
-
-                robot.drive.followTrajectorySequence(park2);
-
-                PoseTransfer.idealGridCoordX=1;
-                PoseTransfer.idealGridCoordY=2;
-                PoseTransfer.idealGridAngle=180;
-
+                // Update drive localization
+                robot.drive.update();
 
             }
 
-            else if(park==3){
-                TrajectorySequence park3 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
+            //TODO: ADD "LIVE-BUILT" TRAJECTORIES HERE IN CASE OF SKEW
 
-                        .lineToConstantHeading(new Vector2d(-PARK_3_X_LEFT, -PARK_3_Y))
-
-                        .build();
-
-                robot.drive.followTrajectorySequence(park3);
-
-                PoseTransfer.idealGridCoordX=2;
-                PoseTransfer.idealGridCoordY=2;
-                PoseTransfer.idealGridAngle=180;
-
-
-            }
-
-            else{
-                TrajectorySequence park1 = robot.drive.trajectorySequenceBuilder(dropLastCone.end())
-
-                        .lineToConstantHeading(new Vector2d(-PARK_1_X_LEFT, -PARK_1_Y))
-
-                        .build();
-
-                robot.drive.followTrajectorySequence(park1);
-
-                PoseTransfer.idealGridCoordX=0;
-                PoseTransfer.idealGridCoordY=2;
-                PoseTransfer.idealGridAngle=180;
-
-
-            }
+            //TODO: ADD PARKING AND POSETRANSFER PROCEDURES
 
         }
 
         PoseTransfer.currentPose = robot.drive.getPoseEstimate();
-        PoseTransfer.slidePos=robot.delivery.getSlidePos();
+        PoseTransfer.slidePos = robot.delivery.getSlidePos();
 
         robot.pause(30);
-
-
 
 
     }

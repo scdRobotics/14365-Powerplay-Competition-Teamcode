@@ -17,7 +17,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
-        Pose2d startPose = new Pose2d(START_X, START_Y, Math.toRadians(START_ANGLE));
+        Pose2d startPose = new Pose2d(START_X, START_Y, Math.toRadians(START_ANG));
 
         waitForStart();
 
@@ -42,35 +42,109 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
-                .lineTo(new Vector2d(FIRST_APPROACH_X, FIRST_APPROACH_Y))
+                .lineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y))
 
                 .build();
 
         TrajectorySequence idealTrajectory = robot.drive.trajectorySequenceBuilder(firstApproach.end())
 
-                .lineTo(new Vector2d(FIRST_DROP_X, FIRST_DROP_Y))
-
-                .waitSeconds(POLE_WAIT_DROP)
+                .lineTo(new Vector2d(I_DROP_X, I_DROP_Y))
 
                 //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(POLE_WAIT_DROP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
                 })
 
                 .waitSeconds(POLE_WAIT_RELEASE)
 
+                .lineToLinearHeading(new Pose2d(I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+
+                .lineTo(new Vector2d(I_PKUP_X, I_PKUP_Y))
+
+                .waitSeconds(STACK_WAIT_GRAB)
+
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-
-                    robot.delivery.openGripper();
-
+                    robot.delivery.closeGripper();
+                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
-                .lineToLinearHeading(new Pose2d(FIRST_BACKOFF_POLE_X, FIRST_BACKOFF_POLE_Y, FIRST_BACKOFF_POLE_ANGLE)) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .waitSeconds(STACK_WAIT_UP)
 
-                //Next: Go to cone stack
+                //May need to swap these two?? Maybe, play with it a little
+
+                .lineTo(new Vector2d(I_PKUP_BKUP_X, I_PKUP_BKUP_Y))
+
+                .lineTo(new Vector2d(II_APPROACH_X, II_APPROACH_Y))
+
+                .turn(Math.toRadians(-II_APPROACH_TURN))
+
+                .lineTo(new Vector2d(II_DROP_X, II_DROP_Y))
+
+                //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(POLE_WAIT_DROP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
+
+                .waitSeconds(POLE_WAIT_RELEASE)
+
+                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
 
+
+                .lineTo(new Vector2d(II_PKUP_X, II_PKUP_Y))
+
+                .waitSeconds(STACK_WAIT_GRAB)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.closeGripper();
+                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(STACK_WAIT_UP)
+
+                //May need to swap these two?? Maybe, play with it a little
+
+                .lineTo(new Vector2d(II_PKUP_BKUP_X, II_PKUP_BKUP_Y))
+
+                .waitSeconds(STACK_WAIT_UP)
+
+
+                .lineTo(new Vector2d(III_APPROACH_X, III_APPROACH_Y))
+
+                .turn(Math.toRadians(-III_APPROACH_TURN))
+
+
+                .lineTo(new Vector2d(III_DROP_X, III_DROP_Y))
+
+                //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(POLE_WAIT_DROP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
+
+                .waitSeconds(POLE_WAIT_RELEASE)
+
+                .lineToLinearHeading(new Pose2d(III_BACK_POLE_X, III_BACK_POLE_Y, Math.toRadians(III_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .build();
 
@@ -121,6 +195,8 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
             }
 
             //TODO: ADD "LIVE-BUILT" TRAJECTORIES HERE IN CASE OF SKEW
+
+            //TODO: ADD PARKING AND POSETRANSFER PROCEDURES
 
         }
 
