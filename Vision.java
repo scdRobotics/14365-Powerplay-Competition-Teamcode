@@ -87,16 +87,86 @@ public class Vision extends Subsystem {
 
     @SuppressLint("NewApi")
     public double findClosePoleDTheta(){
+
+        same.clear();
+
         ArrayList<RectData> viewCam1 = yellowPipeline.getRects();
-        //TODO: THESE MAY HAVE FLIPPED ON THE ROBOT WHEN WE GOT NEW WEBCAMS. I DON'T KNOW YET UNTIL I TEST
+        //May need to adjust?
         ArrayList<RectData> viewCam2 = aprilTagYellowPipeline.getRects();
 
         if(!viewCam1.isEmpty() && !viewCam2.isEmpty()){
 
-            //MAY cause errors on controller app?? Will have to see
+            viewCam1.sort(Comparator.comparing(RectData::getWidth));
+
+            viewCam2.sort(Comparator.comparing(RectData::getWidth));
+
+
+
+            RectData widest1 = null;
+            RectData widest2 = null;
+
+            widest1 = viewCam1.get(viewCam1.size()-1);
+            widest2 = viewCam2.get(viewCam2.size()-1);
+            telemetry.addData("Widest 1: ", widest1);
+            telemetry.addData("Widest 2: ", widest2);
+            same.add(widest1);
+            same.add(widest2);
+
+
+        }
+
+
+        else{
+            //TODO: If same.size() is >2, isolate which equal rects within "same" are the pole we want to be looking at (AKA, the widest pair that still is a pole and not some strange background object/interference) so that same.size()==2
+            return -1;
+        }
+
+        //TODO: Refine formula to ensure accurate dTheta
+        double theta1 = Math.toRadians(142.5  - (same.get(0).getX()*5.5/128)); //Camera 1 Theta
+        double theta2 = Math.toRadians(92.5 - (same.get(1).getX()*5.5/128)); //Camera 2 Theta
+
+        double c1;
+        double c2;
+        double c3;
+        double dx;
+        double dy;
+        double phi;
+        double a = 6.825;
+        double b = 2;
+
+        c1 = theta1;
+        c2 = theta2;
+
+        dx = a * (Math.tan(c1) + Math.tan(c2))/(Math.tan(c1)-Math.tan(c2));
+        dy = (2 * a) * (Math.tan(c1) * Math.tan(c2))/(Math.tan(c1)-Math.tan(c2)); //Test to see if it's 2*a or a
+
+        c3 = Math.atan((dy - b)/dx);
+
+        double dTheta = c3 - Math.PI/2;
+
+        if(dTheta < -Math.PI/2) {
+            dTheta = Math.PI+dTheta;
+        }
+
+        return dTheta;
+
+    }
+
+
+
+    @SuppressLint("NewApi")
+    public double findClosePoleDist(){
+
+        same.clear();
+
+        ArrayList<RectData> viewCam1 = yellowPipeline.getRects();
+        //May need to adjust?
+        ArrayList<RectData> viewCam2 = aprilTagYellowPipeline.getRects();
+
+        if(!viewCam1.isEmpty() && !viewCam2.isEmpty()){
 
             viewCam1.sort(Comparator.comparing(RectData::getWidth));
-            
+
             viewCam2.sort(Comparator.comparing(RectData::getWidth));
 
 
@@ -120,19 +190,16 @@ public class Vision extends Subsystem {
             return -1; //failure case, nothing detected more than likely (or flaw in selecting "same" poles)
         }
 
-        //TODO: Refine formula to ensure accurate dTheta and dist
+        //TODO: Refine formula to ensure accurate dTheta
         double theta1 = Math.toRadians(142.5  - (same.get(0).getX()*5.5/128)); //Camera 1 Theta
         double theta2 = Math.toRadians(92.5 - (same.get(1).getX()*5.5/128)); //Camera 2 Theta
-
-        telemetry.addData("Theta 1 (Radians): ", theta1);
-        telemetry.addData("Theta 2 (Radians): ", theta2);
 
         double c1;
         double c2;
         double c3;
         double dx;
         double dy;
-        double phi;
+        //double phi;
         double a = 6.825;
         double b = 2;
 
@@ -140,19 +207,13 @@ public class Vision extends Subsystem {
         c2 = theta2;
 
         dx = a * (Math.tan(c1) + Math.tan(c2))/(Math.tan(c1)-Math.tan(c2));
-        dy = a * (Math.tan(c1) * Math.tan(c2))/(Math.tan(c1)-Math.tan(c2));
+        dy = (2 * a) * (Math.tan(c1) * Math.tan(c2))/(Math.tan(c1)-Math.tan(c2)); //Test to see if it's 2*a or a
 
-        c3 = Math.atan((dy - b)/dx);
+        //c3 = Math.atan((dy - b)/dx);
 
-        //double dTheta = Math.atan((13.5*Math.sin(theta2)*Math.sin(theta1)/Math.sin(theta1 - theta2) - 2.25) /(6.75 + (13.5*Math.sin(theta2)*Math.cos(theta1)/(Math.sin(theta1 - theta2))))) - (3.14159265358979323846264338327950/2);
+        double dist = Math.sqrt(Math.pow(dy-b, 2) + Math.pow(dx, 2));
 
-        double dTheta = c3 - Math.PI/2;
-
-        if(dTheta < -Math.PI/2) {
-            dTheta = Math.PI+dTheta;
-        }
-
-        return dTheta;
+        return dist;
 
     }
 
