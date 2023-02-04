@@ -198,6 +198,35 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
             //TODO: ADD PARKING AND POSETRANSFER PROCEDURES
 
+
+            if(park==2){
+                TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(startPose)
+
+                        .lineTo(new Vector2d(PARK_II_X, PARK_Y))
+
+                        .build();
+
+                robot.drive.followTrajectorySequence(parkTwo);
+            }
+            else if(park == 3){
+                TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(startPose)
+
+                        .lineTo(new Vector2d(LEFT_PARK_I_X, PARK_Y))
+
+                        .build();
+
+                robot.drive.followTrajectorySequence(parkThree);
+            }
+            else{
+                TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(startPose)
+
+                        .lineTo(new Vector2d(LEFT_PARK_I_X, PARK_Y))
+
+                        .build();
+
+                robot.drive.followTrajectorySequence(parkOne);
+            }
+
         }
 
         PoseTransfer.currentPose = robot.drive.getPoseEstimate();

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -103,6 +104,8 @@ public class AUTO_PRIME extends LinearOpMode {
 
 
 
+
+
     public int HIGH_POLE_DROP_HEIGHT = 3900;
     public int MEDIUM_POLE_DROP_HEIGHT = 2700;
     public int I_CONE_STACK_PICKUP_HEIGHT = 500;
@@ -115,7 +118,16 @@ public class AUTO_PRIME extends LinearOpMode {
     public int COLLISION_AVOIDANCE_LOWER_LIMIT = 4;
     public int COLLISION_AVOIDANCE_UPPER_LIMIT = 12;
 
-    
+    public double PARK_II_X = 36+0.01;
+
+    public int LEFT_PARK_III_X = 12;
+    public int RIGHT_PARK_III_X = 60;
+
+    public int LEFT_PARK_I_X = 60;
+    public int RIGHT_PARK_I_X = 12;
+
+    public int PARK_Y = 12;
+
     
     
 }

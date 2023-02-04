@@ -26,7 +26,6 @@ public class Sensors extends Subsystem {
         this.front=front;
         this.left=left;
         this.right=right;
-
         this.frontLeft=frontLeft;
         this.frontRight=frontRight;
     }

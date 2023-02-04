@@ -112,10 +112,10 @@ public class Robot {
 
         //Map Sensor System
         front = hardwareMap.get(DistanceSensor.class, "front");
-        left = hardwareMap.get(DistanceSensor.class, "left");
+        /*left = hardwareMap.get(DistanceSensor.class, "left");
         right = hardwareMap.get(DistanceSensor.class, "right");
         frontLeft = hardwareMap.get(DistanceSensor.class, "frontLeft");
-        frontRight = hardwareMap.get(DistanceSensor.class, "frontRight");
+        frontRight = hardwareMap.get(DistanceSensor.class, "frontRight");*/
 
 
 
