@@ -196,8 +196,6 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
             //TODO: ADD "LIVE-BUILT" TRAJECTORIES HERE IN CASE OF SKEW
 
-            //TODO: ADD PARKING AND POSETRANSFER PROCEDURES
-
 
             if(park==2){
                 TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(startPose)
@@ -231,6 +229,36 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
         PoseTransfer.currentPose = robot.drive.getPoseEstimate();
         PoseTransfer.slidePos = robot.delivery.getSlidePos();
+
+        //Find actual closest coord grid values in case park goes wrong, and also prevents a code block for each block case
+        //TODO: NEEDS TESTING TO ENSURE IT ACTUALLY WORKS PROPERLY
+
+        for(int i = 0; i< 6; i++){
+            if(Math.abs(validRobotPosConversion[i]-robot.drive.getPoseEstimate().getX()) < closestTempValX){
+                closestTempValX = robot.drive.getPoseEstimate().getX();
+                closestX = i;
+            }
+        }
+
+        for(int i = 0; i< 6; i++){
+            if(Math.abs(validRobotPosConversion[i]-robot.drive.getPoseEstimate().getY()) < closestTempValY){
+                closestTempValY = robot.drive.getPoseEstimate().getY();
+                closestY = i;
+            }
+        }
+
+        for(int i = 0; i<360; i+=90){
+            if(Math.abs(robot.drive.getPoseEstimate().getHeading()) < closestTempValAngle){
+                closestTempValAngle = robot.drive.getPoseEstimate().getHeading();
+                closestAngle = i;
+            }
+        }
+
+        PoseTransfer.idealGridCoordX = closestX;
+        PoseTransfer.idealGridCoordY = closestY;
+        PoseTransfer.idealGridAngle = closestAngle;
+
+
 
         robot.pause(30);
 
