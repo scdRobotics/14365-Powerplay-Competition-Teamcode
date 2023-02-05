@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name = "AUTO_PRIME", group = "Autonomous")
 @Disabled
-class AUTO_PRIME extends LinearOpMode {
+public class AUTO_PRIME extends LinearOpMode {
 
     Robot robot;
 
