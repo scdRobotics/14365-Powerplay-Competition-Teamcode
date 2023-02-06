@@ -35,14 +35,14 @@ public class Sensors extends Subsystem {
     boolean isBlue = PoseTransfer.isBlue;
 
     //"Constructor" object for Sensors
-    public Sensors(DistanceSensor front, DistanceSensor left, DistanceSensor right, DistanceSensor frontLeft, DistanceSensor frontRight, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
+    public Sensors(DistanceSensor front, DistanceSensor leftFront, DistanceSensor rightFront, DistanceSensor leftBack, DistanceSensor rightBack, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
         super(telemetry,hardwareMap,timer); //Map basic, required aspects of robot
 
         this.front=front;
-        this.left=left;
-        this.right=right;
-        this.frontLeft=frontLeft;
-        this.frontRight=frontRight;
+        this.leftFront=leftFront;
+        this.rightFront=rightFront;
+        this.leftBack=leftBack;
+        this.rightBack=rightBack;
 
         this.led = led;
     }
@@ -73,8 +73,8 @@ public class Sensors extends Subsystem {
         led.setPattern(b);
     }
 
-    public void setLEDState(LED_STATE current){
-        this.current = current;
+    public void setLEDState(LED_STATE c){
+        current = c;
         updateLEDs();
     }
 

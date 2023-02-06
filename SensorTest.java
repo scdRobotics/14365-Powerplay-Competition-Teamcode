@@ -43,17 +43,7 @@ public class SensorTest extends AUTO_PRIME {
 
         while(!isStopRequested()){
 
-            robot.sensors.setLEDs(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-            telemetry.addData("YELLOW", "");
-            telemetry.update();
-
-            robot.pause(3);
-
-            robot.sensors.setLEDs(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-            telemetry.addData("VIOLET", "");
-            telemetry.update();
-
-            robot.pause(3);
+            PoseTransfer.isBlue=false;
 
         }
 
