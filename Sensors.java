@@ -20,7 +20,19 @@ public class Sensors extends Subsystem {
 
     private DistanceSensor frontRight; //Front Left Dist Sensor initial declaration
 
-    public RevBlinkinLedDriver led;
+    private RevBlinkinLedDriver led;
+
+    public enum LED_STATE{
+        DEFAULT,
+        DESYNCED,
+        POLE_GOOD,
+        POLE_BAD,
+        SEMI_AUTO
+    }
+
+    LED_STATE current = LED_STATE.DEFAULT;
+
+    boolean isBlue = PoseTransfer.isBlue;
 
     //"Constructor" object for Sensors
     public Sensors(DistanceSensor front, DistanceSensor left, DistanceSensor right, DistanceSensor frontLeft, DistanceSensor frontRight, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
@@ -57,8 +69,49 @@ public class Sensors extends Subsystem {
         return right.getDistance(DistanceUnit.INCH);
     }
 
-    public void setLEDsManual(RevBlinkinLedDriver.BlinkinPattern b){
+    public void setLEDs(RevBlinkinLedDriver.BlinkinPattern b){
         led.setPattern(b);
+    }
+
+    public void setLEDState(LED_STATE current){
+        this.current = current;
+        updateLEDs();
+    }
+
+    public void updateLEDs(){
+        switch(current){
+
+            case DEFAULT:
+                if(isBlue){
+                    led.setPattern(RevBlinkinLedDriver.BlinkinPattern.SKY_BLUE);
+                }
+                else{
+                    led.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+                }
+                break;
+
+            case DESYNCED:
+                if(isBlue){
+                    led.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_BLUE);
+                }
+                else{
+                    led.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED);
+                }
+                break;
+
+            case POLE_BAD:
+                led.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+                break;
+
+            case POLE_GOOD:
+                led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+                break;
+
+            case SEMI_AUTO:
+                led.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+                break;
+
+        }
     }
 
 }

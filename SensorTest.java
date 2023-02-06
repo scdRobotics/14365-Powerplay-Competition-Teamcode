@@ -40,41 +40,16 @@ public class SensorTest extends AUTO_PRIME {
             telemetry.update();
         }*/
 
-        /*
-
-        ---BOTH---
-        BLUE ALLIANCE: SKY_BLUE (Brightest blue)
-        RED ALLIANCE: RED (Brightest red)
-
-        ---AUTO---
-        IN SYNC WITH TRAJ: CONSTANT
-        DESYNCED WITH TRAJ: HEARTBEAT
-
-        ---TELEOP---
-        (WHEN SLIDE IS EXTENDED UP)
-        READY TO STACK: GREEN
-        NOT READY TO STACK: YELLOW
-
-        (DEPENDENT ON MODE)
-        AUTO: PURPLE
-        MANUAL: SKY_BLUE/RED (ALLIANCE COLORS)
-
-
-
-
-
-         */
-
 
         while(!isStopRequested()){
 
-            robot.sensors.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+            robot.sensors.setLEDs(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
             telemetry.addData("YELLOW", "");
             telemetry.update();
 
             robot.pause(3);
 
-            robot.sensors.led.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            robot.sensors.setLEDs(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
             telemetry.addData("VIOLET", "");
             telemetry.update();
 

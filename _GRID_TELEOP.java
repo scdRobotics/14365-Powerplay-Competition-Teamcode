@@ -111,6 +111,8 @@ public class _GRID_TELEOP extends LinearOpMode {
 
                     robot.drive.update();
 
+                    robot.sensors.setLEDState(Sensors.LED_STATE.SEMI_AUTO);
+
                     break;
 
 
@@ -339,6 +341,14 @@ public class _GRID_TELEOP extends LinearOpMode {
                     }
 
                     robot.drive.update();
+
+
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+
+
+                    //TODO: ADD LED-ASSISTED POLE DROPOFF. REQUIRES CAMERA UTILIZATION IN TELEOP. ONLY ACTIVATE IF SLIDE IS WITHIN DROPPING RANGES. ELSE, JUST USE DEFAULT. EXAMPLE CODE FOR LED CONTROL:
+                    //robot.sensors.setLEDState(Sensors.LED_STATE.POLE_GOOD);
+                    //robot.sensors.setLEDState(Sensors.LED_STATE.POLE_BAD);
 
 
                     break;
