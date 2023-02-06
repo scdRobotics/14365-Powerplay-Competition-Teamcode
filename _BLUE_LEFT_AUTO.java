@@ -298,6 +298,8 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
             return false;
         }
 
+        return true;
+
     }
 
     public boolean isEqual(double a, double aRange, double b, double bRange, double tolerance){
