@@ -287,4 +287,35 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
     }
 
+    //TODO: FINISH. Only have this as a simple, temporary example.
+    public boolean isSkewFirst(){
+        double webcamThetaCalc = robot.vision.findClosePoleDTheta() - I_EXPECTED_WEBCAM_READOUT; //Or minus? Probably plus though...
+        double odometryCalc = robot.drive.getPoseEstimate().getHeading() - Math.toRadians(90);
+        double imucalc = 0; //Add IMU support
+
+        if(isEqual(webcamThetaCalc, 1.5, odometryCalc, Math.toRadians(3), Math.toRadians(2))){
+            //Webcam dTheta Calculation and Localizer Calculation are equal
+            return false;
+        }
+
+    }
+
+    public boolean isEqual(double a, double aRange, double b, double bRange, double tolerance){
+        if(Math.abs((a+aRange) - (b+bRange)) < tolerance){
+            return true;
+        }
+        else if(Math.abs((a+aRange - b+bRange)) < tolerance){
+            return true;
+        }
+        else if(Math.abs((a-aRange - b+bRange)) < tolerance){
+            return true;
+        }
+        else if(Math.abs((a-aRange - b-bRange)) < tolerance){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 }
