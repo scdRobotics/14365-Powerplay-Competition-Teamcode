@@ -147,8 +147,8 @@ public class Robot {
         delivery = new Delivery(slide, gripper, telemetry, hardwareMap, timer);
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
-        
-        sensors = new Sensors(front, left, right, frontLeft, frontRight, led, telemetry, hardwareMap, timer);
+
+        sensors = new Sensors(front, leftFront, rightFront, leftBack, rightBack, led, telemetry, hardwareMap, timer);
 
 
 

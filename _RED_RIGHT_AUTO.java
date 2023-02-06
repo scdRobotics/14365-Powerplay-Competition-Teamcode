@@ -203,6 +203,7 @@ public class _RED_RIGHT_AUTO extends AUTO_PRIME {
                 if(trajectorySkewFirst || trajectorySkewSecond || trajectorySkewThird){ //Meaning we sense we are off of the trajectory by a significant margin. One for each pole drop
                     robot.drive.breakFollowing();
                     robot.drive.setDrivePower(new Pose2d());
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
                     break;
                 }
 
