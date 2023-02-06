@@ -12,13 +12,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Sensors extends Subsystem {
     private DistanceSensor front; //Underbelly Dist Sensor #1 initial declaration
 
-    private DistanceSensor left; //Left Dist Sensor initial declaration
+    private DistanceSensor leftFront; //Left Dist Sensor initial declaration
 
-    private DistanceSensor right; //Front Left Dist Sensor initial declaration
+    private DistanceSensor rightFront; //Front Left Dist Sensor initial declaration
 
-    private DistanceSensor frontLeft; //Left Dist Sensor initial declaration
+    private DistanceSensor leftBack; //Left Dist Sensor initial declaration
 
-    private DistanceSensor frontRight; //Front Left Dist Sensor initial declaration
+    private DistanceSensor rightBack; //Front Left Dist Sensor initial declaration
 
     private RevBlinkinLedDriver led;
 
@@ -53,20 +53,20 @@ public class Sensors extends Subsystem {
         return front.getDistance(DistanceUnit.INCH);
     }
 
-    public double getFrontLeftDist(){
-        return frontLeft.getDistance(DistanceUnit.INCH);
+    public double getLeftFrontDist(){
+        return leftFront.getDistance(DistanceUnit.INCH);
     }
 
-    public double getFrontRightDist(){
-        return frontRight.getDistance(DistanceUnit.INCH);
+    public double getRightFrontDist(){
+        return rightFront.getDistance(DistanceUnit.INCH);
     }
 
-    public double getLeftDist(){
-        return left.getDistance(DistanceUnit.INCH);
+    public double getLeftBackDist(){
+        return leftBack.getDistance(DistanceUnit.INCH);
     }
 
-    public double getRightDist(){
-        return right.getDistance(DistanceUnit.INCH);
+    public double getRightBackDist(){
+        return rightBack.getDistance(DistanceUnit.INCH);
     }
 
     public void setLEDs(RevBlinkinLedDriver.BlinkinPattern b){

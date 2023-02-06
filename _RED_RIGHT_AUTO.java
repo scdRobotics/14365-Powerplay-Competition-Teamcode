@@ -16,35 +16,11 @@ public class _RED_RIGHT_AUTO extends AUTO_PRIME {
 
         initAuto();
 
-        //TODO: ADD DESYNC FUNCTIONALITY WITH SKEW FUNCTION AVAILABLE IN AUTONOMOUS-IMPROVEMENTS BRANCH. EXAMPLE OF WHAT THIS WOULD LOOK LIKE HERE:
-        //robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
-
-        int[] validRobotPosConversion = new int[6];
-
-        for(int i = 0; i< validRobotPosConversion.length; i++){
-            validRobotPosConversion[i]= ((i*24) + 12) - 72;
-        }
-
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
         Pose2d startPose = new Pose2d(-START_X, -START_Y, Math.toRadians(START_ANG-180));
 
-        waitForStart();
-
-        int park = robot.vision.readAprilTagCamera2() + 1;
-
-        telemetry.addData("April Tag Detected: ", park);
-        telemetry.update();
-
-        robot.vision.runAprilTag(false);
-
         boolean robotDetected = false;
-
-        boolean trajectorySkewFirst = false;
-
-        boolean trajectorySkewSecond = false;
-
-        boolean trajectorySkewThird = false;
 
         TrajectorySequence firstApproach = robot.drive.trajectorySequenceBuilder(startPose)
 
@@ -60,7 +36,12 @@ public class _RED_RIGHT_AUTO extends AUTO_PRIME {
 
                 .lineTo(new Vector2d(-I_DROP_X, -I_DROP_Y))
 
-                //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
+                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - I_EXPECTED_SENSOR_READOUT) > I_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - I_EXPECTED_WEBCAM_READOUT) > I_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
+                        trajectorySkewFirst = true;
+                    }
+                })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
@@ -97,7 +78,12 @@ public class _RED_RIGHT_AUTO extends AUTO_PRIME {
 
                 .lineTo(new Vector2d(-II_DROP_X, -II_DROP_Y))
 
-                //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
+                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - II_III_EXPECTED_SENSOR_READOUT) > II_III_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - II_III_EXPECTED_WEBCAM_READOUT) > II_III_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
+                        trajectorySkewSecond = true;
+                    }
+                })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(-II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
@@ -140,7 +126,12 @@ public class _RED_RIGHT_AUTO extends AUTO_PRIME {
 
                 .lineTo(new Vector2d(-III_DROP_X, -III_DROP_Y))
 
-                //TODO: ADD FIRST TRAJECTORY "INTEGRITY CHECK" HERE
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
+                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - II_III_EXPECTED_SENSOR_READOUT) > II_III_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - II_III_EXPECTED_WEBCAM_READOUT) > II_III_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
+                        trajectorySkewThird = true;
+                    }
+                })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
@@ -158,14 +149,30 @@ public class _RED_RIGHT_AUTO extends AUTO_PRIME {
 
                 .build();
 
+        waitForStart();
 
-        double sensorReadout;
+        int park = robot.vision.readAprilTagCamera2() + 1;
+
+        telemetry.addData("April Tag Detected: ", park);
+        telemetry.update();
+
+        robot.vision.runAprilTag(false);
+
+
+        double frontSensorReadout = 0;
+        double backSensorReadout = 0;
+
+        robot.timer.startTime();
 
         while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy()){ //Should leave loop when async function is done or robot is detected
 
-            sensorReadout = robot.sensors.getRightDist();
+            if(robot.timer.time()>1.5){
+                frontSensorReadout = robot.sensors.getRightFrontDist();
+                backSensorReadout = robot.sensors.getRightBackDist();
+            }
 
-            if((sensorReadout<COLLISION_AVOIDANCE_UPPER_LIMIT && sensorReadout>COLLISION_AVOIDANCE_LOWER_LIMIT)){ //Meaning a robot is approaching the same direction
+
+            if((frontSensorReadout<COLLISION_AVOIDANCE_UPPER_LIMIT && frontSensorReadout>COLLISION_AVOIDANCE_LOWER_LIMIT) && (backSensorReadout<COLLISION_AVOIDANCE_UPPER_LIMIT && backSensorReadout>COLLISION_AVOIDANCE_LOWER_LIMIT)){ //Meaning a robot is approaching the same direction
                 robot.drive.breakFollowing();
                 robot.drive.setDrivePower(new Pose2d());
                 robotDetected=true;
@@ -179,7 +186,7 @@ public class _RED_RIGHT_AUTO extends AUTO_PRIME {
 
 
         if(robotDetected){
-            //Run alt version of program (go for middle 4 point)
+            //TODO: Run alt version of program (go for middle 4 point & park). Still needs programming.
 
 
         }

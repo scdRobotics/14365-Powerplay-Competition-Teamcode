@@ -109,6 +109,40 @@ public class AUTO_PRIME extends LinearOpMode {
     int COLLISION_AVOIDANCE_LOWER_LIMIT = 4;
     int COLLISION_AVOIDANCE_UPPER_LIMIT = 12;
 
+
+
+
+
+    boolean trajectorySkewFirst = false;
+
+    boolean trajectorySkewSecond = false;
+
+    boolean trajectorySkewThird = false;
+
+
+    //NOTE: Only the distances have different tolerances for I and II/III dropoffs. This is because the first dropoff is at an angle and inherently different than the rest.
+    int WEBCAM_DEGREE_TOLERANCE = 5; //Degree of tolerance within findDTheta to trigger a skew flag
+
+    int I_WEBCAM_DIST_TOLERANCE = 3;
+
+    int I_EXPECTED_WEBCAM_READOUT = 14;
+
+    int II_III_WEBCAM_DIST_TOLERANCE = 3;
+
+    int II_III_EXPECTED_WEBCAM_READOUT = 14;
+
+
+    int I_DISTANCE_SENSOR_TOLERANCE = 1; //Degree of tolerance within front distance sensor readout to trigger a skew flag
+
+    int I_EXPECTED_SENSOR_READOUT = 2; //TODO: NEEDS AN ACTUAL MEASUREMENT. Exepected readout of front distance sensor for first drop
+
+
+    int II_III_DISTANCE_SENSOR_TOLERANCE = 1; //Degree of tolerance within front distance sensor readout to trigger a skew flag
+
+    int II_III_EXPECTED_SENSOR_READOUT = 2; //TODO: NEEDS AN ACTUAL MEASUREMENT. Exepected readout of front distance sensor for first drop
+
+
+
     double PARK_II_X = 36+0.01;
 
     int LEFT_PARK_III_X = 12;
