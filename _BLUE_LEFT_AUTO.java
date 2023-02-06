@@ -12,8 +12,12 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
     @Override
     public void runOpMode() throws InterruptedException{
 
+        PoseTransfer.isBlue=true;
 
         initAuto();
+
+        //TODO: ADD DESYNC FUNCTIONALITY WITH SKEW FUNCTION AVAILABLE IN AUTONOMOUS-IMPROVEMENTS BRANCH. EXAMPLE OF WHAT THIS WOULD LOOK LIKE HERE:
+        //robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 

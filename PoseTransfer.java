@@ -10,4 +10,6 @@ public class PoseTransfer {
     public static int idealGridAngle = 0;
     public static double slidePos = 0;
 
+    public static boolean isBlue = true;
+
 }

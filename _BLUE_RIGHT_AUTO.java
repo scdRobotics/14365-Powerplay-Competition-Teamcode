@@ -12,9 +12,10 @@ public class _BLUE_RIGHT_AUTO extends AUTO_PRIME {
     @Override
     public void runOpMode() throws InterruptedException{
 
+        PoseTransfer.isBlue=true;
 
         initAuto();
-
+        
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
         Pose2d startPose = new Pose2d(-START_X, START_Y, Math.toRadians(START_ANG-180));

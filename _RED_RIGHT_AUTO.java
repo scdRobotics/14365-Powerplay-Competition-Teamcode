@@ -12,6 +12,7 @@ public class _RED_RIGHT_AUTO extends AUTO_PRIME {
     @Override
     public void runOpMode() throws InterruptedException{
 
+        PoseTransfer.isBlue=false;
 
         initAuto();
 

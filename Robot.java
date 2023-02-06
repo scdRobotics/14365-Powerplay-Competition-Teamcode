@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 //Package is a VERY important step! Required to do basically anything with the robot
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -56,6 +57,13 @@ public class Robot {
 
     public DistanceSensor rightFront;
     public DistanceSensor leftFront;
+
+
+
+
+
+
+    public RevBlinkinLedDriver led;
 
     //NOTE: These are all basic, required aspects of the robot
     public final ElapsedTime timer;
@@ -118,6 +126,8 @@ public class Robot {
         leftBack = hardwareMap.get(DistanceSensor.class, "leftBack");
         rightBack = hardwareMap.get(DistanceSensor.class, "rightBack");*/
 
+        led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
+
 
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -137,8 +147,8 @@ public class Robot {
         delivery = new Delivery(slide, gripper, telemetry, hardwareMap, timer);
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
-
-        sensors = new Sensors(front, leftFront, rightFront, leftBack, rightBack, telemetry, hardwareMap, timer);
+        
+        sensors = new Sensors(front, left, right, frontLeft, frontRight, led, telemetry, hardwareMap, timer);
 
 
 

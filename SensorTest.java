@@ -13,6 +13,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MinAccelerationConstra
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TranslationalVelocityConstraint;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -20,7 +21,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous(name="SensorTest", group="TestAutonomous")
-public class SensorTest extends LinearOpMode {
+public class SensorTest extends AUTO_PRIME {
 
     @Override
     public void runOpMode() {
@@ -28,18 +29,35 @@ public class SensorTest extends LinearOpMode {
 
         ElapsedTime timer = new ElapsedTime();
 
-        Robot robot = new Robot(this, hardwareMap, telemetry, timer, false);
-
-        Sensors sensors = robot.sensors;
+        initAuto();
 
         waitForStart();
 
-        while(!isStopRequested()){
-            telemetry.addData("Front Right sensor readout: ", sensors.getFrontRightDist());
-            telemetry.addData("Front Left sensor readout: ", sensors.getFrontLeftDist());
-            telemetry.addData("Front sensor readout: ", sensors.getFrontDist());
+        /*while(!isStopRequested()){
+            telemetry.addData("Front Right sensor readout: ", robot.sensors..getFrontRightDist());
+            telemetry.addData("Front Left sensor readout: ", robot.sensors..getFrontLeftDist());
+            telemetry.addData("Front sensor readout: ", robot.sensors..getFrontDist());
             telemetry.update();
+        }*/
+
+
+        while(!isStopRequested()){
+
+            robot.sensors.setLEDs(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+            telemetry.addData("YELLOW", "");
+            telemetry.update();
+
+            robot.pause(3);
+
+            robot.sensors.setLEDs(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            telemetry.addData("VIOLET", "");
+            telemetry.update();
+
+            robot.pause(3);
+
         }
+
+
 
 
 
