@@ -51,10 +51,11 @@ public class Robot {
 
 
     public DistanceSensor front;
-    public DistanceSensor right;
-    public DistanceSensor left;
-    public DistanceSensor frontRight;
-    public DistanceSensor frontLeft;
+    public DistanceSensor rightBack;
+    public DistanceSensor leftBack;
+
+    public DistanceSensor rightFront;
+    public DistanceSensor leftFront;
 
     //NOTE: These are all basic, required aspects of the robot
     public final ElapsedTime timer;
@@ -112,10 +113,10 @@ public class Robot {
 
         //Map Sensor System
         front = hardwareMap.get(DistanceSensor.class, "front");
-        /*left = hardwareMap.get(DistanceSensor.class, "left");
-        right = hardwareMap.get(DistanceSensor.class, "right");
-        frontLeft = hardwareMap.get(DistanceSensor.class, "frontLeft");
-        frontRight = hardwareMap.get(DistanceSensor.class, "frontRight");*/
+        /*leftFront = hardwareMap.get(DistanceSensor.class, "leftFront");
+        rightFront = hardwareMap.get(DistanceSensor.class, "rightFront");
+        leftBack = hardwareMap.get(DistanceSensor.class, "leftBack");
+        rightBack = hardwareMap.get(DistanceSensor.class, "rightBack");*/
 
 
 
@@ -137,7 +138,7 @@ public class Robot {
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
 
-        sensors = new Sensors(front, left, right, frontLeft, frontRight, telemetry, hardwareMap, timer);
+        sensors = new Sensors(front, leftFront, rightFront, leftBack, rightBack, telemetry, hardwareMap, timer);
 
 
 
