@@ -291,18 +291,45 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
     //TODO: FINISH. Only have this as a simple, temporary example.
     public boolean isSkewFirst(){
         double webcamThetaCalc = robot.vision.findClosePoleDTheta() - I_EXPECTED_WEBCAM_READOUT; //Or minus? Probably plus though...
-        double odometryCalc = robot.drive.getPoseEstimate().getHeading() - Math.toRadians(90);
-        double imucalc = 0; //Add IMU support
+        double odometryCalc = robot.drive.getPoseEstimate().getHeading() - Math.toRadians(90); //90 degrees is expected readout
+        double imuCalc = robot.sensors.getIMUReadout(); //Add IMU support
 
-        if(isEqual(webcamThetaCalc, 1.5, odometryCalc, Math.toRadians(3), Math.toRadians(2))){
+        if(isEqual(webcamThetaCalc, WEBCAM_THETA_ACCEPTABLE_RANGE, odometryCalc, ODO_HEADING_ACCEPTABLE_RANGE, UNIVERSAL_TOLERANCE_VAL)){
             //Webcam dTheta Calculation and Localizer Calculation are equal
-            return false;
+            if(isEqual(webcamThetaCalc, WEBCAM_THETA_ACCEPTABLE_RANGE, imuCalc, IMU_READOUT_ACCEPTABLE_RANGE, Math.toRadians(3)) || isEqual(odometryCalc, Math.toRadians(2), imuCalc, Math.toRadians(2), UNIVERSAL_TOLERANCE_VAL)){
+                //Webcam dTheta Calculation, Localizer, AND IMU are equal. THIS IS GOOD! :)
+                //TODO: MOVE ON TO DISTANCE INTEGRITY CHECKS.
+            }
+            else{
+                //Webcam dTheta and Localizer are equal, but not IMU
+                //TODO: THIS MEANS ODO AND dTHETA DRIFTED. TRY TO ADDRESS (THROUGH RECURSIVE CALLS) AND UPDATING ODO, BUUUT IF THAT DOESNT WORK...
+                return true;
+            }
+        }
+        else{
+            //Webcam dTheta Calculation and Localizer Calculation are NOT equal
+            if(isEqual(webcamThetaCalc, WEBCAM_THETA_ACCEPTABLE_RANGE, imuCalc, IMU_READOUT_ACCEPTABLE_RANGE, UNIVERSAL_TOLERANCE_VAL)){
+                //Webcam dTheta Calculation and IMU are accurate
+                //TODO: THIS MEANS ODO DRIFTED BUT dTHETA IS ACCURATE. TRY TO ADDRESS BY UPDATING ODO, BUUUT IF THAT DOESNT WORK...
+                return true;
+            }
+            else if(isEqual(odometryCalc, ODO_HEADING_ACCEPTABLE_RANGE, imuCalc, IMU_READOUT_ACCEPTABLE_RANGE, UNIVERSAL_TOLERANCE_VAL)){
+                //Odometry Calculation and IMU are accurate, but not
+                //TODO: THIS MEANS CAMERA dTHETA DID NOT WORK. TRY TO ADDRESS (THROUGH RECURSIVE CALLS), BUUUT IF THAT DOESNT WORK...
+                return true;
+            }
+            else{
+                //None are equal
+                //TODO: THIS MEANS ODO AND dTHETA DRIFTED. TRY TO ADDRESS (THROUGH RECURSIVE CALLS) AND UPDATING ODO, BUUUT IF THAT DOESNT WORK...
+                return true;
+            }
         }
 
-        return true;
+        return false;
 
     }
 
+    //TODO: Reevaluate. This seems inefficient and redundant. "Tolerance" should not be necessary here. Hmm.
     public boolean isEqual(double a, double aRange, double b, double bRange, double tolerance){
         if(Math.abs((a+aRange) - (b+bRange)) < tolerance){
             return true;

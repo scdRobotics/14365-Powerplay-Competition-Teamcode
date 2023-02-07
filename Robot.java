@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 //Package is a VERY important step! Required to do basically anything with the robot
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +15,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.AxisDirection;
+import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 //Most imports are automatically handled by Android Studio as you program
@@ -57,6 +60,11 @@ public class Robot {
 
     public DistanceSensor rightFront;
     public DistanceSensor leftFront;
+
+
+
+    public BNO055IMU imu;
+
 
 
 
@@ -143,12 +151,20 @@ public class Robot {
         webcam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
 
 
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
+        BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_X);
+
+
         //delivery = new Delivery(slide, lazySusan, gripper, telemetry, hardwareMap, timer);
         delivery = new Delivery(slide, gripper, telemetry, hardwareMap, timer);
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
 
-        sensors = new Sensors(front, leftFront, rightFront, leftBack, rightBack, led, telemetry, hardwareMap, timer);
+        sensors = new Sensors(imu, front, leftFront, rightFront, leftBack, rightBack, led, telemetry, hardwareMap, timer);
 
 
 

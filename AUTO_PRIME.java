@@ -155,6 +155,16 @@ public class AUTO_PRIME extends LinearOpMode {
 
     int[] validRobotPosConversion = new int[6];
 
+
+
+
+    double WEBCAM_THETA_ACCEPTABLE_RANGE = Math.toRadians(3);
+
+    double IMU_READOUT_ACCEPTABLE_RANGE = Math.toRadians(2);
+
+    double ODO_HEADING_ACCEPTABLE_RANGE = Math.toRadians(1);
+    double UNIVERSAL_TOLERANCE_VAL = Math.toRadians(1);
+
     
     void initAuto(){
         ElapsedTime timer = new ElapsedTime();

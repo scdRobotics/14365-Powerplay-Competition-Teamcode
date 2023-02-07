@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 //Package is a VERY important step! Required to do basically anything with the robot
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,6 +23,8 @@ public class Sensors extends Subsystem {
 
     private RevBlinkinLedDriver led;
 
+    private BNO055IMU imu;
+
     public enum LED_STATE{
         DEFAULT,
         DESYNCED,
@@ -35,8 +38,10 @@ public class Sensors extends Subsystem {
     boolean isBlue = PoseTransfer.isBlue;
 
     //"Constructor" object for Sensors
-    public Sensors(DistanceSensor front, DistanceSensor leftFront, DistanceSensor rightFront, DistanceSensor leftBack, DistanceSensor rightBack, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
+    public Sensors(BNO055IMU imu, DistanceSensor front, DistanceSensor leftFront, DistanceSensor rightFront, DistanceSensor leftBack, DistanceSensor rightBack, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
         super(telemetry,hardwareMap,timer); //Map basic, required aspects of robot
+
+        this.imu=imu;
 
         this.front=front;
         this.leftFront=leftFront;
@@ -112,6 +117,10 @@ public class Sensors extends Subsystem {
                 break;
 
         }
+    }
+
+    public double getIMUReadout(){
+        return imu.getAngularOrientation().firstAngle;
     }
 
 }
