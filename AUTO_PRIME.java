@@ -34,14 +34,14 @@ public class AUTO_PRIME extends LinearOpMode {
     int START_X = 36;
     double START_Y = 61.25;
     double START_ANG = 180;
-
+    public static int I_APPROACH_TURN = 45;
 
     int I_APPROACH_X = 36;
-    int I_APPROACH_Y = 0;
+    int I_APPROACH_Y = 12;
 
 
-    int I_DROP_X = 32;
-    int I_DROP_Y = 0;
+    double I_DROP_X = 32.19;
+    double I_DROP_Y = 6.19;
 
 
     int I_BACK_POLE_X = 36;
@@ -62,8 +62,8 @@ public class AUTO_PRIME extends LinearOpMode {
     int II_APPROACH_TURN = 135;
 
 
-    int II_DROP_X = 30;
-    int II_DROP_Y = 6;
+    double II_DROP_X = 30.19;
+    double II_DROP_Y = 6.19;
 
 
 
@@ -86,8 +86,8 @@ public class AUTO_PRIME extends LinearOpMode {
 
 
 
-    int III_DROP_X = 30;
-    int III_DROP_Y = 6;
+    double III_DROP_X = 30.19;
+    double III_DROP_Y = 6.19;
 
     int III_APPROACH_X = 36;
     int III_APPROACH_Y = 12;

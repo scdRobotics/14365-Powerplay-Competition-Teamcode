@@ -13,7 +13,7 @@ import java.lang.reflect.Array;
 
 
 @TeleOp(name = "GRID_TELEOP", group = "TeleOp")
-public class _GRID_TELEOP extends LinearOpMode {
+public class GridTeleop extends LinearOpMode {
 
     enum MODE {
         MANUAL,

@@ -34,6 +34,8 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence idealTrajectory = robot.drive.trajectorySequenceBuilder(firstApproach.end())
 
+                .turn(Math.toRadians(I_APPROACH_TURN))
+
                 .lineTo(new Vector2d(I_DROP_X, -I_DROP_Y))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
