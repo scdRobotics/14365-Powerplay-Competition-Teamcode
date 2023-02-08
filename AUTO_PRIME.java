@@ -25,6 +25,12 @@ public class AUTO_PRIME extends LinearOpMode {
         BASIC MOVEMENTS (UNIVERSAL)
         */
 
+
+    int ANGLE_SKEW_COUNT = 0;
+
+    int DIST_SKEW_COUNT = 0;
+
+
     int START_X = 36;
     double START_Y = 61.25;
     double START_ANG = 180;
@@ -162,8 +168,24 @@ public class AUTO_PRIME extends LinearOpMode {
 
     double IMU_READOUT_ACCEPTABLE_RANGE = Math.toRadians(2);
 
+    double I_EXPECTED_IMU_READOUT = 0;
+
+    double I_EXPECTED_WEBCAM_DIST = 14;
+
+    double I_WEBCAM_DIST_ACCEPTABLE_RANGE = 2;
+
+
     double ODO_HEADING_ACCEPTABLE_RANGE = Math.toRadians(1);
+
+    double I_EXPECTED_ODO_READOUT = Math.toRadians(90);
+
     double UNIVERSAL_TOLERANCE_VAL = Math.toRadians(1);
+
+
+
+    double I_EXPECTED_SENSOR_DIST = 14;
+
+    double I_SENSOR_DIST_ACCPETABLE_RANGE = 0.5;
 
     
     void initAuto(){
