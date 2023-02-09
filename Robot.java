@@ -63,7 +63,7 @@ public class Robot {
 
 
 
-    public BNO055IMU imu;
+    //public BNO055IMU imu;
 
 
 
@@ -152,11 +152,11 @@ public class Robot {
 
 
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        /*imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
-        BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_X);
+        BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_X);*/
 
 
         //delivery = new Delivery(slide, lazySusan, gripper, telemetry, hardwareMap, timer);
@@ -164,7 +164,7 @@ public class Robot {
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
 
-        sensors = new Sensors(imu, front, leftFront, rightFront, leftBack, rightBack, led, telemetry, hardwareMap, timer);
+        sensors = new Sensors(front, leftFront, rightFront, leftBack, rightBack, led, telemetry, hardwareMap, timer);
 
 
 
