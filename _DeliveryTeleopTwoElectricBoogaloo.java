@@ -162,9 +162,18 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
              */
 
 
-            //TODO: ADD LED-ASSISTED POLE DROPOFF. REQUIRES CAMERA UTILIZATION IN TELEOP. ONLY ACTIVATE IF SLIDE IS WITHIN DROPPING RANGES. ELSE, JUST USE DEFAULT. EXAMPLE CODE FOR LED CONTROL:
-            //robot.sensors.setLEDState(Sensors.LED_STATE.POLE_GOOD);
-            //robot.sensors.setLEDState(Sensors.LED_STATE.POLE_BAD);
+            //TODO: ADD LED-ASSISTED POLE DROPOFF. WILL LIKELY BEHAVE INCREDIBLY SIMILARLY TO AUTONOMOUS SKEW CHECK, JUST SLIGHTLY DIFFERENT CONSTANTS. ONLY ACTIVATE IF SLIDE IS WITHIN DROPPING RANGES. ELSE, JUST USE DEFAULT. EXAMPLE CODE FOR LED CONTROL:
+            robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+            if(slidePos>1250){
+                /*
+                if(isSkew()){
+                    robot.sensors.setLEDState(Sensors.LED_STATE.POLE_BAD);
+                }
+                else{
+                    robot.sensors.setLEDState(Sensors.LED_STATE.POLE_GOOD);
+                }
+                 */
+            }
 
 
 
