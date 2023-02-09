@@ -292,7 +292,45 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
     //TODO: THIS ASSUMES IMU IS ACCURATE-- I really should have a helper function for getting IMU information in Sensors subsystem which generates Drive profile first, followed by updating IMU with an "addition val" that equals start position
     //TODO: Just updating odo based off IMU readout is... a touch sketch. This will definitely need tuning (a lot of it.)
-    public boolean isSkewFirst(){
+
+    public boolean isSkew(double odoTheta, double camTheta, double frontSensorDist, double odoDist, double camDist){
+        if(
+                isEqual(odoTheta, Math.toRadians(ODO_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
+                && isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
+                && isEqual(frontSensorDist, FRONT_SENSOR_DIST_ACCPETABLE_RANGE, IDEAL_DIST)
+                && isEqual(odoDist, ODO_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)
+                && isEqual(camDist, WEBCAM_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)
+        ){
+          return false;
+        }
+
+        else{
+            if(!isEqual(odoTheta, Math.toRadians(ODO_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)){
+                //TODO: Update Odo angle based on IMU readout (need to get IMU working). Technically, IMU resyncing can (and tobe safe, maybe should) happen anywhere in the program and may not add to Trajectory build time. Needs experimentation.
+                //odoTheta = robot.sensors.getIMUReadout();
+            }
+            if(!isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)){
+                camTheta = robot.vision.findClosePoleDTheta();
+            }
+            if(!isEqual(camDist, Math.toRadians(WEBCAM_DIST_ACCEPTABLE_RANGE), IDEAL_DIST)){
+                camDist = robot.vision.findClosePoleDist();
+            }
+            if(!isEqual(frontSensorDist, FRONT_SENSOR_DIST_ACCPETABLE_RANGE, IDEAL_DIST)){
+                frontSensorDist = robot.sensors.getFrontDist();
+            }
+            if(!isEqual(odoDist, ODO_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)){
+                //TODO: Our Odo is totally screwed up. See if we can salvage it from other measurements.
+            }
+            if(SKEW_COUNT<4){
+                SKEW_COUNT++;
+                isSkew(odoTheta, camTheta, frontSensorDist, odoDist, camDist);
+            }
+            return true; //TODO: NEED SOME WAY TO QUICKLY PASS OUT WHICH SENSORS ARE STILL VALID. PROBABLY OUTSIDE BOOLEANS, AS SEMI JANKY/SPAGHETTI AS THAT IS.
+        }
+
+    }
+
+    /*public boolean isSkewFirst(){
         double webcamThetaCalc = robot.vision.findClosePoleDTheta() - I_EXPECTED_WEBCAM_READOUT; //Or minus? Probably plus though...
         double odometryCalc = robot.drive.getPoseEstimate().getHeading() - I_EXPECTED_ODO_READOUT; //Or minus? Probably plus though...
         double imuCalc = robot.sensors.getIMUReadout() - I_EXPECTED_IMU_READOUT; //Add IMU support
@@ -356,10 +394,14 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
             }
         }
 
-    }
+    }*/
 
     public boolean isEqual(double a, double aRange, double b, double bRange){
         return (a-aRange <= b+bRange) && (b-bRange <= a+aRange);
+    }
+
+    public boolean isEqual(double a, double aRange, double b){
+        return (a-aRange <= b) && (b <= a+aRange);
     }
 
 }

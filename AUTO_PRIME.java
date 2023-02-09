@@ -20,15 +20,13 @@ public class AUTO_PRIME extends LinearOpMode {
     double closestTempValAngle = 500;
 
 
+    int SKEW_COUNT = 0;
+
+
 
         /*
         BASIC MOVEMENTS (UNIVERSAL)
         */
-
-
-    int ANGLE_SKEW_COUNT = 0;
-
-    int DIST_SKEW_COUNT = 0;
 
 
     int START_X = 36;
@@ -166,26 +164,20 @@ public class AUTO_PRIME extends LinearOpMode {
 
     double WEBCAM_THETA_ACCEPTABLE_RANGE = Math.toRadians(3);
 
-    double IMU_READOUT_ACCEPTABLE_RANGE = Math.toRadians(2);
-
-    double I_EXPECTED_IMU_READOUT = 0;
-
-    double I_EXPECTED_WEBCAM_DIST = 14;
-
-    double I_WEBCAM_DIST_ACCEPTABLE_RANGE = 2;
+    double WEBCAM_DIST_ACCEPTABLE_RANGE = 3;
 
 
-    double ODO_HEADING_ACCEPTABLE_RANGE = Math.toRadians(1);
+    double ODO_THETA_ACCEPTABLE_RANGE = Math.toRadians(1);
 
-    double I_EXPECTED_ODO_READOUT = Math.toRadians(90);
-
-    double UNIVERSAL_TOLERANCE_VAL = Math.toRadians(1);
+    double ODO_DIST_ACCEPTABLE_RANGE = 1;
 
 
 
-    double I_EXPECTED_SENSOR_DIST = 14;
+    double BLUE_LEFT_IDEAL_THETA = Math.toRadians(245);
 
-    double I_SENSOR_DIST_ACCPETABLE_RANGE = 0.5;
+    double FRONT_SENSOR_DIST_ACCPETABLE_RANGE = 1.5;
+
+    double IDEAL_DIST = 6.15;
 
     
     void initAuto(){
