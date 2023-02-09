@@ -118,7 +118,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
                     if(gamepad1.left_bumper) {
-                        slow = 3;
+                        slow = 8;
                     }
                     else {
                         slow = 1;
@@ -128,14 +128,14 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
                     //TODO: HAVE CHECK AGAINST IMU FOR IF/WHEN "GET HEADING" IS NOT ACCURATE
                     Pose2d poseEstimate = robot.drive.getPoseEstimate();
                     Vector2d input = new Vector2d(
-                            -gamepad1.left_stick_y/slow,
-                            -gamepad1.left_stick_x/slow
+                            -gamepad1.left_stick_y,
+                            -gamepad1.left_stick_x
                     ).rotated(-poseEstimate.getHeading());
 
                     robot.drive.setWeightedDrivePower(
                             new Pose2d(
-                                    input.getX(),
-                                    input.getY(),
+                                    input.getX()/slow,
+                                    input.getY()/slow,
                                     -gamepad1.right_stick_x/slow
                             )
                     );

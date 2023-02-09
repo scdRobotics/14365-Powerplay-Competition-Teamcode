@@ -40,10 +40,16 @@ public class SensorTest extends AUTO_PRIME {
             telemetry.update();
         }*/
 
+        TrajectorySequence forward = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
+
+                .forward(10)
+
+                .build();
+
 
         while(!isStopRequested()){
 
-            PoseTransfer.isBlue=false;
+            robot.drive.followTrajectorySequence(forward);
 
         }
 
