@@ -400,8 +400,14 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
         return (a-aRange <= b+bRange) && (b-bRange <= a+aRange);
     }
 
-    public boolean isEqual(double a, double aRange, double b){
-        return (a-aRange <= b) && (b <= a+aRange);
+    /*public boolean isEqual(double a, double aRange, double b){
+        //return (a-aRange <= b) && (b <= a+aRange);
+    }*/
+
+    public boolean isEqual (double x, double delta, double a) //X = sensor input, A = ideal input, delta = range/2
+    {
+        return Math.abs(x-a)< (delta/2);
     }
+
 
 }
