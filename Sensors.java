@@ -13,13 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Sensors extends Subsystem {
     private DistanceSensor front; //Underbelly Dist Sensor #1 initial declaration
 
-    private DistanceSensor leftFront; //Left Dist Sensor initial declaration
+    private DistanceSensor left; //Left Dist Sensor initial declaration
 
-    private DistanceSensor rightFront; //Front Left Dist Sensor initial declaration
-
-    private DistanceSensor leftBack; //Left Dist Sensor initial declaration
-
-    private DistanceSensor rightBack; //Front Left Dist Sensor initial declaration
+    private DistanceSensor right; //Front Left Dist Sensor initial declaration
 
     private RevBlinkinLedDriver led;
 
@@ -36,14 +32,12 @@ public class Sensors extends Subsystem {
     boolean isBlue = PoseTransfer.isBlue;
 
     //"Constructor" object for Sensors
-    public Sensors(DistanceSensor front, DistanceSensor leftFront, DistanceSensor rightFront, DistanceSensor leftBack, DistanceSensor rightBack, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
+    public Sensors(DistanceSensor front, DistanceSensor left, DistanceSensor right, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
         super(telemetry,hardwareMap,timer); //Map basic, required aspects of robot
 
         this.front=front;
-        this.leftFront=leftFront;
-        this.rightFront=rightFront;
-        this.leftBack=leftBack;
-        this.rightBack=rightBack;
+        this.left=left;
+        this.right=right;
 
         this.led = led;
     }
@@ -54,20 +48,12 @@ public class Sensors extends Subsystem {
         return front.getDistance(DistanceUnit.INCH);
     }
 
-    public double getLeftFrontDist(){
-        return leftFront.getDistance(DistanceUnit.INCH);
+    public double getLeftDist(){
+        return left.getDistance(DistanceUnit.INCH);
     }
 
-    public double getRightFrontDist(){
-        return rightFront.getDistance(DistanceUnit.INCH);
-    }
-
-    public double getLeftBackDist(){
-        return leftBack.getDistance(DistanceUnit.INCH);
-    }
-
-    public double getRightBackDist(){
-        return rightBack.getDistance(DistanceUnit.INCH);
+    public double getRightDist(){
+        return right.getDistance(DistanceUnit.INCH);
     }
 
     public void setLEDs(RevBlinkinLedDriver.BlinkinPattern b){

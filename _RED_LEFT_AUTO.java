@@ -169,8 +169,8 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
         while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy()){ //Should leave loop when async function is done or robot is detected
 
             if(robot.timer.time()>1.5){
-                frontSensorReadout = robot.sensors.getLeftFrontDist();
-                backSensorReadout = robot.sensors.getLeftBackDist();
+                //frontSensorReadout = robot.sensors.getLeftFrontDist();
+                //backSensorReadout = robot.sensors.getLeftBackDist();
             }
 
 

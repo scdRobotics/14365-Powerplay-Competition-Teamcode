@@ -55,11 +55,8 @@ public class Robot {
 
 
     public DistanceSensor front;
-    public DistanceSensor rightBack;
-    public DistanceSensor leftBack;
-
-    public DistanceSensor rightFront;
-    public DistanceSensor leftFront;
+    public DistanceSensor right;
+    public DistanceSensor left;
 
 
 
@@ -164,7 +161,7 @@ public class Robot {
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
 
-        sensors = new Sensors(front, leftFront, rightFront, leftBack, rightBack, led, telemetry, hardwareMap, timer);
+        sensors = new Sensors(front, left, right, led, telemetry, hardwareMap, timer);
 
 
 

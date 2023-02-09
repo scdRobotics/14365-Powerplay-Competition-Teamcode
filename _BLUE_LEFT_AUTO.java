@@ -174,8 +174,8 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
         while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy()){ //Should leave loop when async function is done or robot is detected
 
             if(robot.timer.time()>1.5){
-                frontSensorReadout = robot.sensors.getLeftFrontDist();
-                backSensorReadout = robot.sensors.getLeftBackDist();
+                //frontSensorReadout = robot.sensors.getLeftFrontDist();
+                //backSensorReadout = robot.sensors.getLeftBackDist();
             }
 
 
@@ -293,7 +293,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
     //TODO: THIS ASSUMES IMU IS ACCURATE-- I really should have a helper function for getting IMU information in Sensors subsystem which generates Drive profile first, followed by updating IMU with an "addition val" that equals start position
     //TODO: Just updating odo based off IMU readout is... a touch sketch. This will definitely need tuning (a lot of it.)
 
-    public boolean isSkew(double odoTheta, double camTheta, double frontSensorDist, double odoDist, double camDist){
+    /*public boolean isSkew(double odoTheta, double camTheta, double frontSensorDist, double odoDist, double camDist){
         if(
                 isEqual(odoTheta, Math.toRadians(ODO_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
                 && isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
@@ -328,7 +328,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
             return true; //TODO: NEED SOME WAY TO QUICKLY PASS OUT WHICH SENSORS ARE STILL VALID. PROBABLY OUTSIDE BOOLEANS, AS SEMI JANKY/SPAGHETTI AS THAT IS.
         }
 
-    }
+    }*/
 
     /*public boolean isSkewFirst(){
         double webcamThetaCalc = robot.vision.findClosePoleDTheta() - I_EXPECTED_WEBCAM_READOUT; //Or minus? Probably plus though...
