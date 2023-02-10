@@ -48,6 +48,8 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         Robot robot = new Robot(this, hardwareMap, telemetry, timer, false);
 
+        robot.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         double slow = 1;
 
         double slidePos = PoseTransfer.slidePos;
@@ -118,7 +120,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
                     if(gamepad1.left_bumper) {
-                        slow = 8;
+                        slow = 2;
                     }
                     else {
                         slow = 1;

@@ -44,10 +44,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 .lineTo(new Vector2d(I_DROP_X, I_DROP_Y))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
-                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - I_EXPECTED_SENSOR_READOUT) > I_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - I_EXPECTED_WEBCAM_READOUT) > I_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
-                        trajectorySkewFirst = true;
-                    }
+                    trajectorySkewFirst = isSkewCamOnly(robot.vision.findClosePoleDTheta(), robot.vision.findClosePoleDist());
                 })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -86,10 +83,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 .lineTo(new Vector2d(II_DROP_X, II_DROP_Y))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
-                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - II_III_EXPECTED_SENSOR_READOUT) > II_III_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - II_III_EXPECTED_WEBCAM_READOUT) > II_III_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
-                        trajectorySkewSecond = true;
-                    }
+                    trajectorySkewSecond = isSkewCamOnly(robot.vision.findClosePoleDTheta(), robot.vision.findClosePoleDist());
                 })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -134,10 +128,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 .lineTo(new Vector2d(III_DROP_X, III_DROP_Y))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
-                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - II_III_EXPECTED_SENSOR_READOUT) > II_III_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - II_III_EXPECTED_WEBCAM_READOUT) > II_III_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
-                        trajectorySkewThird = true;
-                    }
+                    trajectorySkewThird = isSkewCamOnly(robot.vision.findClosePoleDTheta(), robot.vision.findClosePoleDist());
                 })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -290,8 +281,31 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
     }
 
-    //TODO: THIS ASSUMES IMU IS ACCURATE-- I really should have a helper function for getting IMU information in Sensors subsystem which generates Drive profile first, followed by updating IMU with an "addition val" that equals start position
-    //TODO: Just updating odo based off IMU readout is... a touch sketch. This will definitely need tuning (a lot of it.)
+
+
+    public boolean isSkewCamOnly(double camTheta, double camDist){
+        if(
+                        isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
+                        && isEqual(camDist, WEBCAM_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)
+        ){
+            return false;
+        }
+
+        else{
+            if(!isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)){
+                camTheta = robot.vision.findClosePoleDTheta();
+            }
+            if(!isEqual(camDist, Math.toRadians(WEBCAM_DIST_ACCEPTABLE_RANGE), IDEAL_DIST)){
+                camDist = robot.vision.findClosePoleDist();
+            }
+            if(SKEW_COUNT<4){
+                SKEW_COUNT++;
+                isSkewCamOnly(camTheta, camDist);
+            }
+            return true;
+        }
+
+    }
 
     /*public boolean isSkew(double odoTheta, double camTheta, double frontSensorDist, double odoDist, double camDist){
         if(
