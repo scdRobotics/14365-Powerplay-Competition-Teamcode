@@ -171,13 +171,30 @@ public class AUTO_PRIME extends LinearOpMode {
 
     double ODO_DIST_ACCEPTABLE_RANGE = 1;
 
+    double ODO_ACCEPTABLE_COMPARSION_RANGE = 1.5
+
+    double ODO_COORDS_EXPECTED = 12;
+
 
 
     double BLUE_LEFT_IDEAL_THETA = Math.toRadians(245);
 
-    double FRONT_SENSOR_DIST_ACCPETABLE_RANGE = 1.5;
+    double FRONT_SENSOR_DIST_ACCEPTABLE_RANGE = 1.5;
 
     double IDEAL_DIST = 6.15;
+
+
+    int IDEAL_POLE_X = 24;
+
+
+
+
+
+    boolean localizerThetaAccurate = false;
+    boolean camThetaAccurate = false;
+    boolean frontSensorDistAccurate = false;
+    boolean localizerDistAccurate = false;
+    boolean camDistAccurate = false;
 
     
     void initAuto(){

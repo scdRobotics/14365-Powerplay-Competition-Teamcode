@@ -15,9 +15,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
         PoseTransfer.isBlue=true;
 
         initAuto();
-
-        //TODO: ADD DESYNC FUNCTIONALITY WITH SKEW FUNCTION AVAILABLE IN AUTONOMOUS-IMPROVEMENTS BRANCH. EXAMPLE OF WHAT THIS WOULD LOOK LIKE HERE:
-        //robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
+        robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
@@ -44,7 +42,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 .lineTo(new Vector2d(I_DROP_X, I_DROP_Y))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    trajectorySkewFirst = isSkewCamOnly(robot.vision.findClosePoleDTheta(), robot.vision.findClosePoleDist());
+                    trajectorySkewFirst = isSkew(robot.drive.getPoseEstimate().getHeading(), robot.vision.findClosePoleDTheta(), robot.sensors.getFrontDist(), (robot.drive.getPoseEstimate().getX()-IDEAL_POLE_X)/Math.sin(robot.drive.getPoseEstimate().getHeading() - Math.toRadians(180)), robot.vision.findClosePoleDist());
                 })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -83,7 +81,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 .lineTo(new Vector2d(II_DROP_X, II_DROP_Y))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    trajectorySkewSecond = isSkewCamOnly(robot.vision.findClosePoleDTheta(), robot.vision.findClosePoleDist());
+                    trajectorySkewSecond = isSkew(robot.drive.getPoseEstimate().getHeading(), robot.vision.findClosePoleDTheta(), robot.sensors.getFrontDist(), (robot.drive.getPoseEstimate().getX()-IDEAL_POLE_X)/Math.sin(robot.drive.getPoseEstimate().getHeading() - Math.toRadians(180)), robot.vision.findClosePoleDist());
                 })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -128,7 +126,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 .lineTo(new Vector2d(III_DROP_X, III_DROP_Y))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    trajectorySkewThird = isSkewCamOnly(robot.vision.findClosePoleDTheta(), robot.vision.findClosePoleDist());
+                    trajectorySkewThird = isSkew(robot.drive.getPoseEstimate().getHeading(), robot.vision.findClosePoleDTheta(), robot.sensors.getFrontDist(), (robot.drive.getPoseEstimate().getX()-IDEAL_POLE_X)/Math.sin(robot.drive.getPoseEstimate().getHeading() - Math.toRadians(180)), robot.vision.findClosePoleDist());
                 })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
@@ -201,7 +199,6 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 if(trajectorySkewFirst || trajectorySkewSecond || trajectorySkewThird){ //Meaning we sense we are off of the trajectory by a significant margin. One for each pole drop
                     robot.drive.breakFollowing();
                     robot.drive.setDrivePower(new Pose2d());
-                    robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
                     break;
                 }
 
@@ -281,134 +278,162 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
     }
 
+    //TODO: MAY NEED TO SWAP NEGATIVE AND ANGLE VALUES HERE AND THERE. REVIEW WITH OTHERS BECAUSE I'M TIRED AND GO INSANE THE MORE I LOOK AT IT BY MYSELF.
+    //TODO: ENTIRE THING NEEDS TESTING IN EVERT POSSIBLE USE CASE. BADLY. VERY BADLY.
+    //TODO: ENTIRE THING NEEDS TO BE TRANSFERRED TO OTHER AUTOS (AN ORDEAL BY ITSELF) ONCE IT'S TESTED WORKING
+    public boolean isSkew(double localizerTheta, double camTheta, double frontSensorDist, double localizerDist, double camDist){
+
+        /*
+        TELEMETRY CALLS
+         */
+
+        telemetry.addData("-----Skew Passthrough #-----", SKEW_COUNT);
+
+        telemetry.addData("Localizer Theta: ", localizerTheta);
+        telemetry.addData("Cam Theta: ", camTheta);
+        telemetry.addData("Front Sensor Dist: ", frontSensorDist);
+        telemetry.addData("Localizer Dist: ", localizerDist);
+        telemetry.addData("Cam Dist: ", camDist);
+
+        telemetry.addData("Is Localizer Theta Accurate? ", isEqual(localizerTheta, Math.toRadians(ODO_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA));
+        telemetry.addData("Is Camera Theta Accurate? ", isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA));
+        telemetry.addData("Is Front Sensor Dist Accurate? ", isEqual(frontSensorDist, FRONT_SENSOR_DIST_ACCEPTABLE_RANGE, IDEAL_DIST));
+        telemetry.addData("Is Localizer Dist Accurate? ", isEqual(localizerDist, ODO_DIST_ACCEPTABLE_RANGE, IDEAL_DIST));
+        telemetry.addData("Is Webcam Dist Accurate? ", isEqual(camDist, WEBCAM_DIST_ACCEPTABLE_RANGE, IDEAL_DIST));
+
+        telemetry.update();
 
 
-    public boolean isSkewCamOnly(double camTheta, double camDist){
+        /*
+        MAIN CHECK-- IS EVERYTHING GOOD?
+         */
         if(
-                        isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
-                        && isEqual(camDist, WEBCAM_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)
-        ){
-            return false;
-        }
-
-        else{
-            if(!isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)){
-                camTheta = robot.vision.findClosePoleDTheta();
-            }
-            if(!isEqual(camDist, Math.toRadians(WEBCAM_DIST_ACCEPTABLE_RANGE), IDEAL_DIST)){
-                camDist = robot.vision.findClosePoleDist();
-            }
-            if(SKEW_COUNT<4){
-                SKEW_COUNT++;
-                isSkewCamOnly(camTheta, camDist);
-            }
-            return true;
-        }
-
-    }
-
-    /*public boolean isSkew(double odoTheta, double camTheta, double frontSensorDist, double odoDist, double camDist){
-        if(
-                isEqual(odoTheta, Math.toRadians(ODO_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
+                isEqual(localizerTheta, Math.toRadians(ODO_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
                 && isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)
-                && isEqual(frontSensorDist, FRONT_SENSOR_DIST_ACCPETABLE_RANGE, IDEAL_DIST)
-                && isEqual(odoDist, ODO_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)
+                && isEqual(frontSensorDist, FRONT_SENSOR_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)
+                && isEqual(localizerDist, ODO_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)
                 && isEqual(camDist, WEBCAM_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)
         ){
+          /*
+          IF EVERYTHING IS GOOD, NO SKEW! ELSE, CONTINUE
+           */
+          SKEW_COUNT=0;
           return false;
         }
 
         else{
-            if(!isEqual(odoTheta, Math.toRadians(ODO_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)){
-                //TODO: Update Odo angle based on IMU readout (need to get IMU working). Technically, IMU resyncing can (and tobe safe, maybe should) happen anywhere in the program and may not add to Trajectory build time. Needs experimentation.
-                //odoTheta = robot.sensors.getIMUReadout();
-            }
-            if(!isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)){
-                camTheta = robot.vision.findClosePoleDTheta();
-            }
-            if(!isEqual(camDist, Math.toRadians(WEBCAM_DIST_ACCEPTABLE_RANGE), IDEAL_DIST)){
-                camDist = robot.vision.findClosePoleDist();
-            }
-            if(!isEqual(frontSensorDist, FRONT_SENSOR_DIST_ACCPETABLE_RANGE, IDEAL_DIST)){
-                frontSensorDist = robot.sensors.getFrontDist();
-            }
-            if(!isEqual(odoDist, ODO_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)){
-                //TODO: Our Odo is totally screwed up. See if we can salvage it from other measurements.
-            }
-            if(SKEW_COUNT<4){
-                SKEW_COUNT++;
-                isSkew(odoTheta, camTheta, frontSensorDist, odoDist, camDist);
-            }
-            return true; //TODO: NEED SOME WAY TO QUICKLY PASS OUT WHICH SENSORS ARE STILL VALID. PROBABLY OUTSIDE BOOLEANS, AS SEMI JANKY/SPAGHETTI AS THAT IS.
-        }
 
-    }*/
+            if(!isEqual(camTheta + BLUE_LEFT_IDEAL_THETA, Math.toRadians(WEBCAM_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)){ //IF CAM THETA IS NOT WHAT WE EXPECT...
+                camThetaAccurate=false; //No longer flagged as accurate
+                camTheta = robot.vision.findClosePoleDTheta(); //Update camera in case it is a processing error
+            }
+            else{ //IF IT IS WHAT WE EXPECT...
+                camThetaAccurate=true; //Flagged as accurate
+            }
 
-    /*public boolean isSkewFirst(){
-        double webcamThetaCalc = robot.vision.findClosePoleDTheta() - I_EXPECTED_WEBCAM_READOUT; //Or minus? Probably plus though...
-        double odometryCalc = robot.drive.getPoseEstimate().getHeading() - I_EXPECTED_ODO_READOUT; //Or minus? Probably plus though...
-        double imuCalc = robot.sensors.getIMUReadout() - I_EXPECTED_IMU_READOUT; //Add IMU support
-
-        if(isEqual(webcamThetaCalc, WEBCAM_THETA_ACCEPTABLE_RANGE, odometryCalc, ODO_HEADING_ACCEPTABLE_RANGE)){
-            //Webcam dTheta Calculation and Localizer Calculation are equal
-            if(isEqual(webcamThetaCalc, WEBCAM_THETA_ACCEPTABLE_RANGE, imuCalc, IMU_READOUT_ACCEPTABLE_RANGE) || isEqual(odometryCalc, Math.toRadians(2), imuCalc, Math.toRadians(2))){
-
-                double webcamDistCalc = robot.vision.findClosePoleDist() - I_EXPECTED_WEBCAM_DIST;
-                double distanceSensorReadout = robot.sensors.getFrontDist() - I_EXPECTED_SENSOR_DIST;
-
-                if(isEqual(webcamDistCalc, I_WEBCAM_DIST_ACCEPTABLE_RANGE, distanceSensorReadout, I_SENSOR_DIST_ACCPETABLE_RANGE)){
-                    //Front distance sensor and webcam distance calculation are equal :)
-                    return false;
+            if(!isEqual(localizerTheta, Math.toRadians(ODO_THETA_ACCEPTABLE_RANGE), BLUE_LEFT_IDEAL_THETA)){ //IF LOCALIZER THETA IS NOT WHAT WE EXPECT...
+                localizerThetaAccurate=false; //No longer flagged as accurate
+                if(camThetaAccurate){ //If camera theta is accurate, we have a reference point! (Albeit, one with a good amount of noise we maybe shouldn't rely on... needs testing)
+                    robot.drive.setPoseEstimate(new Pose2d(robot.drive.getPoseEstimate().getX(), robot.drive.getPoseEstimate().getY(), camTheta + BLUE_LEFT_IDEAL_THETA)); //Update localizer estimate based on camTheta readout
                 }
-                else{
-                    if(DIST_SKEW_COUNT<3){
-                        DIST_SKEW_COUNT++;
-                        isSkewFirst();
+            }
+            else{ //IF IT IS WHAT WE EXPECT...
+                localizerThetaAccurate=true; //Flagged as accurate
+            }
+
+            if(!isEqual(camDist, Math.toRadians(WEBCAM_DIST_ACCEPTABLE_RANGE), IDEAL_DIST)){ //IF CAMERA DIST IS NOT WHAT WE EXPECT...
+                camDistAccurate=false; //No longer flagged as accurate
+                camDist = robot.vision.findClosePoleDist(); //Update camera in case it is a processing error
+            }
+            else{ //IF IT IS WHAT WE EXPECT...
+                camDistAccurate=true; //Flagged as accurate
+            }
+
+            if(!isEqual(frontSensorDist, FRONT_SENSOR_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)){ //IF FRONT SENSOR DIST IS NOT WHAT WE EXPECT...
+                frontSensorDistAccurate=false; //No longer flagged as accurate
+                frontSensorDist = robot.sensors.getFrontDist(); //Update sensor in case it is a processing error
+            }
+            else{ //IF IT IS WHAT WE EXPECT...
+                frontSensorDistAccurate=true; //Flagged as accurate
+            }
+
+            if(!isEqual(localizerDist, ODO_DIST_ACCEPTABLE_RANGE, IDEAL_DIST)){ //IF ODOMETRY DIST IS NOT WHAT WE EXPECT... (this one's a doozy)
+
+                if(localizerThetaAccurate){ //IF LOCALIZER THETA (PREFERRED REFERENCE, LESS VARIANCE) IS ACCURATE...
+                    double cos = Math.cos(localizerTheta - Math.toRadians(180)); //Variable for storage
+                    if(!isEqual((robot.drive.getPoseEstimate().getX()-IDEAL_POLE_X)/ cos, ODO_ACCEPTABLE_COMPARSION_RANGE, ODO_COORDS_EXPECTED)){ //If our calculated X is outside tolerance... (ask Logan about math- it's just trig triangles)
+
+                        if(frontSensorDistAccurate){ //IF DISTANCE SENSOR (PREFERRED REFERENCE, LESS VARIANCE) IS ACCURATE...
+                            robot.drive.setPoseEstimate(new Pose2d(cos *frontSensorDist, robot.drive.getPoseEstimate().getY(), robot.drive.getPoseEstimate().getX())); //Update localizer X estimate based on sensor calculated X dist
+                        }
+                        else if(camDistAccurate){ //IF CAMERA DIST (NOT PREFERRED, MORE VARIANCE) IS ACCURATE...
+                            robot.drive.setPoseEstimate(new Pose2d(cos *camDist, robot.drive.getPoseEstimate().getY(), robot.drive.getPoseEstimate().getX())); //Update localizer X estimate based on camera calculated X dist
+                        }
                     }
-                    return true;
+
+
+                    double sin = Math.sin(localizerTheta - Math.toRadians(180)); //Variable for storage
+                    if(!isEqual((robot.drive.getPoseEstimate().getY())/ sin, ODO_ACCEPTABLE_COMPARSION_RANGE, ODO_COORDS_EXPECTED)){ //If our calculated Y is outside tolerance... (ask Logan about math- it's just trig triangles)
+                        if(frontSensorDistAccurate){ //IF DISTANCE SENSOR (PREFERRED REFERENCE, LESS VARIANCE) IS ACCURATE...
+                            robot.drive.setPoseEstimate(new Pose2d(robot.drive.getPoseEstimate().getX(), sin *frontSensorDist, robot.drive.getPoseEstimate().getHeading())); //Update localizer Y estimate based on sensor calculated Y dist
+                        }
+                        else if(camDistAccurate){ //IF CAMERA DIST (NOT PREFERRED, MORE VARIANCE) IS ACCURATE...
+                            robot.drive.setPoseEstimate(new Pose2d(robot.drive.getPoseEstimate().getX(), sin *camDist, robot.drive.getPoseEstimate().getHeading())); //Update localizer X estimate based on camera calculated X dist
+                        }
+                    }
                 }
 
-            }
-            else{
-                //Webcam dTheta and Localizer are equal, but not IMU
-                robot.drive.setPoseEstimate(new Pose2d(PoseTransfer.currentPose.getX(), PoseTransfer.currentPose.getY(), imuCalc + I_EXPECTED_IMU_READOUT));
-                if(ANGLE_SKEW_COUNT<3){
-                    ANGLE_SKEW_COUNT++;
-                    isSkewFirst();
+
+                else if(camThetaAccurate){ //IF CAMERA THETA (NOT PREFERRED, MORE VARIANCE) IS ACCURATE...
+                    double cos = Math.cos(camTheta + Math.toRadians(45)); //Variable for storage
+                    if(!isEqual((robot.drive.getPoseEstimate().getX()-IDEAL_POLE_X)/ cos, ODO_ACCEPTABLE_COMPARSION_RANGE, ODO_COORDS_EXPECTED)){ //If our calculated X is outside tolerance... (ask Logan about math- it's just trig triangles)
+
+                        if(frontSensorDistAccurate){ //IF DISTANCE SENSOR (PREFERRED REFERENCE, LESS VARIANCE) IS ACCURATE...
+                            robot.drive.setPoseEstimate(new Pose2d(cos *frontSensorDist, robot.drive.getPoseEstimate().getY(), robot.drive.getPoseEstimate().getX())); //Update localizer X estimate based on sensor calculated X dist
+                        }
+                        else if(camDistAccurate){ //IF CAMERA DIST (NOT PREFERRED, MORE VARIANCE) IS ACCURATE...
+                            robot.drive.setPoseEstimate(new Pose2d(cos *camDist, robot.drive.getPoseEstimate().getY(), robot.drive.getPoseEstimate().getX())); //Update localizer X estimate based on camera calculated X dist
+                        }
+                    }
+
+
+                    double sin = Math.sin(camTheta - Math.toRadians(45)); //Variable for storage
+                    if(!isEqual((robot.drive.getPoseEstimate().getY())/ sin, ODO_ACCEPTABLE_COMPARSION_RANGE, ODO_COORDS_EXPECTED)){ //If our calculated Y is outside tolerance... (ask Logan about math- it's just trig triangles)
+                        if(frontSensorDistAccurate){ //IF DISTANCE SENSOR (PREFERRED REFERENCE, LESS VARIANCE) IS ACCURATE...
+                            robot.drive.setPoseEstimate(new Pose2d(robot.drive.getPoseEstimate().getX(), sin *frontSensorDist, robot.drive.getPoseEstimate().getHeading())); //Update localizer Y estimate based on sensor calculated Y dist
+                        }
+                        else if(camDistAccurate){ //IF CAMERA DIST (NOT PREFERRED, MORE VARIANCE) IS ACCURATE...
+                            robot.drive.setPoseEstimate(new Pose2d(robot.drive.getPoseEstimate().getX(), sin *camDist, robot.drive.getPoseEstimate().getHeading())); //Update localizer X estimate based on camera calculated X dist
+                        }
+                    }
                 }
-                return true;
-            }
-        }
-        else{
-            //Webcam dTheta Calculation and Localizer Calculation are NOT equal
-            if(isEqual(webcamThetaCalc, WEBCAM_THETA_ACCEPTABLE_RANGE, imuCalc, IMU_READOUT_ACCEPTABLE_RANGE)){
-                robot.drive.setPoseEstimate(new Pose2d(PoseTransfer.currentPose.getX(), PoseTransfer.currentPose.getY(), imuCalc + I_EXPECTED_IMU_READOUT));
-                if(ANGLE_SKEW_COUNT<3){
-                    ANGLE_SKEW_COUNT++;
-                    isSkewFirst();
+
+
+                else{
+                    //Can't do anything else :( too much is messed up and totally wrong. hope it fixes itself on a recursive call. this should never happen since we should always have at least the webcams viewing the pole but, you never know.
                 }
-                return true;
+
+                localizerDistAccurate=false; //No longer flagged as accurate
+
+            }else{
+                localizerDistAccurate=true; //Flagged as accurate
             }
-            else if(isEqual(odometryCalc, ODO_HEADING_ACCEPTABLE_RANGE, imuCalc, IMU_READOUT_ACCEPTABLE_RANGE)){
-                //Odometry Calculation and IMU are accurate, but not
-                if(ANGLE_SKEW_COUNT<3){
-                    ANGLE_SKEW_COUNT++;
-                    isSkewFirst();
-                }
-                return true;
+
+            if(localizerDistAccurate && localizerThetaAccurate){
+                //Just localizer is good enough to act on-- no skew here folks, juuust potentially faulty sensors!
+                return false;
             }
-            else{
-                //None are equal
-                robot.drive.setPoseEstimate(new Pose2d(PoseTransfer.currentPose.getX(), PoseTransfer.currentPose.getY(), imuCalc + I_EXPECTED_IMU_READOUT));
-                if(ANGLE_SKEW_COUNT<3){
-                    ANGLE_SKEW_COUNT++;
-                    isSkewFirst();
-                }
-                return true;
+
+            if(SKEW_COUNT<4){ //IF WE HAVENT RECURSIVE CALLED 4 OR MORE TIMES...
+                SKEW_COUNT++; //Increase count
+                isSkew(robot.drive.getPoseEstimate().getHeading(), camTheta, robot.drive.getPoseEstimate().getY()/Math.sin(camTheta - Math.toRadians(45)), localizerDist, camDist); //Recursive function yay! This just goes back and checks sensors again after aalll refreshes in logic above have occured...
             }
+
+            robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED); //We did all recursive calls and still, something's wrong. Big uh oh. Just go to live built trajectories and hope robot can mostly fix itself, probably. NOTE: ITS EXTREMELY RARE FOR THIS TO HAPPEN SINCE IT MEANS EVERY SINGLE SENSOR HAS IN SOME WAY MESSED UP. FUNCTIONALLY, WE WILL NEVER REACH THIS-- BUT BETTER TO HOPE "IT'LL FIGURE IT OUT WITH LOCALIZER ADJUSTMENTS" THAN HAVE IT CRASH HERE
+            return true; //We skewed :(
         }
 
-    }*/
+    }
 
     public boolean isEqual(double a, double aRange, double b, double bRange){
         return (a-aRange <= b+bRange) && (b-bRange <= a+aRange);
@@ -420,7 +445,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
     public boolean isEqual (double x, double delta, double a) //X = sensor input, A = ideal input, delta = range/2
     {
-        return Math.abs(x-a)< (delta/2);
+        return Math.abs(x-a) < (delta/2);
     }
 
 
