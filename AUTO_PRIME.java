@@ -171,7 +171,7 @@ public class AUTO_PRIME extends LinearOpMode {
 
     double ODO_DIST_ACCEPTABLE_RANGE = 1;
 
-    double ODO_ACCEPTABLE_COMPARSION_RANGE = 1.5
+    double ODO_ACCEPTABLE_COMPARSION_RANGE = 1.5;
 
     double ODO_COORDS_EXPECTED = 12;
 

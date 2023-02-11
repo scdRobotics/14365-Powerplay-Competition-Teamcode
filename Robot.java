@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 //Package is a VERY important step! Required to do basically anything with the robot
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -146,6 +147,10 @@ public class Robot {
         //Map Vision System
         webcam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[0]);
         webcam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
+
+        FtcDashboard.getInstance().startCameraStream(webcam1, 0);
+        //TODO: Needs testing, but will be very helpful!
+        FtcDashboard.getInstance().startCameraStream(webcam2, 0);
 
 
 
