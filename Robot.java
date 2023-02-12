@@ -148,9 +148,9 @@ public class Robot {
         webcam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[0]);
         webcam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
 
-        FtcDashboard.getInstance().startCameraStream(webcam1, 0);
+        //FtcDashboard.getInstance().startCameraStream(webcam1, 0);
         //TODO: Needs testing, but will be very helpful!
-        FtcDashboard.getInstance().startCameraStream(webcam2, 0);
+        //FtcDashboard.getInstance().startCameraStream(webcam2, 0);
 
 
 

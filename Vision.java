@@ -94,34 +94,39 @@ public class Vision extends Subsystem {
         //May need to adjust?
         ArrayList<RectData> viewCam2 = aprilTagYellowPipeline.getRects();
 
-        if(!viewCam1.isEmpty() && !viewCam2.isEmpty()){
-
-            viewCam1.sort(Comparator.comparing(RectData::getWidth));
-
-            viewCam2.sort(Comparator.comparing(RectData::getWidth));
-
-
-
-            RectData widest1 = null;
-            RectData widest2 = null;
-
-            widest1 = viewCam1.get(viewCam1.size()-1);
-            widest2 = viewCam2.get(viewCam2.size()-1);
-            telemetry.addData("Widest 1: ", widest1);
-            telemetry.addData("Widest 2: ", widest2);
-            same.add(widest1);
-            same.add(widest2);
-
-
-        }
-
-
-        else{
-            //TODO: If same.size() is >2, isolate which equal rects within "same" are the pole we want to be looking at (AKA, the widest pair that still is a pole and not some strange background object/interference) so that same.size()==2
+        if(viewCam1.isEmpty() || viewCam2.isEmpty()){
             return -1;
         }
 
+        //viewCam1.sort(Comparator.comparing(RectData::getWidth));
+
+        Collections.sort(viewCam1, new sortByWidth());
+        Collections.sort(viewCam2, new sortByWidth());
+
+        //viewCam2.sort(Comparator.comparing(RectData::getWidth));
+
+        RectData widest1 = null;
+        RectData widest2 = null;
+
+        widest1 = viewCam1.get(viewCam1.size()-1);
+        widest2 = viewCam2.get(viewCam2.size()-1);
+        //telemetry.addData("Widest 1: ", widest1);
+        //telemetry.addData("Widest 2: ", widest2);
+        same.add(widest1);
+        same.add(widest2);
+
+
+        //else{
+            //TODO: If same.size() is >2, isolate which equal rects within "same" are the pole we want to be looking at (AKA, the widest pair that still is a pole and not some strange background object/interference) so that same.size()==2
+            //return -1;
+        //}
+
         //TODO: Refine formula to ensure accurate dTheta
+
+        if(same.isEmpty()){
+            return -1;
+        }
+
         double theta1 = Math.toRadians(142.5  - (same.get(0).getX()*5.5/128)); //Camera 1 Theta
         double theta2 = Math.toRadians(92.5 - (same.get(1).getX()*5.5/128)); //Camera 2 Theta
 
@@ -163,31 +168,39 @@ public class Vision extends Subsystem {
         //May need to adjust?
         ArrayList<RectData> viewCam2 = aprilTagYellowPipeline.getRects();
 
-        if(!viewCam1.isEmpty() && !viewCam2.isEmpty()){
-
-            viewCam1.sort(Comparator.comparing(RectData::getWidth));
-
-            viewCam2.sort(Comparator.comparing(RectData::getWidth));
-
-
-
-            RectData widest1 = null;
-            RectData widest2 = null;
-
-            widest1 = viewCam1.get(viewCam1.size()-1);
-            widest2 = viewCam2.get(viewCam2.size()-1);
-            telemetry.addData("Widest 1: ", widest1);
-            telemetry.addData("Widest 2: ", widest2);
-            same.add(widest1);
-            same.add(widest2);
-
-
+        if(viewCam1.isEmpty() || viewCam2.isEmpty()){
+            return -1;
         }
 
+        //viewCam1.sort(Comparator.comparing(RectData::getWidth));
 
-        else{
-            //TODO: If same.size() is >2, isolate which equal rects within "same" are the pole we want to be looking at (AKA, the widest pair that still is a pole and not some strange background object/interference) so that same.size()==2
-            return -1; //failure case, nothing detected more than likely (or flaw in selecting "same" poles)
+        Collections.sort(viewCam1, new sortByWidth());
+        Collections.sort(viewCam2, new sortByWidth());
+
+        //viewCam2.sort(Comparator.comparing(RectData::getWidth));
+
+
+
+        RectData widest1 = null;
+        RectData widest2 = null;
+
+        widest1 = viewCam1.get(viewCam1.size()-1);
+        widest2 = viewCam2.get(viewCam2.size()-1);
+        //telemetry.addData("Widest 1: ", widest1);
+        //telemetry.addData("Widest 2: ", widest2);
+        same.add(widest1);
+        same.add(widest2);
+
+
+        //else{
+        //TODO: If same.size() is >2, isolate which equal rects within "same" are the pole we want to be looking at (AKA, the widest pair that still is a pole and not some strange background object/interference) so that same.size()==2
+        //return -1;
+        //}
+
+        //TODO: Refine formula to ensure accurate dTheta
+
+        if(same.isEmpty()){
+            return -1;
         }
 
         //TODO: Refine formula to ensure accurate dTheta
@@ -234,5 +247,11 @@ public class Vision extends Subsystem {
         }
         return -1;
 
+    }
+}
+
+class sortByWidth implements Comparator<RectData>{
+    public int compare(RectData a, RectData b){
+        return (int) (a.getWidth() - b.getWidth()); //i don't like this cast here tbh but what else can we do?
     }
 }
