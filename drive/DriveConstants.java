@@ -32,8 +32,8 @@ public class DriveConstants {
      * from DriveVelocityPIDTuner.
      */
     public static final boolean RUN_USING_ENCODER = true;
-    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(0, 0, 0,
-            11);
+    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(23, 0, 19,
+            26);
 
     /*
      * These are physical constants that can be determined from your robot (including the track
@@ -45,7 +45,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 3.34; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 13.45; // in
+    public static double TRACK_WIDTH = 11.72; // in
     //Traingularly: 18.89155 in
     //Horizontally: 13.552463 in
 
