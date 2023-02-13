@@ -31,11 +31,13 @@ public class AUTO_PRIME extends LinearOpMode {
 
     int START_X = 36;
     double START_Y = 61.25;
-    double START_ANG = 180;
-    public static int I_APPROACH_TURN = 45;
+    double START_ANG = 270;
+    public int I_APPROACH_TURN = 45;
 
     int I_APPROACH_X = 36;
     int I_APPROACH_Y = 12;
+
+    public int I_TOWARDS_POLE = 6;
 
 
     double I_DROP_X = 32.19;
@@ -47,11 +49,11 @@ public class AUTO_PRIME extends LinearOpMode {
     int I_BACK_POLE_ANG = 360;
 
 
-    double I_PKUP_X = 61.25;
+    double I_PKUP_X = 62.5;
     int I_PKUP_Y = 12;
 
 
-    double I_PKUP_BKUP_X = 60.75;
+    double I_PKUP_BKUP_X = 61;
     int I_PKUP_BKUP_Y = 12;
 
 
@@ -67,8 +69,8 @@ public class AUTO_PRIME extends LinearOpMode {
 
     int POLE_WAIT_DROP = 1;
     double POLE_WAIT_RELEASE = 0.5;
-    int STACK_WAIT_GRAB = 1;
-    double STACK_WAIT_UP = 0.5;
+    double STACK_WAIT_GRAB = 0.75;
+    double STACK_WAIT_UP = 1;
 
     int II_BACK_POLE_X = 38;
     int II_BACK_POLE_Y = 12;
@@ -101,10 +103,10 @@ public class AUTO_PRIME extends LinearOpMode {
 
 
 
-    int HIGH_POLE_DROP_HEIGHT = 3900;
+    int HIGH_POLE_DROP_HEIGHT = 4100;
     int MEDIUM_POLE_DROP_HEIGHT = 2700;
-    int I_CONE_STACK_PICKUP_HEIGHT = 500;
-    int II_CONE_STACK_PICKUP_HEIGHT = 435;
+    int I_CONE_STACK_PICKUP_HEIGHT = 575;
+    int II_CONE_STACK_PICKUP_HEIGHT = 475;
 
     double SLIDE_POWER = 0.65;
 

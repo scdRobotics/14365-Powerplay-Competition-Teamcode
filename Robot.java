@@ -150,7 +150,7 @@ public class Robot {
 
         //FtcDashboard.getInstance().startCameraStream(webcam1, 0);
         //TODO: Needs testing, but will be very helpful!
-        //FtcDashboard.getInstance().startCameraStream(webcam2, 0);
+        FtcDashboard.getInstance().startCameraStream(webcam2, 0);
 
 
 

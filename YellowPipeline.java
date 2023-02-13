@@ -87,7 +87,7 @@ public class YellowPipeline extends OpenCvPipeline {
     }
 
     public ArrayList<RectData> getRects(){
-        return rects;
+        return new ArrayList<RectData>(rects);
     }
 
     @Override

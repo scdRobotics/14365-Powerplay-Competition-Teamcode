@@ -30,7 +30,7 @@ public class Vision extends Subsystem {
 
     YellowPipeline yellowPipeline = new YellowPipeline();
 
-    public ArrayList<RectData> same = new ArrayList<RectData>(); //Only global because I want to access it in VisionTest.java; SHOULD CHANGE TO BE INSIDE FUNCTION findClosePoleDTheta() ONCE TESTING IS DONE !!
+    //public ArrayList<RectData> same = new ArrayList<RectData>(); //Only global because I want to access it in VisionTest.java; SHOULD CHANGE TO BE INSIDE FUNCTION findClosePoleDTheta() ONCE TESTING IS DONE !!
 
     //"Constructor" object for Vision
     public Vision(OpenCvCamera webcam1, OpenCvCamera webcam2, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
@@ -88,7 +88,7 @@ public class Vision extends Subsystem {
     @SuppressLint("NewApi")
     public double findClosePoleDTheta(){
 
-        same.clear();
+        //same.clear();
 
         ArrayList<RectData> viewCam1 = yellowPipeline.getRects();
         //May need to adjust?
@@ -108,12 +108,13 @@ public class Vision extends Subsystem {
         RectData widest1 = null;
         RectData widest2 = null;
 
+
         widest1 = viewCam1.get(viewCam1.size()-1);
         widest2 = viewCam2.get(viewCam2.size()-1);
         //telemetry.addData("Widest 1: ", widest1);
         //telemetry.addData("Widest 2: ", widest2);
-        same.add(widest1);
-        same.add(widest2);
+        //same.add(widest1);
+        //same.add(widest2);
 
 
         //else{
@@ -123,12 +124,8 @@ public class Vision extends Subsystem {
 
         //TODO: Refine formula to ensure accurate dTheta
 
-        if(same.isEmpty()){
-            return -1;
-        }
-
-        double theta1 = Math.toRadians(142.5  - (same.get(0).getX()*5.5/128)); //Camera 1 Theta
-        double theta2 = Math.toRadians(92.5 - (same.get(1).getX()*5.5/128)); //Camera 2 Theta
+        double theta1 = Math.toRadians(142.5  - (widest1.getX()*5.5/128)); //Camera 1 Theta
+        double theta2 = Math.toRadians(92.5 - (widest2.getX()*5.5/128)); //Camera 2 Theta
 
         double c1;
         double c2;
@@ -162,7 +159,7 @@ public class Vision extends Subsystem {
     @SuppressLint("NewApi")
     public double findClosePoleDist(){
 
-        same.clear();
+        //same.clear();
 
         ArrayList<RectData> viewCam1 = yellowPipeline.getRects();
         //May need to adjust?
@@ -188,8 +185,6 @@ public class Vision extends Subsystem {
         widest2 = viewCam2.get(viewCam2.size()-1);
         //telemetry.addData("Widest 1: ", widest1);
         //telemetry.addData("Widest 2: ", widest2);
-        same.add(widest1);
-        same.add(widest2);
 
 
         //else{
@@ -199,13 +194,13 @@ public class Vision extends Subsystem {
 
         //TODO: Refine formula to ensure accurate dTheta
 
-        if(same.isEmpty()){
+        /*if(same.isEmpty()){
             return -1;
-        }
+        }*/
 
         //TODO: Refine formula to ensure accurate dTheta
-        double theta1 = Math.toRadians(142.5  - (same.get(0).getX()*5.5/128)); //Camera 1 Theta
-        double theta2 = Math.toRadians(92.5 - (same.get(1).getX()*5.5/128)); //Camera 2 Theta
+        double theta1 = Math.toRadians(142.5  - (widest1.getX()*5.5/128)); //Camera 1 Theta
+        double theta2 = Math.toRadians(92.5 - (widest2.getX()*5.5/128)); //Camera 2 Theta
 
         double c1;
         double c2;

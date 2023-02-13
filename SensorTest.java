@@ -75,7 +75,7 @@ public class SensorTest extends AUTO_PRIME {
             telemetry.update();
             allDTheta.add(robot.vision.findClosePoleDTheta());
             allDist.add(robot.vision.findClosePoleDist());
-            robot.pause(1);
+            robot.pause(0.15);
         }
 
         double meanDTheta = 0;
