@@ -23,6 +23,8 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
     double idealGridAngle = PoseTransfer.idealGridAngle;
 
+    double slidePos = 0;
+
 
     MODE currentMode = MODE.AUTO;
 
@@ -52,7 +54,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
         double slow = 1;
 
-        double slidePos = PoseTransfer.slidePos;
+        slidePos = PoseTransfer.slidePos;
 
         boolean dpadUpHeld = false;
 
@@ -253,6 +255,10 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
         else if(idealGridCoordY<0){
             idealGridCoordY=0;
         }
+    }
+
+    public double getSlidePos(){
+        return slidePos;
     }
 
 }
