@@ -9,13 +9,13 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.Collections;
 
-@Autonomous(name="BLUE_LEFT_AUTO", group="Autonomous")
-public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
+@Autonomous(name="_LEFT_AUTO", group="Autonomous")
+public class _LEFT_AUTO extends AUTO_PRIME {
 
     @Override
     public void runOpMode() throws InterruptedException{
 
-        PoseTransfer.isBlue=true;
+        //PoseTransfer.isBlue=true;
 
         initAuto();
         robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
@@ -28,7 +28,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
         robot.drive.setPoseEstimate(startPose);
 
-        Pose2d DROP_POSE_ESTIMATE = new Pose2d(29, 6, Math.toRadians(225));
+        Pose2d DROP_POSE_ESTIMATE = new Pose2d(29, 6, Math.toRadians(270-45));
 
 
 
@@ -211,7 +211,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 if(dist!=-1){
                     dists.add(dist);
                 }
-                robot.pause(.125);
+                robot.pause(.110);
             }
 
             for(Double d: dThetas){
@@ -243,7 +243,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
             TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH_II.end())
 
-                    .turn(dTheta - Math.toRadians(3.5))
+                    .turn(dTheta - Math.toRadians(0))
 
                     .forward(dist-4)
 
@@ -278,16 +278,16 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
             dThetas.clear();
             dists.clear();
 
-            for(int i = 0; i<7; i++){
+            for(int i = 0; i<10; i++){
                 dTheta = robot.vision.findClosePoleDTheta();
                 dist = robot.vision.findClosePoleDist();
                 if(dTheta!=-1){
                     dThetas.add(dTheta);
                 }
-                if(dist!=-1){
+                if(dist!=-1 && dTheta<23){
                     dists.add(dist);
                 }
-                robot.pause(.125);
+                robot.pause(.110);
             }
 
             for(Double d: dThetas){
@@ -317,9 +317,10 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
             TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
 
-                    .turn(dTheta - Math.toRadians(3.5))
+                    //.turn(dTheta - Math.toRadians(3.5))
+                    .turn(dTheta)
 
-                    .forward(dist-4)
+                    .forward(dist-3)
 
                     .waitSeconds(POLE_WAIT_DROP)
 

@@ -36,6 +36,8 @@ public class SensorTest extends AUTO_PRIME {
 
         robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
+        robot.vision.runAprilTag(false);
+
         waitForStart();
 
         robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
