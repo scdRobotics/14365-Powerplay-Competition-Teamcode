@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 @Autonomous(name="RED_LEFT_AUTO", group="Autonomous")
 public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
@@ -15,14 +18,19 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
         PoseTransfer.isBlue=false;
 
         initAuto();
+        robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
-        Pose2d startPose = new Pose2d(START_X, -START_Y, Math.toRadians(START_ANG));
+        Pose2d startPose = new Pose2d(START_X, -START_Y, Math.toRadians(START_ANG-180));
 
         boolean robotDetected = false;
 
-        TrajectorySequence firstApproach = robot.drive.trajectorySequenceBuilder(startPose)
+        robot.drive.setPoseEstimate(startPose);
+
+        Pose2d DROP_POSE_ESTIMATE = new Pose2d(29, 6, Math.toRadians(225));
+
+        TrajectorySequence I_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
@@ -32,30 +40,17 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
                 .build();
 
-        TrajectorySequence idealTrajectory = robot.drive.trajectorySequenceBuilder(firstApproach.end())
+        TrajectorySequence I_APPROACH_II = robot.drive.trajectorySequenceBuilder(I_APPROACH.end())
 
-                .turn(Math.toRadians(I_APPROACH_TURN))
+                .turn(Math.toRadians(-I_APPROACH_TURN))
 
-                .lineTo(new Vector2d(I_DROP_X, -I_DROP_Y))
+                .forward(I_TOWARDS_POLE)
 
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
-                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - I_EXPECTED_SENSOR_READOUT) > I_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - I_EXPECTED_WEBCAM_READOUT) > I_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
-                        trajectorySkewFirst = true;
-                    }
-                })
+                .build();
 
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                })
+        //Live build for drop off!
 
-                .waitSeconds(POLE_WAIT_DROP)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.openGripper();
-                })
-
-                .waitSeconds(POLE_WAIT_RELEASE)
+        TrajectorySequence II_APPROACH = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
                 .lineToLinearHeading(new Pose2d(I_BACK_POLE_X, -I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG + 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
@@ -65,10 +60,13 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.closeGripper();
-                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
                 .waitSeconds(STACK_WAIT_UP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
+                })
 
                 //May need to swap these two?? Maybe, play with it a little
 
@@ -78,30 +76,43 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
                 .turn(Math.toRadians(-II_APPROACH_TURN))
 
-                .lineTo(new Vector2d(II_DROP_X, -II_DROP_Y))
+                .build();
 
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
-                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - II_III_EXPECTED_SENSOR_READOUT) > II_III_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - II_III_EXPECTED_WEBCAM_READOUT) > II_III_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
-                        trajectorySkewSecond = true;
-                    }
-                })
 
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                })
 
-                .waitSeconds(POLE_WAIT_DROP)
 
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.openGripper();
-                })
+        TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(startPose)
 
-                .waitSeconds(POLE_WAIT_RELEASE)
+                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, -II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG)))
+
+                .lineTo(new Vector2d(-PARK_II_X, -PARK_Y))
+
+                .build();
+
+        TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(startPose)
+
+                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, -II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG)))
+
+                .lineTo(new Vector2d(-LEFT_PARK_III_X, -PARK_Y))
+
+                .build();
+
+        TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(startPose)
+
+                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, -II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG)))
+
+                .lineTo(new Vector2d(-LEFT_PARK_I_X, -PARK_Y))
+
+                .build();
+
+
+
+
+        //Live build for drop off!
+
+        /*TrajectorySequence III_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
 
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, -II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
-
-
 
                 .lineTo(new Vector2d(II_PKUP_X, -II_PKUP_Y))
 
@@ -123,10 +134,53 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
                 .lineTo(new Vector2d(III_APPROACH_X, -III_APPROACH_Y))
 
-                .turn(Math.toRadians(-III_APPROACH_TURN))
+                .turn(Math.toRadians(-III_APPROACH_TURN))*/
 
 
-                .lineTo(new Vector2d(III_DROP_X, -III_DROP_Y))
+
+        //TrajectorySequence idealTrajectory = robot.drive.trajectorySequenceBuilder(firstApproach.end())
+
+
+
+                /*.lineTo(new Vector2d(I_DROP_X, -I_DROP_Y))
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(POLE_WAIT_DROP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
+
+                .waitSeconds(POLE_WAIT_RELEASE)*/
+
+                /*.lineTo(new Vector2d(II_DROP_X, -II_DROP_Y))
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
+                    if( (robot.vision.findClosePoleDTheta() > Math.toRadians(WEBCAM_DEGREE_TOLERANCE)) || ( Math.abs(robot.sensors.getFrontDist() - II_III_EXPECTED_SENSOR_READOUT) > II_III_DISTANCE_SENSOR_TOLERANCE) || ( Math.abs(robot.vision.findClosePoleDist() - II_III_EXPECTED_WEBCAM_READOUT) > II_III_WEBCAM_DIST_TOLERANCE)){ //MAY add an additional check against distance sensors and webcam dist? Not sure if necessary yet, though
+                        trajectorySkewSecond = true;
+                    }
+                })
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
+
+                .waitSeconds(POLE_WAIT_DROP)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
+
+                .waitSeconds(POLE_WAIT_RELEASE)*/
+
+
+
+
+                /*.lineTo(new Vector2d(III_DROP_X, -III_DROP_Y))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     //TODO: ADD REDUNDANCY CHECKS AGAINST THESE SENSORS. WILL PROBABLY WANT TO MOVE INTO A BOOLEAN FUNCTION SO WE CAN HAVE SEVERAL LINES AND KEEP EVERYTHING MUCH, MUCH CLEANER.
@@ -149,16 +203,18 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
 
                 .lineToLinearHeading(new Pose2d(III_BACK_POLE_X, -III_BACK_POLE_Y, Math.toRadians(III_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .build();
+                .build();*/
+
+        robot.delivery.closeGripper();
 
         waitForStart();
 
         int park = robot.vision.readAprilTagCamera2() + 1;
 
+        robot.vision.runAprilTag(false);
+
         telemetry.addData("April Tag Detected: ", park);
         telemetry.update();
-
-        robot.vision.runAprilTag(false);
 
 
         double frontSensorReadout = 0;
@@ -199,47 +255,166 @@ public class _RED_LEFT_AUTO extends AUTO_PRIME {
         else {
 
 
-            robot.drive.followTrajectorySequenceAsync(idealTrajectory);
-            while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy()){ //Should leave loop when async function is done or robot is detected
+            robot.drive.followTrajectorySequenceAsync(I_APPROACH_II);
 
-                if(trajectorySkewFirst || trajectorySkewSecond || trajectorySkewThird){ //Meaning we sense we are off of the trajectory by a significant margin. One for each pole drop
-                    robot.drive.breakFollowing();
-                    robot.drive.setDrivePower(new Pose2d());
-                    robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
-                    break;
+            robot.pause(0.2);
+
+            double dTheta = 0;
+            double dist = 0;
+
+            ArrayList<Double> dThetas = new ArrayList<>();
+            ArrayList<Double>  dists = new ArrayList<>();
+
+            for(int i = 0; i<10; i++){
+                dTheta = robot.vision.findClosePoleDTheta();
+                dist = robot.vision.findClosePoleDist();
+                if(dTheta!=-1){
+                    dThetas.add(dTheta);
                 }
-
-                // Update drive localization
-                robot.drive.update();
-
+                if(dist!=-1){
+                    dists.add(dist);
+                }
+                robot.pause(.125);
             }
 
-            //TODO: ADD "LIVE-BUILT" TRAJECTORIES HERE IN CASE OF SKEW
+            for(Double d: dThetas){
+                telemetry.addData("dTheta val: ", d);
+            }
+
+            for(Double d: dists){
+                telemetry.addData("dist val: ", d);
+            }
+
+            telemetry.update();
+
+            Collections.sort(dThetas);
+            Collections.sort(dists);
+
+            //We only take median rn, is there a better way? Probably.
+
+            if (dThetas.size() % 2 == 0)
+                dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
+            else
+                dTheta = (dThetas.get(dThetas.size()/2));
+
+
+            if (dists.size() % 2 == 0)
+                dist = (dists.get(dists.size()/2) + (dists.get(dists.size()/2-1)))/2;
+            else
+                dist = (dists.get(dists.size()/2));
+
+            TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH_II.end())
+
+                    .turn(dTheta - Math.toRadians(3.5))
+
+                    .forward(dist-4)
+
+                    .waitSeconds(POLE_WAIT_DROP)
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                    })
+
+                    .waitSeconds(POLE_WAIT_RELEASE)
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        robot.delivery.openGripper();
+                    })
+
+                    .build();
+
+            robot.drive.followTrajectorySequence(I_DROP);
+
+            telemetry.addData("X Pos: ", robot.drive.getPoseEstimate().getX());
+            telemetry.addData("Y Pos: ", robot.drive.getPoseEstimate().getY());
+            telemetry.addData("Heading: ", robot.drive.getPoseEstimate().getHeading());
+            telemetry.update();
+
+            robot.drive.followTrajectorySequence(II_APPROACH);
+
+            robot.pause(0.2);
+
+            dTheta = 0;
+            dist = 0;
+
+            dThetas.clear();
+            dists.clear();
+
+            for(int i = 0; i<7; i++){
+                dTheta = robot.vision.findClosePoleDTheta();
+                dist = robot.vision.findClosePoleDist();
+                if(dTheta!=-1){
+                    dThetas.add(dTheta);
+                }
+                if(dist!=-1){
+                    dists.add(dist);
+                }
+                robot.pause(.125);
+            }
+
+            for(Double d: dThetas){
+                telemetry.addData("dTheta val: ", d);
+            }
+
+            for(Double d: dists){
+                telemetry.addData("dist val: ", d);
+            }
+
+            telemetry.update();
+
+            Collections.sort(dThetas);
+            Collections.sort(dists);
+
+            if (dThetas.size() % 2 == 0)
+                dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
+            else
+                dTheta = (dThetas.get(dThetas.size()/2));
+
+
+            if (dists.size() % 2 == 0)
+                dist = (dists.get(dists.size()/2) + (dists.get(dists.size()/2-1)))/2;
+            else
+                dist = (dists.get(dists.size()/2));
+
+
+            TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
+
+                    .turn(dTheta - Math.toRadians(3.5))
+
+                    .forward(dist-4)
+
+                    .waitSeconds(POLE_WAIT_DROP)
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                    })
+
+                    .waitSeconds(POLE_WAIT_RELEASE)
+
+                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                        robot.delivery.openGripper();
+                    })
+
+                    .build();
+
+            robot.drive.followTrajectorySequence(II_DROP);
+
+
+
+
 
             if(park==2){
-                TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(startPose)
 
-                        .lineTo(new Vector2d(-PARK_II_X, -PARK_Y))
-
-                        .build();
 
                 robot.drive.followTrajectorySequence(parkTwo);
             }
             else if(park == 3){
-                TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(startPose)
 
-                        .lineTo(new Vector2d(-LEFT_PARK_III_X, -PARK_Y))
-
-                        .build();
 
                 robot.drive.followTrajectorySequence(parkThree);
             }
             else{
-                TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(startPose)
 
-                        .lineTo(new Vector2d(-LEFT_PARK_I_X, -PARK_Y))
-
-                        .build();
 
                 robot.drive.followTrajectorySequence(parkOne);
             }

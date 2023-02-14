@@ -28,7 +28,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
         robot.drive.setPoseEstimate(startPose);
 
-        Pose2d I_DROP_POSE_ESTIMATE = new Pose2d(29, 6, Math.toRadians(225));
+        Pose2d DROP_POSE_ESTIMATE = new Pose2d(29, 6, Math.toRadians(225));
 
 
 
@@ -52,7 +52,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
         //Live build for drop off!
 
-        TrajectorySequence II_APPROACH = robot.drive.trajectorySequenceBuilder(I_DROP_POSE_ESTIMATE) //Need to have estimate for startPose
+        TrajectorySequence II_APPROACH = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE) //Need to have estimate for startPose
 
                 .lineToLinearHeading(new Pose2d(I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
@@ -82,7 +82,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
         //Live build for drop off!
 
-        TrajectorySequence III_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
+        /*TrajectorySequence III_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
 
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
@@ -105,15 +105,11 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
                 .turn(Math.toRadians(-III_APPROACH_TURN))
 
-                .build();
+                .build();*/
 
 
 
-
-
-
-
-        TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(I_DROP_POSE_ESTIMATE)
+        TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
@@ -122,7 +118,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
                 .build();
 
 
-        TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(I_DROP_POSE_ESTIMATE)
+        TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
@@ -130,7 +126,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
                 .build();
 
-        TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(I_DROP_POSE_ESTIMATE)
+        TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
@@ -141,99 +137,14 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
 
 
-
-        //TrajectorySequence idealTrajectory = robot.drive.trajectorySequenceBuilder(firstApproach.end())
-
-                //.lineTo(new Vector2d(I_DROP_X, I_DROP_Y))
-
-                /*.UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    trajectorySkewFirst = isSkew(robot.drive.getPoseEstimate().getHeading(), robot.vision.findClosePoleDTheta(), robot.sensors.getFrontDist(), (robot.drive.getPoseEstimate().getX()-IDEAL_POLE_X)/Math.sin(robot.drive.getPoseEstimate().getHeading() - Math.toRadians(180)), robot.vision.findClosePoleDist());
-                })
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                })
-
-                .waitSeconds(POLE_WAIT_DROP)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.openGripper();
-                })
-
-                .waitSeconds(POLE_WAIT_RELEASE)*/
-
-                /*.lineTo(new Vector2d(II_DROP_X, II_DROP_Y))
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    trajectorySkewSecond = isSkew(robot.drive.getPoseEstimate().getHeading(), robot.vision.findClosePoleDTheta(), robot.sensors.getFrontDist(), (robot.drive.getPoseEstimate().getX()-IDEAL_POLE_X)/Math.sin(robot.drive.getPoseEstimate().getHeading() - Math.toRadians(180)), robot.vision.findClosePoleDist());
-                })
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                })
-
-                .waitSeconds(POLE_WAIT_DROP)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.openGripper();
-                })
-
-                .waitSeconds(POLE_WAIT_RELEASE)
-
-                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
-
-
-
-                .lineTo(new Vector2d(II_PKUP_X, II_PKUP_Y))
-
-                .waitSeconds(STACK_WAIT_GRAB)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.closeGripper();
-                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
-                })
-
-                .waitSeconds(STACK_WAIT_UP)
-
-                //May need to swap these two?? Maybe, play with it a little
-
-                .lineTo(new Vector2d(II_PKUP_BKUP_X, II_PKUP_BKUP_Y))
-
-                .waitSeconds(STACK_WAIT_UP)
-
-
-                .lineTo(new Vector2d(III_APPROACH_X, III_APPROACH_Y))
-
-                .turn(Math.toRadians(-III_APPROACH_TURN))
-
-
-                .lineTo(new Vector2d(III_DROP_X, III_DROP_Y))
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    trajectorySkewThird = isSkew(robot.drive.getPoseEstimate().getHeading(), robot.vision.findClosePoleDTheta(), robot.sensors.getFrontDist(), (robot.drive.getPoseEstimate().getX()-IDEAL_POLE_X)/Math.sin(robot.drive.getPoseEstimate().getHeading() - Math.toRadians(180)), robot.vision.findClosePoleDist());
-                })
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(II_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                })
-
-                .waitSeconds(POLE_WAIT_DROP)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.openGripper();
-                })
-
-                .waitSeconds(POLE_WAIT_RELEASE)
-
-                .lineToLinearHeading(new Pose2d(III_BACK_POLE_X, III_BACK_POLE_Y, Math.toRadians(III_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
-
-                .build();*/
 
         robot.delivery.closeGripper();
 
         waitForStart();
 
         int park = robot.vision.readAprilTagCamera2() + 1;
+
+        robot.vision.runAprilTag(false); //Hopefully this will decrease pipeline overhead time
 
         telemetry.addData("April Tag Detected: ", park);
         telemetry.update();
@@ -291,7 +202,7 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
             ArrayList<Double>  dThetas = new ArrayList<>();
             ArrayList<Double>  dists = new ArrayList<>();
 
-            for(int i = 0; i<7; i++){
+            for(int i = 0; i<10; i++){
                 dTheta = robot.vision.findClosePoleDTheta();
                 dist = robot.vision.findClosePoleDist();
                 if(dTheta!=-1){
@@ -315,6 +226,8 @@ public class _BLUE_LEFT_AUTO extends AUTO_PRIME {
 
             Collections.sort(dThetas);
             Collections.sort(dists);
+
+            //We only take median rn, is there a better way? Probably.
 
             if (dThetas.size() % 2 == 0)
                 dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
