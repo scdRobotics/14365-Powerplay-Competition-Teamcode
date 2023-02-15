@@ -134,7 +134,7 @@ public class Vision extends Subsystem {
         double dy;
         double phi;
         double a = 6.825;
-        double b = 2;
+        double b = -1.5;
 
         c1 = theta1;
         c2 = theta2;
@@ -209,7 +209,7 @@ public class Vision extends Subsystem {
         double dy;
         //double phi;
         double a = 6.825;
-        double b = 2;
+        double b = -1.5;
 
         c1 = theta1;
         c2 = theta2;

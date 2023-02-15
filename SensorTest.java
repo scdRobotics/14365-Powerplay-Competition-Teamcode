@@ -88,7 +88,7 @@ public class SensorTest extends AUTO_PRIME {
 
         int validCountDTheta = 0;
         for(Double d: allDTheta){
-            if(d!=-1){
+            if(d!=-1 || d!=-0.01){
                 dThetaSum += d;
                 validCountDTheta++;
             }
@@ -96,7 +96,7 @@ public class SensorTest extends AUTO_PRIME {
 
         int validCountDist = 0;
         for(Double d: allDist){
-            if(d!=-1){
+            if(d!=-1 || d!=-0.01){
                 distSum += d;
                 validCountDist++;
             }
@@ -139,13 +139,13 @@ public class SensorTest extends AUTO_PRIME {
         int count = 0;
         for(Double dTheta: allDTheta){
             count++;
-            telemetry.addData("dTheta #" + count + " Val: ", dTheta/100);
+            telemetry.addData("dTheta #" + count + " Val: ", dTheta);
         }
 
         count = 0;
         for(Double dist: allDist){
             count++;
-            telemetry.addData("dist #" + count + " Val: ", dist/100);
+            telemetry.addData("dist #" + count + " Val: ", dist);
         }
 
         telemetry.update();
