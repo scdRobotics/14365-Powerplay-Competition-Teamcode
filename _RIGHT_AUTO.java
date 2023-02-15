@@ -54,9 +54,9 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence II_APPROACH = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE) //Need to have estimate for startPose
 
-                .lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(-(I_BACK_POLE_ANG - 1e-6)))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians((I_BACK_POLE_ANG - 180 + 1e-6)))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .lineTo(new Vector2d(-I_PKUP_X, I_PKUP_Y))
+                .lineTo(new Vector2d(-(I_PKUP_X + 3.25), I_PKUP_Y))
 
                 .waitSeconds(STACK_WAIT_GRAB)
 
@@ -122,7 +122,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(-(II_BACK_POLE_ANG - 1e-6)))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .lineTo(new Vector2d(-LEFT_PARK_I_X, PARK_Y))
+                .lineTo(new Vector2d(-LEFT_PARK_III_X, PARK_Y))
 
                 .build();
 
@@ -211,7 +211,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                 if(dist!=-1){
                     dists.add(dist);
                 }
-                robot.pause(.125);
+                robot.pause(.110);
             }
 
             for(Double d: dThetas){
@@ -243,9 +243,9 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
             TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH_II.end())
 
-                    .turn(dTheta - Math.toRadians(3.5))
+                    .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist-4)
+                    .forward(dist * 1 - 7.1)
 
                     .waitSeconds(POLE_WAIT_DROP)
 
@@ -278,7 +278,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
             dThetas.clear();
             dists.clear();
 
-            for(int i = 0; i<7; i++){
+            for(int i = 0; i<10; i++){
                 dTheta = robot.vision.findClosePoleDTheta();
                 dist = robot.vision.findClosePoleDist();
                 if(dTheta!=-1){
@@ -287,7 +287,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                 if(dist!=-1){
                     dists.add(dist);
                 }
-                robot.pause(.125);
+                robot.pause(.110);
             }
 
             for(Double d: dThetas){
@@ -317,9 +317,9 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
             TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
 
-                    .turn(dTheta - Math.toRadians(3.5))
+                    .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist-4)
+                    .forward(dist * 1 - 7.1)
 
                     .waitSeconds(POLE_WAIT_DROP)
 
@@ -363,30 +363,8 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
         //Find actual closest coord grid values in case park goes wrong, and also prevents a code block for each block case
         //TODO: NEEDS TESTING TO ENSURE IT ACTUALLY WORKS PROPERLY
 
-        for(int i = 0; i< 6; i++){
-            if(Math.abs(validRobotPosConversion[i]-robot.drive.getPoseEstimate().getX()) < closestTempValX){
-                closestTempValX = robot.drive.getPoseEstimate().getX();
-                closestX = i;
-            }
-        }
 
-        for(int i = 0; i< 6; i++){
-            if(Math.abs(validRobotPosConversion[i]-robot.drive.getPoseEstimate().getY()) < closestTempValY){
-                closestTempValY = robot.drive.getPoseEstimate().getY();
-                closestY = i;
-            }
-        }
-
-        for(int i = 0; i<360; i+=90){
-            if(Math.abs(robot.drive.getPoseEstimate().getHeading()) < closestTempValAngle){
-                closestTempValAngle = robot.drive.getPoseEstimate().getHeading();
-                closestAngle = i;
-            }
-        }
-
-        PoseTransfer.idealGridCoordX = closestX;
-        PoseTransfer.idealGridCoordY = closestY;
-        PoseTransfer.idealGridAngle = closestAngle;
+        PoseTransfer.idealGridAngle = robot.drive.getPoseEstimate().getHeading();
 
 
 

@@ -15,8 +15,6 @@ public class _LEFT_AUTO extends AUTO_PRIME {
     @Override
     public void runOpMode() throws InterruptedException{
 
-        //PoseTransfer.isBlue=true;
-
         initAuto();
         robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
@@ -122,7 +120,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .lineTo(new Vector2d(LEFT_PARK_I_X, PARK_Y))
+                .lineTo(new Vector2d(LEFT_PARK_III_X, PARK_Y))
 
                 .build();
 
@@ -243,9 +241,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
             TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH_II.end())
 
-                    .turn(dTheta - Math.toRadians(0))
+                    .turn(dTheta * 1.2)
 
-                    .forward(dist-4)
+                    .forward(dist * 0.9 - 7)
 
                     .waitSeconds(POLE_WAIT_DROP)
 
@@ -318,9 +316,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
             TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
 
                     //.turn(dTheta - Math.toRadians(3.5))
-                    .turn(dTheta)
+                    .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist-3)
+                    .forward(dist * 1 - 7.1)
 
                     .waitSeconds(POLE_WAIT_DROP)
 
@@ -354,8 +352,6 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                 robot.drive.followTrajectorySequence(parkOne);
             }
 
-            robot.pause(30);
-
         }
 
         PoseTransfer.currentPose = robot.drive.getPoseEstimate();
@@ -364,30 +360,8 @@ public class _LEFT_AUTO extends AUTO_PRIME {
         //Find actual closest coord grid values in case park goes wrong, and also prevents a code block for each block case
         //TODO: NEEDS TESTING TO ENSURE IT ACTUALLY WORKS PROPERLY
 
-        for(int i = 0; i< 6; i++){
-            if(Math.abs(validRobotPosConversion[i]-robot.drive.getPoseEstimate().getX()) < closestTempValX){
-                closestTempValX = robot.drive.getPoseEstimate().getX();
-                closestX = i;
-            }
-        }
 
-        for(int i = 0; i< 6; i++){
-            if(Math.abs(validRobotPosConversion[i]-robot.drive.getPoseEstimate().getY()) < closestTempValY){
-                closestTempValY = robot.drive.getPoseEstimate().getY();
-                closestY = i;
-            }
-        }
-
-        for(int i = 0; i<360; i+=90){
-            if(Math.abs(robot.drive.getPoseEstimate().getHeading()) < closestTempValAngle){
-                closestTempValAngle = robot.drive.getPoseEstimate().getHeading();
-                closestAngle = i;
-            }
-        }
-
-        PoseTransfer.idealGridCoordX = closestX;
-        PoseTransfer.idealGridCoordY = closestY;
-        PoseTransfer.idealGridAngle = closestAngle;
+        PoseTransfer.idealGridAngle = robot.drive.getPoseEstimate().getHeading();
 
 
 

@@ -16,6 +16,8 @@ public class DeliveryTeleOp extends LinearOpMode {
 
         robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
+        //robot.drive.setPoseEstimate(PoseTransfer.currentPose);
+
         double slow = 1;
 
         double slidePos = 0;

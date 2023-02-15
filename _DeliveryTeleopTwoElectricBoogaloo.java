@@ -45,12 +45,13 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
         }
 
 
-        Pose2d idealPose = new Pose2d(validRobotPosConversion[idealGridCoordX], validRobotPosConversion[idealGridCoordY], Math.toRadians(idealGridAngle));
 
         ElapsedTime timer = new ElapsedTime();
         Robot robot = new Robot(this, hardwareMap, telemetry, timer, false);
 
         robot.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        robot.drive.setPoseEstimate(PoseTransfer.currentPose);
 
         double slow = 1;
 
