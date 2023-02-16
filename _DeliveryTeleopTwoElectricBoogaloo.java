@@ -49,6 +49,12 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         Robot robot = new Robot(this, hardwareMap, telemetry, timer, false);
 
+        robot.vision.runAprilTag(false);
+
+        CameraThread cameraThread = new CameraThread(robot.sensors, robot.vision);
+
+        cameraThread.start();
+
         robot.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         robot.drive.setPoseEstimate(PoseTransfer.currentPose);
@@ -64,20 +70,18 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
 
-        robot.drive.setPoseEstimate(PoseTransfer.currentPose);
-
-
-
-
         robot.delivery.initEncodersNoReset();
 
         int slidePosIdx = 0; //0 = bottom, 1 = low, 2 = med, 3 = high
 
 
+
+
+
         waitForStart();
 
 
-        while(!isStopRequested() && opModeIsActive()){
+        while(!isStopRequested() && opModeIsActive()) {
 
             /*
 
@@ -87,74 +91,45 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
              */
 
-
-            switch(currentMode){
-                case AUTO:
-
-                    if(gamepad1.left_stick_button){
-                        robot.drive.breakFollowing();
-                        currentMode = MODE.MANUAL;
-                    }
-
-                    if(!robot.drive.isBusy()){
-                        robot.drive.setPoseEstimate(robot.drive.getPoseEstimate());
-                        currentMode= MODE.MANUAL;
-                    }
-
-                    robot.drive.update();
-
-                    robot.sensors.setLEDState(Sensors.LED_STATE.SEMI_AUTO);
-
-                    break;
+            telemetry.addData("Ideal X Coord Grid: ", idealGridCoordX);
+            telemetry.addData("Ideal Y Coord Grid: ", idealGridCoordY);
+            telemetry.addData("Ideal Coord X: ", validRobotPosConversion[idealGridCoordX]);
+            telemetry.addData("Ideal Coord Y: ", validRobotPosConversion[idealGridCoordY]);
+            telemetry.addData("Ideal Heading: ", idealGridAngle);
+            telemetry.addData("Gamepad 1 Left Stick X: ", gamepad1.left_stick_x);
+            telemetry.addData("Gamepad 1 Left Stick Y: ", gamepad1.left_stick_y);
+            telemetry.update();
 
 
-                case MANUAL:
-
-                    //TODO: ADD SOME FORM OF SEMI_AUTO FUNCTION, PROBABLY FOR CYCLING ON ONE POLE
-
-                    telemetry.addData("Ideal X Coord Grid: ", idealGridCoordX);
-                    telemetry.addData("Ideal Y Coord Grid: ", idealGridCoordY);
-                    telemetry.addData("Ideal Coord X: ", validRobotPosConversion[idealGridCoordX]);
-                    telemetry.addData("Ideal Coord Y: ", validRobotPosConversion[idealGridCoordY]);
-                    telemetry.addData("Ideal Heading: ", idealGridAngle);
-                    telemetry.addData("Gamepad 1 Left Stick X: ", gamepad1.left_stick_x);
-                    telemetry.addData("Gamepad 1 Left Stick Y: ", gamepad1.left_stick_y);
-                    telemetry.update();
-
-
-                    if(gamepad1.left_bumper) {
-                        slow = 2;
-                    }
-                    else {
-                        slow = 1;
-                    }
-
-                    //TODO: FIND OUT WHERE /SLOW GOES & TEST
-                    //TODO: HAVE CHECK AGAINST IMU FOR IF/WHEN "GET HEADING" IS NOT ACCURATE
-                    Pose2d poseEstimate = robot.drive.getPoseEstimate();
-                    Vector2d input = new Vector2d(
-                            -gamepad1.left_stick_y,
-                            -gamepad1.left_stick_x
-                    ).rotated(-poseEstimate.getHeading());
-
-                    robot.drive.setWeightedDrivePower(
-                            new Pose2d(
-                                    input.getX()/slow,
-                                    input.getY()/slow,
-                                    -gamepad1.right_stick_x/slow
-                            )
-                    );
-
-                    robot.drive.update();
-
-
-                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
-
-
-                    break;
-
-
+            if (gamepad1.left_bumper) {
+                slow = 2;
+            } else {
+                slow = 1;
             }
+
+            //TODO: FIND OUT WHERE /SLOW GOES & TEST
+            //TODO: HAVE CHECK AGAINST IMU FOR IF/WHEN "GET HEADING" IS NOT ACCURATE
+            Pose2d poseEstimate = robot.drive.getPoseEstimate();
+            Vector2d input = new Vector2d(
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x
+            ).rotated(-poseEstimate.getHeading());
+
+            robot.drive.setWeightedDrivePower(
+                    new Pose2d(
+                            input.getX() / slow,
+                            input.getY() / slow,
+                            -gamepad1.right_stick_x / slow
+                    )
+            );
+
+            robot.drive.update();
+
+
+            //robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+
+
+
 
 
 
@@ -167,73 +142,55 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
              */
 
 
-            //TODO: ADD LED-ASSISTED POLE DROPOFF. WILL LIKELY BEHAVE INCREDIBLY SIMILARLY TO AUTONOMOUS SKEW CHECK, JUST SLIGHTLY DIFFERENT CONSTANTS. ONLY ACTIVATE IF SLIDE IS WITHIN DROPPING RANGES. ELSE, JUST USE DEFAULT. EXAMPLE CODE FOR LED CONTROL:
-            robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
-            if(slidePos>1250){
-                /*
-                if(isSkew()){
-                    robot.sensors.setLEDState(Sensors.LED_STATE.POLE_BAD);
-                }
-                else{
-                    robot.sensors.setLEDState(Sensors.LED_STATE.POLE_GOOD);
-                }
-                 */
-            }
-
-
-
-            if(gamepad2.dpad_up && !dpadUpHeld){
+            if (gamepad2.dpad_up && !dpadUpHeld) {
                 slidePosIdx++;
-                dpadUpHeld=true;
+                dpadUpHeld = true;
 
                 slidePos = robot.delivery.slideIdxToEncoderVal(slidePosIdx);
-            }
-
-            else if(gamepad2.dpad_down && !dpadDownHeld){
+            } else if (gamepad2.dpad_down && !dpadDownHeld) {
                 slidePosIdx--;
-                dpadDownHeld=true;
+                dpadDownHeld = true;
 
                 slidePos = robot.delivery.slideIdxToEncoderVal(slidePosIdx);
             }
 
-            if(!gamepad2.dpad_up){
-                dpadUpHeld=false;
+            if (!gamepad2.dpad_up) {
+                dpadUpHeld = false;
             }
 
-            if(!gamepad2.dpad_down){
-                dpadDownHeld=false;
+            if (!gamepad2.dpad_down) {
+                dpadDownHeld = false;
             }
 
 
-
-
-
-            if(gamepad2.left_stick_y>0.1 || gamepad2.left_stick_y<-0.1){
-                slidePos += -gamepad2.left_stick_y*10;
+            if (gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < -0.1) {
+                slidePos += -gamepad2.left_stick_y * 10;
             }
 
 
             robot.delivery.runSlide((int) (slidePos), 0.9);
 
 
-            if(gamepad2.a){
+            if (gamepad2.a) {
                 robot.delivery.runGripper(0.225);
-            }
-            else{
+            } else {
                 robot.delivery.runGripper(0);
             }
 
-            if(gamepad2.y){ //Reset button
-                slidePos=0;
-                slidePosIdx=0;
+            if (gamepad2.y) { //Reset button
+                slidePos = 0;
+                slidePosIdx = 0;
                 robot.delivery.resetEncoders();
             }
 
 
 
+
         }
 
-    }
+        cameraThread.stop();
+
+}
 
     public void checkBoundaries(){
         if(idealGridAngle>360){
