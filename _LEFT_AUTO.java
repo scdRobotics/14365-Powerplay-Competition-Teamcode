@@ -241,7 +241,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
             TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH_II.end())
 
-                    .turn(dTheta * 1.2)
+                    .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
                     .forward(dist * 0.9 - 7)
 
