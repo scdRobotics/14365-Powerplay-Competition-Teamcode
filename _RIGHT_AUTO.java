@@ -42,6 +42,8 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
+                .lineTo(new Vector2d(-I_APPROACH_X, I_APPROACH_Y - 6))
+
                 .lineTo(new Vector2d(-I_APPROACH_X, I_APPROACH_Y))
 
                 .build();
@@ -68,7 +70,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 .lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians((I_BACK_POLE_ANG - 180 + 1e-6)))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .lineTo(new Vector2d(- (I_PKUP_X + 1.5), I_PKUP_Y))
+                .lineTo(new Vector2d(- (I_PKUP_X + 3), I_PKUP_Y))
 
                 .waitSeconds(STACK_WAIT_GRAB)
 
@@ -84,7 +86,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 //May need to swap these two?? Maybe, play with it a little
 
-                .lineTo(new Vector2d(- (I_PKUP_BKUP_X + 1.5), I_PKUP_BKUP_Y))
+                .lineTo(new Vector2d(- (I_PKUP_BKUP_X + 3), I_PKUP_BKUP_Y))
 
                 .lineTo(new Vector2d(-II_APPROACH_X, II_APPROACH_Y))
 
@@ -218,7 +220,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
             robot.drive.followTrajectorySequence(I_APPROACH_II);
 
-            robot.pause(0.2);
+            robot.pause(1.5);
 
             robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
@@ -228,16 +230,34 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
             ArrayList<Double>  dThetas = new ArrayList<>();
             ArrayList<Double>  dists = new ArrayList<>();
 
-            for(int i = 0; i<10; i++){
-                dTheta = robot.vision.findClosePoleDTheta();
-                dist = robot.vision.findClosePoleDist();
-                if(dTheta!=-1){
-                    dThetas.add(dTheta);
+            int count = 0;
+
+            while(count<20){
+
+                if(dThetas.size() < 10){
+                    dTheta = robot.vision.findClosePoleDTheta();
+                    if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
+                        dThetas.add(dTheta);
+                    }
                 }
-                if(dist!=-1){
-                    dists.add(dist);
+
+                if(dists.size() < 10){
+                    dist = robot.vision.findClosePoleDist();
+                    if(dist!=-1 && dist<23 && dist>8){
+                        dists.add(dist);
+                    }
                 }
-                robot.pause(.110);
+
+                if(dThetas.size()==10 && dists.size()==10){
+                    break;
+                }
+
+                count++;
+
+                telemetry.addData("Loop Count: ", count);
+
+
+                robot.pause(0.075);
             }
 
             for(Double d: dThetas){
@@ -271,7 +291,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                     .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist * 1 - 7.1)
+                    .forward(dist - 7 + 1.75)
 
                     .waitSeconds(POLE_WAIT_DROP)
 
@@ -296,7 +316,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
             robot.drive.followTrajectorySequence(II_APPROACH);
 
-            robot.pause(0.2);
+            robot.pause(1.5);
 
             robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
@@ -306,16 +326,32 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
             dThetas.clear();
             dists.clear();
 
-            for(int i = 0; i<10; i++){
-                dTheta = robot.vision.findClosePoleDTheta();
-                dist = robot.vision.findClosePoleDist();
-                if(dTheta!=-1){
-                    dThetas.add(dTheta);
+            while(count<20){
+
+                if(dThetas.size() < 10){
+                    dTheta = robot.vision.findClosePoleDTheta();
+                    if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
+                        dThetas.add(dTheta);
+                    }
                 }
-                if(dist!=-1){
-                    dists.add(dist);
+
+                if(dists.size() < 10){
+                    dist = robot.vision.findClosePoleDist();
+                    if(dist!=-1 && dist<23 && dist>8){
+                        dists.add(dist);
+                    }
                 }
-                robot.pause(.110);
+
+                if(dThetas.size()==10 && dists.size()==10){
+                    break;
+                }
+
+                count++;
+
+                telemetry.addData("Loop Count: ", count);
+
+
+                robot.pause(0.075);
             }
 
             for(Double d: dThetas){
@@ -347,7 +383,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                     .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist * 1 - 7.1)
+                    .forward(dist - 7 + 1.75)
 
                     .waitSeconds(POLE_WAIT_DROP)
 
@@ -380,8 +416,6 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 robot.drive.followTrajectorySequence(parkOne);
             }
-
-            robot.pause(30);
 
         }
 

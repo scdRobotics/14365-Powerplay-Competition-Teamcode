@@ -40,6 +40,8 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
+                .lineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y - 6))
+
                 .lineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y))
 
                 .build();
@@ -216,7 +218,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
             robot.drive.followTrajectorySequence(I_APPROACH_II);
 
-            robot.pause(0.5);
+            robot.pause(1.5);
 
             robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
@@ -289,7 +291,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
                     .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist - 8.5)
+                    .forward(dist - 7 + 1.75)
 
                     .waitSeconds(POLE_WAIT_DROP)
 
@@ -314,7 +316,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
             robot.drive.followTrajectorySequence(II_APPROACH);
 
-            robot.pause(0.5);
+            robot.pause(1.5);
 
             robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
@@ -386,7 +388,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
                     .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist - 9)
+                    .forward(dist - 7 + 1.75)
 
                     .waitSeconds(POLE_WAIT_DROP)
 

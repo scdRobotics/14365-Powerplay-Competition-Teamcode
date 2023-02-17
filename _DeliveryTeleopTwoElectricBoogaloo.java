@@ -145,10 +145,16 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
                     )
             );
 
-            robot.drive.update();
+            telemetry.addData("IMU: ", robot.sensors.getIMUReadout());
+
+            //robot.drive.update();
 
 
             //robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+
+            if(gamepad1.y){
+                robot.sensors.setImuOffset(robot.sensors.getIMUReadout());
+            }
 
 
 
@@ -191,18 +197,6 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
             robot.delivery.runSlide((int) (slidePos), 0.9);
-
-
-            if (gamepad2.a) {
-                //robot.delivery.runGripper(0.225);
-                robot.delivery.openGripper();
-                if(slidePos<1250 && robot.sensors.getFrontDist()<2){
-                    robot.sensors.setLEDState(Sensors.LED_STATE.CONE_DETECTED);
-                }
-            } else {
-                //robot.delivery.runGripper(0.5);
-                robot.delivery.closeGripper();
-            }
 
             if (gamepad2.y) { //Reset button
                 slidePos = 0;
@@ -267,7 +261,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
 
-                if(isEqual(dTheta, Math.toRadians(16), 0) && isEqual(dist, 7, 6)){
+                if(isEqual(dTheta, Math.toRadians(20), 0) && isEqual(dist, 7, 5)){
                     robot.sensors.setLEDState(Sensors.LED_STATE.POLE_GOOD);
                     telemetry.addData("Pole Good! ", "");
                 }
@@ -288,7 +282,18 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
                 telemetry.addData("Slide Down! ", "");
             }
 
-
+            if (gamepad2.a) {
+                //robot.delivery.runGripper(0.225);
+                robot.delivery.openGripper();
+                double frontDist = robot.sensors.getFrontDist();
+                telemetry.addData("Front Dist: ", frontDist);
+                if(slidePos<1250 && frontDist<1.6){
+                    robot.sensors.setLEDState(Sensors.LED_STATE.CONE_DETECTED);
+                }
+            } else {
+                //robot.delivery.runGripper(0.5);
+                robot.delivery.closeGripper();
+            }
 
 
             telemetry.addData("median dTheta: ", dTheta);

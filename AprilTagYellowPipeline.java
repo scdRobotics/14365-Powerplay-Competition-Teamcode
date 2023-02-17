@@ -96,7 +96,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
     int numContoursFound;
 
-    private Stage stageToRenderToViewport = Stage.THRESHOLD;
+    private Stage stageToRenderToViewport = Stage.CONTOURS_OVERLAYED_ON_FRAME;
     private Stage[] stages = Stage.values();
 
     public AprilTagYellowPipeline(double tagsize, double fx, double fy, double cx, double cy)
@@ -240,14 +240,14 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
 
 
-        thresholdMat.copyTo(contoursMat);
+        input.copyTo(contoursMat);
 
         Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
 
         numContoursFound = contoursList.size();
 
         for (MatOfPoint contour: contoursList){
-            Imgproc.fillPoly(thresholdMat, Arrays.asList(contour), white);
+            Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
         }
 
         Scalar black = new Scalar(0, 0, 0);
@@ -288,15 +288,15 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.height;
                     double correctHeight = rotatedRect.size.width;
-                    drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
+                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             } else {
-                if (fixedAngle >= 160 && fixedAngle <= 200 && (x > (1080*0.3) && x < (1080*0.7)) ) {
+                if ( fixedAngle >= 160 && fixedAngle <= 200 ) {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.width;
                     double correctHeight = rotatedRect.size.height;
-                    drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
+                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             }

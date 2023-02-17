@@ -127,8 +127,25 @@ public class SensorTest extends AUTO_PRIME {
 
         standDevDistSum = Math.sqrt(standDevDistSum/validCountDist);
 
-        telemetry.addData("Mean dTheta: ", meanDTheta);
-        telemetry.addData("Mean dist: ", meanDist);
+        double medianDTheta = 0;
+        double medianDist = 0;
+
+        if (allDTheta.size() % 2 == 0)
+            medianDTheta = (allDTheta.get(allDTheta.size()/2) + (allDTheta.get(allDTheta.size()/2-1)))/2;
+        else
+            medianDTheta = (allDTheta.get(allDTheta.size()/2));
+
+
+        if (allDist.size() % 2 == 0)
+            medianDist = (allDist.get(allDist.size()/2) + (allDist.get(allDist.size()/2-1)))/2;
+        else
+            medianDist = (allDist.get(allDist.size()/2));
+
+        telemetry.addData("dTheta Mean: ", meanDTheta);
+        telemetry.addData("dist Mean: ", meanDist);
+
+        telemetry.addData("dTheta Median: ", medianDTheta);
+        telemetry.addData("dist Median: ", medianDist);
 
         telemetry.addData("dTheta Stand Dev: ", standDevDThetaSum);
         telemetry.addData("dist Stand Dev: ", standDevDistSum);
