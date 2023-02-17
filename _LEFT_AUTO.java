@@ -33,6 +33,10 @@ public class _LEFT_AUTO extends AUTO_PRIME {
         TrajectorySequence I_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
@@ -41,6 +45,10 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                 .build();
 
         TrajectorySequence I_APPROACH_II = robot.drive.trajectorySequenceBuilder(I_APPROACH.end())
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
 
                 .turn(Math.toRadians(-I_APPROACH_TURN))
 
@@ -51,6 +59,10 @@ public class _LEFT_AUTO extends AUTO_PRIME {
         //Live build for drop off!
 
         TrajectorySequence II_APPROACH = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE) //Need to have estimate for startPose
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
 
                 .lineToLinearHeading(new Pose2d(I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
@@ -109,6 +121,10 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
+
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .lineTo(new Vector2d(PARK_II_X, PARK_Y))
@@ -118,6 +134,10 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
+
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .lineTo(new Vector2d(LEFT_PARK_III_X, PARK_Y))
@@ -125,6 +145,10 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                 .build();
 
         TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
 
                 .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
@@ -192,7 +216,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
             robot.drive.followTrajectorySequence(I_APPROACH_II);
 
-            robot.pause(0.2);
+            robot.pause(0.5);
+
+            robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
             double dTheta = 0;
             double dist = 0;
@@ -200,16 +226,34 @@ public class _LEFT_AUTO extends AUTO_PRIME {
             ArrayList<Double>  dThetas = new ArrayList<>();
             ArrayList<Double>  dists = new ArrayList<>();
 
-            for(int i = 0; i<10; i++){
-                dTheta = robot.vision.findClosePoleDTheta();
-                dist = robot.vision.findClosePoleDist();
-                if(dTheta!=-1){
-                    dThetas.add(dTheta);
+            int count = 0;
+
+            while(count<20){
+
+                if(dThetas.size() < 10){
+                    dTheta = robot.vision.findClosePoleDTheta();
+                    if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
+                        dThetas.add(dTheta);
+                    }
                 }
-                if(dist!=-1){
-                    dists.add(dist);
+
+                if(dists.size() < 10){
+                    dist = robot.vision.findClosePoleDist();
+                    if(dist!=-1 && dist<23 && dist>8){
+                        dists.add(dist);
+                    }
                 }
-                robot.pause(.110);
+
+                if(dThetas.size()==10 && dists.size()==10){
+                    break;
+                }
+
+                count++;
+
+                telemetry.addData("Loop Count: ", count);
+
+
+                robot.pause(0.075);
             }
 
             for(Double d: dThetas){
@@ -241,9 +285,11 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
             TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH_II.end())
 
+                    //.turn(dTheta * Math.abs(Math.cos(dTheta)))
+
                     .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist * 0.9 - 7)
+                    .forward(dist - 8.5)
 
                     .waitSeconds(POLE_WAIT_DROP)
 
@@ -268,7 +314,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
             robot.drive.followTrajectorySequence(II_APPROACH);
 
-            robot.pause(0.2);
+            robot.pause(0.5);
+
+            robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
             dTheta = 0;
             dist = 0;
@@ -276,16 +324,34 @@ public class _LEFT_AUTO extends AUTO_PRIME {
             dThetas.clear();
             dists.clear();
 
-            for(int i = 0; i<10; i++){
-                dTheta = robot.vision.findClosePoleDTheta();
-                dist = robot.vision.findClosePoleDist();
-                if(dTheta!=-1){
-                    dThetas.add(dTheta);
+            count = 0;
+
+            while(count<20){
+
+                if(dThetas.size() < 10){
+                    dTheta = robot.vision.findClosePoleDTheta();
+                    if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
+                        dThetas.add(dTheta);
+                    }
                 }
-                if(dist!=-1 && dTheta<23){
-                    dists.add(dist);
+
+                if(dists.size() < 10){
+                    dist = robot.vision.findClosePoleDist();
+                    if(dist!=-1 && dist<23 && dist>8){
+                        dists.add(dist);
+                    }
                 }
-                robot.pause(.110);
+
+                if(dThetas.size()==10 && dists.size()==10){
+                    break;
+                }
+
+                count++;
+
+                telemetry.addData("Loop Count: ", count);
+
+
+                robot.pause(0.075);
             }
 
             for(Double d: dThetas){
@@ -316,9 +382,11 @@ public class _LEFT_AUTO extends AUTO_PRIME {
             TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
 
                     //.turn(dTheta - Math.toRadians(3.5))
+                    //.turn(dTheta * Math.abs(Math.cos(dTheta)))
+
                     .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    .forward(dist * 1 - 7.1)
+                    .forward(dist - 9)
 
                     .waitSeconds(POLE_WAIT_DROP)
 

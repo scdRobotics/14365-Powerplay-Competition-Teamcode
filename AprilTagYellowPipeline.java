@@ -96,7 +96,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
     int numContoursFound;
 
-    private Stage stageToRenderToViewport = Stage.CONTOURS_OVERLAYED_ON_FRAME;
+    private Stage stageToRenderToViewport = Stage.THRESHOLD;
     private Stage[] stages = Stage.values();
 
     public AprilTagYellowPipeline(double tagsize, double fx, double fy, double cx, double cy)
@@ -201,6 +201,8 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
         Scalar white = new Scalar(255, 255, 255);
 
+        Scalar yellow = new Scalar(255, 255, 0);
+
         contoursList.clear();
 
         Imgproc.cvtColor(input, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
@@ -238,7 +240,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
 
 
-        input.copyTo(contoursMat);
+        thresholdMat.copyTo(contoursMat);
 
         Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
 
@@ -257,21 +259,45 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
             double fixedAngle;
 
-            if(rotatedRect.size.width < rotatedRect.size.height){
-                fixedAngle = rotatedRect.angle+180;
-            }else{
-                fixedAngle = rotatedRect.angle+90;
+            if (rotatedRect.size.width < rotatedRect.size.height) {
+                fixedAngle = rotatedRect.angle + 180;
+            } else {
+                fixedAngle = rotatedRect.angle + 90;
             }
 
-            if(fixedAngle>=170 && fixedAngle<=190){
-                if(rotatedRect.size.width>5 && rotatedRect.size.height>25){
-                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
+            /*if(fixedAngle>=170 && fixedAngle<=190){
+                if(rotatedRect.size.width>16  && rotatedRect.size.height>200){
                     if(rotatedRect.size.width>rotatedRect.size.height) {
+                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
                         rects.add(new RectData(rotatedRect.size.height, rotatedRect.size.width, rotatedRect.center.x, rotatedRect.center.y));
                     }
                     else{
+                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
                         rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height, rotatedRect.center.x, rotatedRect.center.y));
                     }
+                }
+            }*/
+
+            double x = rotatedRect.center.x;
+
+            double y = rotatedRect.center.y;
+
+            if (rotatedRect.size.width > rotatedRect.size.height) {
+                //if ( (fixedAngle >= 160 && fixedAngle <= 200) && (x > (1080*0.3) && x < (1080*0.7)) ) {
+                if ( (fixedAngle >= 160 && fixedAngle <= 200)) {
+                    //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
+                    double correctWidth = rotatedRect.size.height;
+                    double correctHeight = rotatedRect.size.width;
+                    drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
+                    rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
+                }
+            } else {
+                if (fixedAngle >= 160 && fixedAngle <= 200 && (x > (1080*0.3) && x < (1080*0.7)) ) {
+                    //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
+                    double correctWidth = rotatedRect.size.width;
+                    double correctHeight = rotatedRect.size.height;
+                    drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
+                    rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             }
         }

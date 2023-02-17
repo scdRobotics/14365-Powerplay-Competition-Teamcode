@@ -17,6 +17,17 @@ public class CameraThread extends _DeliveryTeleopTwoElectricBoogaloo implements 
         this.vision=vision;
     }
 
+    double dTheta = 2;
+    double dist = 0;
+
+    public double getDTheta(){
+        return dTheta;
+    }
+
+    public double getDist(){
+        return dist;
+    }
+
     @Override
     public void run() {
         while(!Thread.currentThread().isInterrupted()){
@@ -46,7 +57,7 @@ public class CameraThread extends _DeliveryTeleopTwoElectricBoogaloo implements 
 
 
                 //Take mean dTheta if not empty
-                double dTheta = 2;
+                dTheta = 2;
                 if(dThetas.size()!=0){
                     if (dThetas.size() % 2 == 0)
                         dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
@@ -56,7 +67,7 @@ public class CameraThread extends _DeliveryTeleopTwoElectricBoogaloo implements 
 
 
                 //Take mean dist if not empty
-                double dist = 0;
+                dist = 0;
                 if(dists.size()!=0){
                     if (dists.size() % 2 == 0)
                         dist = (dists.get(dists.size()/2) + (dists.get(dists.size()/2-1)))/2;

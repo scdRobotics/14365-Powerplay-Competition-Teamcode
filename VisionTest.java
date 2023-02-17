@@ -41,19 +41,37 @@ public class VisionTest extends AUTO_PRIME {
         double dTheta = 0;
         double dist = 0;
 
-        ArrayList<Double> dThetas = new ArrayList<>();
+        ArrayList<Double>  dThetas = new ArrayList<>();
         ArrayList<Double>  dists = new ArrayList<>();
 
-        for(int i = 0; i<10; i++){
-            dTheta = robot.vision.findClosePoleDTheta();
-            dist = robot.vision.findClosePoleDist();
-            if(dTheta!=-1){
-                dThetas.add(dTheta);
+        int count = 0;
+
+        while(count<20){
+
+            if(dThetas.size() < 10){
+                dTheta = robot.vision.findClosePoleDTheta();
+                if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
+                    dThetas.add(dTheta);
+                }
             }
-            if(dist!=-1){
-                dists.add(dist);
+
+            if(dists.size() < 10){
+                dist = robot.vision.findClosePoleDist();
+                if(dist!=-1 && dist<23 && dist>8){
+                    dists.add(dist);
+                }
             }
-            robot.pause(.110);
+
+            if(dThetas.size()==10 && dists.size()==10){
+                break;
+            }
+
+            count++;
+
+            telemetry.addData("Loop Count: ", count);
+
+
+            robot.pause(0.075);
         }
 
         for(Double d: dThetas){
@@ -85,9 +103,11 @@ public class VisionTest extends AUTO_PRIME {
 
         TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(new Pose2d(0,0,0))
 
-                .turn(dTheta * Math.abs(Math.cos(dTheta))) //just using cosine to approximate better than a constant multiple
+                //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                .forward(dist - 7.2)
+                .turn(dTheta * Math.abs(Math.cos(dTheta)))
+
+                .forward(dist - 8.5)
 
                 .waitSeconds(POLE_WAIT_DROP)
 

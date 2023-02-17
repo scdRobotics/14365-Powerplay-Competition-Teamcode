@@ -134,7 +134,7 @@ public class Vision extends Subsystem {
         double dy;
         double phi;
         double a = 6.825;
-        double b = -1.5;
+        double b = 1.1;
 
         c1 = theta1;
         c2 = theta2;
@@ -165,7 +165,7 @@ public class Vision extends Subsystem {
         //May need to adjust?
         ArrayList<RectData> viewCam2 = aprilTagYellowPipeline.getRects();
 
-        if(viewCam1.isEmpty() || viewCam2.isEmpty()){
+        if( (viewCam1.isEmpty() || viewCam2.isEmpty()) || (viewCam1==null || viewCam2==null) ){
             return -1;
         }
 
@@ -209,7 +209,7 @@ public class Vision extends Subsystem {
         double dy;
         //double phi;
         double a = 6.825;
-        double b = -1.5;
+        double b = 1.1;
 
         c1 = theta1;
         c2 = theta2;
@@ -247,6 +247,9 @@ public class Vision extends Subsystem {
 
 class sortByWidth implements Comparator<RectData>{
     public int compare(RectData a, RectData b){
-        return (int) (a.getWidth() - b.getWidth()); //i don't like this cast here tbh but what else can we do?
+        if(a!=null && b!= null){
+            return (int) (a.getWidth() - b.getWidth()); //i don't like this cast here tbh but what else can we do?
+        }
+        return -1;
     }
 }

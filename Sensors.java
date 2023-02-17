@@ -40,6 +40,8 @@ public class Sensors extends Subsystem {
         this.right=right;
 
         this.led = led;
+
+        updateLEDs();
     }
 
     //NOTE: All below functions focus on updating particular distance sensor values. Pretty straightforward.
@@ -61,8 +63,12 @@ public class Sensors extends Subsystem {
     }
 
     public void setLEDState(LED_STATE c){
+        if(current == c){
+            return;
+        }
         current = c;
         updateLEDs();
+
     }
 
     public void updateLEDs(){

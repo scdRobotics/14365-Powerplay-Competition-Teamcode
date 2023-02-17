@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+import java.util.ArrayList;
+
 @TeleOp(name = "DeliveryTeleopTwoElectricBoogaloo", group = "TeleOp")
 public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
@@ -28,8 +30,22 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
     MODE currentMode = MODE.AUTO;
 
+    public ArrayList<Double> dThetas = new ArrayList<>();
+    public ArrayList<Double> dists = new ArrayList<>();
+
+    double dTheta = 2;
+    double dist = 0;
+
     @Override
     public void runOpMode(){
+
+        Pose2d startPos = new Pose2d();
+        if(PoseTransfer.isBlue){
+            startPos = PoseTransfer.currentPose;
+        }
+        else{
+            startPos = PoseTransfer.currentPose.plus(new Pose2d(0,0,Math.toRadians(180)));
+        }
 
         //0,0 = Blue right corner square
         //0,5 = Blue left corner square
@@ -49,15 +65,16 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         Robot robot = new Robot(this, hardwareMap, telemetry, timer, false);
 
+        robot.vision.activateYellowPipelineCamera1();
+        robot.vision.activateAprilTagYellowPipelineCamera2();
+
         robot.vision.runAprilTag(false);
 
-        CameraThread cameraThread = new CameraThread(robot.sensors, robot.vision);
-
-        cameraThread.start();
+        //CameraThread cameraThread = new CameraThread(robot.sensors, robot.vision);
 
         robot.drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        robot.drive.setPoseEstimate(PoseTransfer.currentPose);
+        robot.drive.setPoseEstimate(startPos);
 
         double slow = 1;
 
@@ -80,6 +97,8 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
         waitForStart();
 
+        //cameraThread.run();
+
 
         while(!isStopRequested() && opModeIsActive()) {
 
@@ -91,13 +110,10 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
              */
 
-            telemetry.addData("Ideal X Coord Grid: ", idealGridCoordX);
-            telemetry.addData("Ideal Y Coord Grid: ", idealGridCoordY);
-            telemetry.addData("Ideal Coord X: ", validRobotPosConversion[idealGridCoordX]);
-            telemetry.addData("Ideal Coord Y: ", validRobotPosConversion[idealGridCoordY]);
-            telemetry.addData("Ideal Heading: ", idealGridAngle);
-            telemetry.addData("Gamepad 1 Left Stick X: ", gamepad1.left_stick_x);
-            telemetry.addData("Gamepad 1 Left Stick Y: ", gamepad1.left_stick_y);
+            /*telemetry.addData("Camera Thread Active: ", cameraThread.isStarted());
+            telemetry.addData("Camera Thread Active dTheta: ", cameraThread.getDTheta());
+            telemetry.addData("Camera Thread Active dist: ", cameraThread.getDist());*/
+
             telemetry.update();
 
 
@@ -109,11 +125,14 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
             //TODO: FIND OUT WHERE /SLOW GOES & TEST
             //TODO: HAVE CHECK AGAINST IMU FOR IF/WHEN "GET HEADING" IS NOT ACCURATE
+
             Pose2d poseEstimate = robot.drive.getPoseEstimate();
             Vector2d input = new Vector2d(
-                    -gamepad1.left_stick_y,
-                    -gamepad1.left_stick_x
+                    gamepad1.left_stick_x,
+                    -gamepad1.left_stick_y
             ).rotated(-poseEstimate.getHeading());
+
+
 
             robot.drive.setWeightedDrivePower(
                     new Pose2d(
@@ -172,9 +191,11 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
             if (gamepad2.a) {
-                robot.delivery.runGripper(0.225);
+                //robot.delivery.runGripper(0.225);
+                robot.delivery.openGripper();
             } else {
-                robot.delivery.runGripper(0);
+                //robot.delivery.runGripper(0.5);
+                robot.delivery.closeGripper();
             }
 
             if (gamepad2.y) { //Reset button
@@ -184,35 +205,107 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
             }
 
 
+            /*
+
+
+            ----- LEDs -----
+
+
+             */
+
+            //double sensorDist = robot.sensors.getFrontDist();
+
+            if(getSlidePos()>1250){
+
+                double newDTheta = robot.vision.findClosePoleDTheta();
+                double newDist = robot.vision.findClosePoleDist();
+
+
+                if(dThetas.size()>5 && newDTheta!=-1){
+                    dThetas.remove(0);
+                    dThetas.add(newDTheta);
+                }
+                else if(newDTheta!=-1){
+                    dThetas.add(newDTheta);
+                }
+
+
+                if(dists.size()>5 && newDist!=-1){
+                    dists.remove(0);
+                    dists.add(newDist);
+                }
+                else if(newDist!=-1){
+                    dists.add(newDist);
+                }
+
+
+                //Take mean dTheta if not empty
+                dTheta = 2;
+                if(dThetas.size()!=0){
+                    if (dThetas.size() % 2 == 0)
+                        dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
+                    else
+                        dTheta = (dThetas.get(dThetas.size()/2));
+                }
+
+
+                //Take mean dist if not empty
+                dist = 0;
+                if(dists.size()!=0){
+                    if (dists.size() % 2 == 0)
+                        dist = (dists.get(dists.size()/2) + (dists.get(dists.size()/2-1)))/2;
+                    else
+                        dist = (dists.get(dists.size()/2));
+                }
+
+
+
+
+                if(isEqual(dTheta, Math.toRadians(16), 0) && isEqual(dist, 7, 6)){
+                    robot.sensors.setLEDState(Sensors.LED_STATE.POLE_GOOD);
+                    telemetry.addData("Pole Good! ", "");
+                }
+                else{
+                    robot.sensors.setLEDState(Sensors.LED_STATE.POLE_BAD);
+                    telemetry.addData("Pole Bad! ", "");
+                }
+
+
+                //pause(0.110);
+
+
+            }
+            else{
+                dThetas.clear();
+                dists.clear();
+                robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                telemetry.addData("Slide Down! ", "");
+            }
+
+
+
+
+            telemetry.addData("median dTheta: ", dTheta);
+            telemetry.addData("median dist: ", dist);
+            //telemetry.addData("Sensor dist: ", sensorDist);
+            telemetry.update();
+
+
+
+
+
+
 
 
         }
 
-        cameraThread.stop();
+        //cameraThread.stop();
 
-}
+    }
 
-    public void checkBoundaries(){
-        if(idealGridAngle>360){
-            idealGridAngle-=360;
-        }
-        else if(idealGridAngle<0){
-            idealGridAngle+=360;
-        }
-
-        if(idealGridCoordX>5){
-            idealGridCoordX=5;
-        }
-        else if(idealGridCoordX<0){
-            idealGridCoordX=0;
-        }
-
-        if(idealGridCoordY>5){
-            idealGridCoordY=5;
-        }
-        else if(idealGridCoordY<0){
-            idealGridCoordY=0;
-        }
+    public boolean isEqual (double x, double delta, double a) //X = sensor input, A = ideal input, delta = range/2
+    {
+        return Math.abs(x-a) < (delta/2);
     }
 
     public double getSlidePos(){

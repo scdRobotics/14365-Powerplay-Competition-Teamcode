@@ -35,6 +35,10 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
         TrajectorySequence I_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
@@ -43,6 +47,10 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                 .build();
 
         TrajectorySequence I_APPROACH_II = robot.drive.trajectorySequenceBuilder(I_APPROACH.end())
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
 
                 .turn(Math.toRadians(I_APPROACH_TURN))
 
@@ -54,9 +62,13 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence II_APPROACH = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE) //Need to have estimate for startPose
 
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
+
                 .lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians((I_BACK_POLE_ANG - 180 + 1e-6)))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .lineTo(new Vector2d(-(I_PKUP_X + 3.25), I_PKUP_Y))
+                .lineTo(new Vector2d(- (I_PKUP_X + 1.5), I_PKUP_Y))
 
                 .waitSeconds(STACK_WAIT_GRAB)
 
@@ -72,7 +84,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 //May need to swap these two?? Maybe, play with it a little
 
-                .lineTo(new Vector2d(-I_PKUP_BKUP_X, I_PKUP_BKUP_Y))
+                .lineTo(new Vector2d(- (I_PKUP_BKUP_X + 1.5), I_PKUP_BKUP_Y))
 
                 .lineTo(new Vector2d(-II_APPROACH_X, II_APPROACH_Y))
 
@@ -111,7 +123,11 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
-                .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(-(II_BACK_POLE_ANG - 1e-6)))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
+
+                .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians((II_BACK_POLE_ANG - 1e-6) - 180))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .lineTo(new Vector2d(-PARK_II_X, PARK_Y))
 
@@ -120,7 +136,11 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence parkThree = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
-                .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(-(II_BACK_POLE_ANG - 1e-6)))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
+
+                .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians((II_BACK_POLE_ANG - 1e-6) - 180))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .lineTo(new Vector2d(-LEFT_PARK_III_X, PARK_Y))
 
@@ -128,7 +148,11 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence parkOne = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
 
-                .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(-(II_BACK_POLE_ANG - 1e-6)))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+                })
+
+                .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians((II_BACK_POLE_ANG - 1e-6) - 180))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .lineTo(new Vector2d(-LEFT_PARK_I_X, PARK_Y))
 
@@ -195,6 +219,8 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
             robot.drive.followTrajectorySequence(I_APPROACH_II);
 
             robot.pause(0.2);
+
+            robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
             double dTheta = 0;
             double dist = 0;
@@ -271,6 +297,8 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
             robot.drive.followTrajectorySequence(II_APPROACH);
 
             robot.pause(0.2);
+
+            robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
             dTheta = 0;
             dist = 0;
