@@ -76,6 +76,8 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
         robot.drive.setPoseEstimate(startPos);
 
+        robot.sensors.setImuOffset(startPos.getHeading());
+
         double slow = 1;
 
         slidePos = PoseTransfer.slidePos;
@@ -126,11 +128,12 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
             //TODO: FIND OUT WHERE /SLOW GOES & TEST
             //TODO: HAVE CHECK AGAINST IMU FOR IF/WHEN "GET HEADING" IS NOT ACCURATE
 
-            Pose2d poseEstimate = robot.drive.getPoseEstimate();
+            //Pose2d poseEstimate = robot.drive.getPoseEstimate();
             Vector2d input = new Vector2d(
                     gamepad1.left_stick_x,
                     -gamepad1.left_stick_y
-            ).rotated(-poseEstimate.getHeading());
+            )//.rotated(-poseEstimate.getHeading());
+                    .rotated(-robot.sensors.getIMUReadout());
 
 
 
@@ -193,6 +196,9 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
             if (gamepad2.a) {
                 //robot.delivery.runGripper(0.225);
                 robot.delivery.openGripper();
+                if(slidePos<1250 && robot.sensors.getFrontDist()<2){
+                    robot.sensors.setLEDState(Sensors.LED_STATE.CONE_DETECTED);
+                }
             } else {
                 //robot.delivery.runGripper(0.5);
                 robot.delivery.closeGripper();

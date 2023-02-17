@@ -19,12 +19,19 @@ public class Sensors extends Subsystem {
 
     private RevBlinkinLedDriver led;
 
+
+    private BNO055IMU imu;
+
+
+    private double IMU_OFFSET = 0;
+
+
     public enum LED_STATE{
         DEFAULT,
         DESYNCED,
         POLE_GOOD,
         POLE_BAD,
-        SEMI_AUTO
+        CONE_DETECTED
     }
 
     LED_STATE current = LED_STATE.DEFAULT;
@@ -32,8 +39,10 @@ public class Sensors extends Subsystem {
     boolean isBlue = PoseTransfer.isBlue;
 
     //"Constructor" object for Sensors
-    public Sensors(DistanceSensor front, DistanceSensor left, DistanceSensor right, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
+    public Sensors(BNO055IMU imu, DistanceSensor front, DistanceSensor left, DistanceSensor right, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
         super(telemetry,hardwareMap,timer); //Map basic, required aspects of robot
+
+        this.imu = imu;
 
         this.front=front;
         this.left=left;
@@ -100,11 +109,20 @@ public class Sensors extends Subsystem {
                 led.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
                 break;
 
-            case SEMI_AUTO:
+            case CONE_DETECTED:
                 led.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
                 break;
 
         }
+    }
+
+    public double getIMUReadout(){
+        return imu.getAngularOrientation().firstAngle + IMU_OFFSET;
+    }
+
+
+    public void setImuOffset(double i){
+        IMU_OFFSET = i;
     }
 
 }

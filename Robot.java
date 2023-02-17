@@ -77,6 +77,8 @@ public class Robot {
     private final LinearOpMode opMode;
     private final Telemetry telemetry;
 
+    public BNO055IMU imu;
+
     //"Constructor" object for Robot-- only the most basic, necessary objects are included
     public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, ElapsedTime timer, boolean isTeleOp) {
         this.opMode = opMode;
@@ -154,6 +156,14 @@ public class Robot {
 
 
 
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
+        BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_X);
+
+
+
         /*imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
@@ -166,7 +176,7 @@ public class Robot {
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
 
-        sensors = new Sensors(front, left, right, led, telemetry, hardwareMap, timer);
+        sensors = new Sensors(imu, front, left, right, led, telemetry, hardwareMap, timer);
 
 
 
