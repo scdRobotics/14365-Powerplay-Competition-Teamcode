@@ -116,7 +116,7 @@ public class YellowPipeline extends OpenCvPipeline {
         Core.extractChannel(ycbcrMat, crMat2, 1);
 
         Imgproc.threshold(crMat1, crMatThresh1, 145, 255, THRESH_BINARY); //140
-        Imgproc.threshold(crMat2, crMatThresh2, 160,255, THRESH_BINARY_INV); //163
+        Imgproc.threshold(crMat2, crMatThresh2, 167,255, THRESH_BINARY_INV); //163
 
         Core.addWeighted(crMatThresh1, 0.5, crMatThresh2, 0.5, 0, crMatThresh);
         Imgproc.threshold(crMatThresh, crMatThresh, 130, 255, THRESH_BINARY);

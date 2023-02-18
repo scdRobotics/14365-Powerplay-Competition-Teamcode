@@ -153,7 +153,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
             //robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
             if(gamepad1.y){
-                robot.sensors.setImuOffset(robot.sensors.getIMUReadout());
+                robot.sensors.setImuOffset(-robot.sensors.getIMUReadout());
             }
 
 
