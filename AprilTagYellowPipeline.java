@@ -143,7 +143,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
     }
 
     public ArrayList<RectData> getRects(){
-        return rects;
+        return new ArrayList<RectData>(rects);
     }
 
     @Override
@@ -201,6 +201,8 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
         Scalar white = new Scalar(255, 255, 255);
 
+        Scalar yellow = new Scalar(255, 255, 0);
+
         contoursList.clear();
 
         Imgproc.cvtColor(input, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
@@ -220,14 +222,14 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         Core.extractChannel(ycbcrMat, crMat2, 1);
 
         Imgproc.threshold(crMat1, crMatThresh1, 145, 255, THRESH_BINARY); //140
-        Imgproc.threshold(crMat2, crMatThresh2, 160,255, THRESH_BINARY_INV); //163
+        Imgproc.threshold(crMat2, crMatThresh2, 167,255, THRESH_BINARY_INV); //163
 
         Core.addWeighted(crMatThresh1, 0.5, crMatThresh2, 0.5, 0, crMatThresh);
         Imgproc.threshold(crMatThresh, crMatThresh, 130, 255, THRESH_BINARY);
 
 
         Core.extractChannel(ycbcrMat, cbMat, 2);
-        Imgproc.threshold(cbMat, cbMatThresh, 82, 255, THRESH_BINARY_INV); //82
+        Imgproc.threshold(cbMat, cbMatThresh, 90, 255, THRESH_BINARY_INV); //82
 
         Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
         Imgproc.threshold(weighted, thresholdMat, 130, 255, THRESH_BINARY);
@@ -245,7 +247,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         numContoursFound = contoursList.size();
 
         for (MatOfPoint contour: contoursList){
-            Imgproc.fillPoly(thresholdMat, Arrays.asList(contour), white);
+            Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
         }
 
         Scalar black = new Scalar(0, 0, 0);
@@ -257,21 +259,45 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
             double fixedAngle;
 
-            if(rotatedRect.size.width < rotatedRect.size.height){
-                fixedAngle = rotatedRect.angle+180;
-            }else{
-                fixedAngle = rotatedRect.angle+90;
+            if (rotatedRect.size.width < rotatedRect.size.height) {
+                fixedAngle = rotatedRect.angle + 180;
+            } else {
+                fixedAngle = rotatedRect.angle + 90;
             }
 
-            if(fixedAngle>=170 && fixedAngle<=190){
-                if(rotatedRect.size.width>5 && rotatedRect.size.height>25){
-                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
+            /*if(fixedAngle>=170 && fixedAngle<=190){
+                if(rotatedRect.size.width>16  && rotatedRect.size.height>200){
                     if(rotatedRect.size.width>rotatedRect.size.height) {
+                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
                         rects.add(new RectData(rotatedRect.size.height, rotatedRect.size.width, rotatedRect.center.x, rotatedRect.center.y));
                     }
                     else{
+                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
                         rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height, rotatedRect.center.x, rotatedRect.center.y));
                     }
+                }
+            }*/
+
+            double x = rotatedRect.center.x;
+
+            double y = rotatedRect.center.y;
+
+            if (rotatedRect.size.width > rotatedRect.size.height) {
+                //if ( (fixedAngle >= 160 && fixedAngle <= 200) && (x > (1080*0.3) && x < (1080*0.7)) ) {
+                if ( (fixedAngle >= 160 && fixedAngle <= 200)) {
+                    //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
+                    double correctWidth = rotatedRect.size.height;
+                    double correctHeight = rotatedRect.size.width;
+                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
+                    rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
+                }
+            } else {
+                if ( fixedAngle >= 160 && fixedAngle <= 200 ) {
+                    //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
+                    double correctWidth = rotatedRect.size.width;
+                    double correctHeight = rotatedRect.size.height;
+                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
+                    rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             }
         }

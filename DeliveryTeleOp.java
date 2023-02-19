@@ -11,12 +11,12 @@ public class DeliveryTeleOp extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-        Delivery delivery;
-
         ElapsedTime timer = new ElapsedTime();
         Robot robot = new Robot(this, hardwareMap, telemetry, timer, true);
 
-        delivery = robot.delivery;
+        robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+
+        //robot.drive.setPoseEstimate(PoseTransfer.currentPose);
 
         double slow = 1;
 
@@ -28,7 +28,7 @@ public class DeliveryTeleOp extends LinearOpMode {
 
         waitForStart();
 
-        delivery.initEncoders();
+        robot.delivery.initEncoders();
 
         int slidePosIdx = 0; //0 = bottom, 1 = low, 2 = med, 3 = high
 
@@ -76,13 +76,13 @@ public class DeliveryTeleOp extends LinearOpMode {
                 slidePosIdx++;
                 dpadUpHeld=true;
 
-                slidePos = delivery.slideIdxToEncoderVal(slidePosIdx);
+                slidePos = robot.delivery.slideIdxToEncoderVal(slidePosIdx);
             }
             else if(gamepad2.dpad_down && !dpadDownHeld){
                 slidePosIdx--;
                 dpadDownHeld=true;
 
-                slidePos = delivery.slideIdxToEncoderVal(slidePosIdx);
+                slidePos = robot.delivery.slideIdxToEncoderVal(slidePosIdx);
             }
 
             if(!gamepad2.dpad_up){
@@ -101,26 +101,32 @@ public class DeliveryTeleOp extends LinearOpMode {
             }
 
 
-            delivery.runSlide((int) (slidePos), 0.9);
+            robot.delivery.runSlide((int) (slidePos), 0.9);
 
 
             if(gamepad2.a){
-                delivery.runGripper(0.225);
+                robot.delivery.runGripper(0.225);
             }
             else{
-                delivery.runGripper(0);
+                robot.delivery.runGripper(0);
             }
 
             if(gamepad2.y){ //Reset button
                 slidePos=0;
                 slidePosIdx=0;
-                delivery.resetEncoders();
+                robot.delivery.resetEncoders();
             }
 
 
+            if(slidePos>1250){
+                robot.sensors.setLEDState(Sensors.LED_STATE.POLE_BAD);
+            }
+            else{
+                robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+            }
 
 
-            delivery.getEncoderValues();
+            //robot.delivery.getEncoderValues();
 
 
 

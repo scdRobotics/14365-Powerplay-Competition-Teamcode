@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 //Package is a VERY important step! Required to do basically anything with the robot
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,6 +16,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.util.AxisDirection;
+import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 //Most imports are automatically handled by Android Studio as you program
@@ -54,11 +59,25 @@ public class Robot {
     public DistanceSensor right;
     public DistanceSensor left;
 
+
+
+    //public BNO055IMU imu;
+
+
+
+
+
+
+
+    public RevBlinkinLedDriver led;
+
     //NOTE: These are all basic, required aspects of the robot
     public final ElapsedTime timer;
     private final HardwareMap hardwareMap;
     private final LinearOpMode opMode;
     private final Telemetry telemetry;
+
+    public BNO055IMU imu;
 
     //"Constructor" object for Robot-- only the most basic, necessary objects are included
     public Robot(LinearOpMode opMode, HardwareMap hardwareMap, Telemetry telemetry, ElapsedTime timer, boolean isTeleOp) {
@@ -110,8 +129,12 @@ public class Robot {
 
         //Map Sensor System
         front = hardwareMap.get(DistanceSensor.class, "front");
-        left = hardwareMap.get(DistanceSensor.class, "left");
-        right = hardwareMap.get(DistanceSensor.class, "right");
+        /*leftFront = hardwareMap.get(DistanceSensor.class, "leftFront");
+        rightFront = hardwareMap.get(DistanceSensor.class, "rightFront");
+        leftBack = hardwareMap.get(DistanceSensor.class, "leftBack");
+        rightBack = hardwareMap.get(DistanceSensor.class, "rightBack");*/
+
+        led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
 
 
 
@@ -127,13 +150,33 @@ public class Robot {
         webcam1 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[0]);
         webcam2 = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
 
+        FtcDashboard.getInstance().startCameraStream(webcam1, 0);
+        //TODO: Needs testing, but will be very helpful!
+        //FtcDashboard.getInstance().startCameraStream(webcam2, 0);
+
+
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
+        BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_X);
+
+
+
+        /*imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
+        BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_X);*/
+
 
         //delivery = new Delivery(slide, lazySusan, gripper, telemetry, hardwareMap, timer);
         delivery = new Delivery(slide, gripper, telemetry, hardwareMap, timer);
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
 
-        sensors = new Sensors(front, left, right, telemetry, hardwareMap, timer);
+        sensors = new Sensors(imu, front, left, right, led, telemetry, hardwareMap, timer);
 
 
 
