@@ -87,11 +87,6 @@ public class Vision extends Subsystem {
 
     @SuppressLint("NewApi")
     public double findClosePoleDTheta(){
-
-        same.clear();
-
-        ArrayList<RectData> viewCam1 = aprilTagYellowPipeline.getRects();
-        ArrayList<RectData> viewCam2 = yellowPipeline.getRects();
         
         ArrayList<RectData> viewCam1 = yellowPipeline.getRects();
         //May need to adjust?
