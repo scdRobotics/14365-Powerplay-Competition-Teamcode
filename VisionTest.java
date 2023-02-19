@@ -30,6 +30,7 @@ public class VisionTest extends AUTO_PRIME {
 
         robot.vision.runAprilTag(false);
 
+        //vision.activateYellowPipelineCamera2();
 
         robot.drive.setPoseEstimate(new Pose2d(0,0,0));
 

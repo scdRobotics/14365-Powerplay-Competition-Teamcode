@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -21,7 +22,6 @@ import java.util.Comparator;
 
 
 //TODO: Have build fix/replace broken webcam and undo camera pipeline switch hotfix
-//TODO TODO: MAKE ALL NEEDED CHANGES IN VISION BRANCH THEN MERGE HERE. THERES A LOT THAT NEEDS FIXING.
 public class Vision extends Subsystem {
     public OpenCvCamera webcam1;
     public OpenCvCamera webcam2;
@@ -88,8 +88,11 @@ public class Vision extends Subsystem {
     @SuppressLint("NewApi")
     public double findClosePoleDTheta(){
 
-        //same.clear();
+        same.clear();
 
+        ArrayList<RectData> viewCam1 = aprilTagYellowPipeline.getRects();
+        ArrayList<RectData> viewCam2 = yellowPipeline.getRects();
+        
         ArrayList<RectData> viewCam1 = yellowPipeline.getRects();
         //May need to adjust?
         ArrayList<RectData> viewCam2 = aprilTagYellowPipeline.getRects();
@@ -153,8 +156,6 @@ public class Vision extends Subsystem {
         return dTheta;
 
     }
-
-
 
     @SuppressLint("NewApi")
     public double findClosePoleDist(){
