@@ -102,6 +102,10 @@ public class YellowPipeline extends OpenCvPipeline {
 
         for (MatOfPoint contour: contoursList){
             Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
+            for(Point p: contour.toArray()){
+                Imgproc.circle(contoursMat, p, 3, black);
+            }
+
         }
 
 
