@@ -7,6 +7,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
@@ -26,6 +27,7 @@ public class YellowPipeline extends OpenCvPipeline {
     {
         YCbCr,
         THRESH,
+        MORPH,
         CONTOURS,
         RAW_IMAGE
     }
@@ -33,6 +35,7 @@ public class YellowPipeline extends OpenCvPipeline {
     Mat ycbcrMat = new Mat();
     Mat ycbcrThresh = new Mat();
     Mat contoursMat = new Mat();
+    Mat ycbcrMorph = new Mat();
 
     ArrayList<RectData> rects = new ArrayList<RectData>();
 
@@ -40,15 +43,19 @@ public class YellowPipeline extends OpenCvPipeline {
 
 
     Scalar white = new Scalar(255, 255, 255);
-    Scalar yellow = new Scalar(255, 255, 0);
+    Scalar pink = new Scalar(255, 105, 180);
     Scalar black = new Scalar(0, 0, 0);
 
 
-    Scalar lowThresh = new Scalar(0, 145, 0);
-    Scalar highThresh = new Scalar(255, 160, 90);
+    Scalar lowThresh = new Scalar(0, 130, 0);
+    Scalar highThresh = new Scalar(255, 170, 90);
+
+    Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
+
+    Mat poles = new Mat();
 
 
-    private Stage stageToRenderToViewport = Stage.THRESH;
+    private Stage stageToRenderToViewport = Stage.CONTOURS;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -93,17 +100,26 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
 
+
+
+        Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
+
         Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         inputMat.copyTo(contoursMat);
 
         Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
 
+        //Imgproc.HoughLinesP(ycbcrThresh, poles, )
+
 
         for (MatOfPoint contour: contoursList){
             Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
             for(Point p: contour.toArray()){
-                Imgproc.circle(contoursMat, p, 3, black);
+                Imgproc.circle(contoursMat, p, 10, pink);
+
+
+
             }
 
         }
@@ -146,7 +162,7 @@ public class YellowPipeline extends OpenCvPipeline {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.height;
                     double correctHeight = rotatedRect.size.width;
-                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
+                    //drawRotatedRect(contoursMat, rotatedRect, black, 10);
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             } else {
@@ -154,7 +170,7 @@ public class YellowPipeline extends OpenCvPipeline {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.width;
                     double correctHeight = rotatedRect.size.height;
-                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
+                    //drawRotatedRect(contoursMat, rotatedRect, black, 10);
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             }
@@ -173,7 +189,12 @@ public class YellowPipeline extends OpenCvPipeline {
 
             case THRESH:
             {
-                return thresholdMat;
+                return ycbcrThresh;
+            }
+
+            case MORPH:
+            {
+                return ycbcrMorph;
             }
 
             case CONTOURS:
