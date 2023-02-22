@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.Comparator;
 //Most imports are automatically handled by Android Studio as you program
 
-
-//TODO: Have build fix/replace broken webcam and undo camera pipeline switch hotfix
 public class Vision extends Subsystem {
     public OpenCvCamera webcam1;
     public OpenCvCamera webcam2;

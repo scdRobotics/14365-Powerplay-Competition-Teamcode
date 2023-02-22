@@ -25,39 +25,30 @@ public class YellowPipeline extends OpenCvPipeline {
     enum Stage
     {
         YCbCr,
-        CR,
-        CB,
-        CR_THRESH_1,
-        CR_THRESH_2,
-        CR_THRESH,
-        CB_THRESH,
-        THRESHOLD,
-        CONTOURS_OVERLAYED_ON_FRAME,
+        THRESH,
+        CONTOURS,
         RAW_IMAGE
     }
 
     Mat ycbcrMat = new Mat();
     Mat ycbcrThresh = new Mat();
-
-    Mat cbMat = new Mat();
-    Mat crMat1 = new Mat();
-    Mat crMat2 = new Mat();
-    Mat crMatThresh = new Mat();
-    Mat crMatThresh1 = new Mat();
-    Mat crMatThresh2 = new Mat();
-    Mat cbMatThresh = new Mat();
-
     Mat contoursMat = new Mat();
-
-    Mat weighted = new Mat();
 
     ArrayList<RectData> rects = new ArrayList<RectData>();
 
     Mat thresholdMat = new Mat();
 
-    int numContoursFound;
 
-    private Stage stageToRenderToViewport = Stage.THRESHOLD;
+    Scalar white = new Scalar(255, 255, 255);
+    Scalar yellow = new Scalar(255, 255, 0);
+    Scalar black = new Scalar(0, 0, 0);
+
+
+    Scalar lowThresh = new Scalar(0, 145, 0);
+    Scalar highThresh = new Scalar(255, 160, 90);
+
+
+    private Stage stageToRenderToViewport = Stage.THRESH;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -94,67 +85,26 @@ public class YellowPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat inputMat) {
 
-        Scalar white = new Scalar(255, 255, 255);
-
-        Scalar yellow = new Scalar(255, 255, 0);
-
-        Scalar lowThresh = new Scalar(0, 145, 0);
-
-        Scalar highThresh = new Scalar(255, 160, 90);
-
 
 
         contoursList.clear();
 
         Imgproc.cvtColor(inputMat, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
 
-
-        /*Core.extractChannel(ycbcrMat, crMat, 1);
-        Imgproc.threshold(crMat, crMatThresh, 140, 255, THRESH_BINARY_INV);
-
-
-        Core.extractChannel(ycbcrMat, cbMat, 2);
-        Imgproc.threshold(cbMat, cbMatThresh, 100, 255, THRESH_BINARY_INV);
-
-        Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
-        Imgproc.threshold(weighted, thresholdMat, 128, 255, THRESH_BINARY_INV);*/
-
-        /*Core.extractChannel(ycbcrMat, crMat1, 1);
-        Core.extractChannel(ycbcrMat, crMat2, 1);
-
-        Imgproc.threshold(crMat1, crMatThresh1, 145, 255, THRESH_BINARY); //140
-        Imgproc.threshold(crMat2, crMatThresh2, 160,255, THRESH_BINARY_INV); //163*/
-
         Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
 
-
-        /*Core.addWeighted(crMatThresh1, 0.5, crMatThresh2, 0.5, 0, crMatThresh);
-        Imgproc.threshold(crMatThresh, crMatThresh, 130, 255, THRESH_BINARY);
-
-
-        Core.extractChannel(ycbcrMat, cbMat, 2);
-        Imgproc.threshold(cbMat, cbMatThresh, 90, 255, THRESH_BINARY_INV); //82
-
-        Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
-        Imgproc.threshold(weighted, thresholdMat, 130, 255, THRESH_BINARY);*/
-
-
         Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-
-
 
         inputMat.copyTo(contoursMat);
 
         Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
 
-        numContoursFound = contoursList.size();
 
         for (MatOfPoint contour: contoursList){
             Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
         }
 
-        Scalar black = new Scalar(0, 0, 0);
+
 
         rects.clear();
 
@@ -217,42 +167,12 @@ public class YellowPipeline extends OpenCvPipeline {
                 return ycbcrMat;
             }
 
-            case CR:
+            case THRESH:
             {
-                return crMat1;
+                return thresholdMat;
             }
 
-            case CB:
-            {
-                return cbMat;
-            }
-
-            case CR_THRESH_1:
-            {
-                return crMatThresh1;
-            }
-
-            case CR_THRESH_2:
-            {
-                return crMatThresh2;
-            }
-
-            case CR_THRESH:
-            {
-                return crMatThresh;
-            }
-
-            case CB_THRESH:
-            {
-                return cbMatThresh;
-            }
-
-            case THRESHOLD:
-            {
-                return ycbcrThresh;
-            }
-
-            case CONTOURS_OVERLAYED_ON_FRAME:
+            case CONTOURS:
             {
                 return contoursMat;
             }
