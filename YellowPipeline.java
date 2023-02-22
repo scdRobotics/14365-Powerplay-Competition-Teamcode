@@ -37,6 +37,7 @@ public class YellowPipeline extends OpenCvPipeline {
     }
 
     Mat ycbcrMat = new Mat();
+    Mat ycbcrThresh = new Mat();
 
     Mat cbMat = new Mat();
     Mat crMat1 = new Mat();
@@ -56,7 +57,7 @@ public class YellowPipeline extends OpenCvPipeline {
 
     int numContoursFound;
 
-    private Stage stageToRenderToViewport = Stage.CONTOURS_OVERLAYED_ON_FRAME;
+    private Stage stageToRenderToViewport = Stage.THRESHOLD;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -97,6 +98,12 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Scalar yellow = new Scalar(255, 255, 0);
 
+        Scalar lowThresh = new Scalar(0, 145, 0);
+
+        Scalar highThresh = new Scalar(255, 160, 90);
+
+
+
         contoursList.clear();
 
         Imgproc.cvtColor(inputMat, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
@@ -112,13 +119,16 @@ public class YellowPipeline extends OpenCvPipeline {
         Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
         Imgproc.threshold(weighted, thresholdMat, 128, 255, THRESH_BINARY_INV);*/
 
-        Core.extractChannel(ycbcrMat, crMat1, 1);
+        /*Core.extractChannel(ycbcrMat, crMat1, 1);
         Core.extractChannel(ycbcrMat, crMat2, 1);
 
         Imgproc.threshold(crMat1, crMatThresh1, 145, 255, THRESH_BINARY); //140
-        Imgproc.threshold(crMat2, crMatThresh2, 167,255, THRESH_BINARY_INV); //163
+        Imgproc.threshold(crMat2, crMatThresh2, 160,255, THRESH_BINARY_INV); //163*/
 
-        Core.addWeighted(crMatThresh1, 0.5, crMatThresh2, 0.5, 0, crMatThresh);
+        Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
+
+
+        /*Core.addWeighted(crMatThresh1, 0.5, crMatThresh2, 0.5, 0, crMatThresh);
         Imgproc.threshold(crMatThresh, crMatThresh, 130, 255, THRESH_BINARY);
 
 
@@ -126,10 +136,10 @@ public class YellowPipeline extends OpenCvPipeline {
         Imgproc.threshold(cbMat, cbMatThresh, 90, 255, THRESH_BINARY_INV); //82
 
         Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
-        Imgproc.threshold(weighted, thresholdMat, 130, 255, THRESH_BINARY);
+        Imgproc.threshold(weighted, thresholdMat, 130, 255, THRESH_BINARY);*/
 
 
-        Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
 
 
@@ -239,7 +249,7 @@ public class YellowPipeline extends OpenCvPipeline {
 
             case THRESHOLD:
             {
-                return thresholdMat;
+                return ycbcrThresh;
             }
 
             case CONTOURS_OVERLAYED_ON_FRAME:
