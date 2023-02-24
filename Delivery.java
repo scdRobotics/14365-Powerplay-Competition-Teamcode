@@ -98,12 +98,12 @@ public class Delivery extends Subsystem {
     }
 
     public void openGripper(){
-        gripper.setPosition(0.4);
+        gripper.setPosition(0.5);
     }
 
 
     public void closeGripper(){
-        gripper.setPosition(0.1);
+        gripper.setPosition(0.25);
     }
 
 

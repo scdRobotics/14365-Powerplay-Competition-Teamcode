@@ -161,6 +161,8 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
 
+
+
             /*
 
 
@@ -192,7 +194,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
             if (gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < -0.1) {
-                slidePos += -gamepad2.left_stick_y * 10;
+                slidePos += -gamepad2.left_stick_y * 37;
             }
 
 
@@ -264,10 +266,14 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
                 if(isEqual(dTheta, Math.toRadians(20), 0) && isEqual(dist, 7, 5)){
                     robot.sensors.setLEDState(Sensors.LED_STATE.POLE_GOOD);
                     telemetry.addData("Pole Good! ", "");
+                    gamepad1.rumble(1, 1, 500);
+                    gamepad2.rumble(1, 1, 500);
                 }
                 else{
                     robot.sensors.setLEDState(Sensors.LED_STATE.POLE_BAD);
                     telemetry.addData("Pole Bad! ", "");
+                    gamepad1.rumble(0,0,500);
+                    gamepad1.rumble(0,0,500);
                 }
 
 
@@ -287,12 +293,18 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
                 robot.delivery.openGripper();
                 double frontDist = robot.sensors.getFrontDist();
                 telemetry.addData("Front Dist: ", frontDist);
-                if(slidePos<1250 && frontDist<1.6){
+                if(slidePos<1250 && frontDist<3){
+                    gamepad2.rumble(1,1,500);
                     robot.sensors.setLEDState(Sensors.LED_STATE.CONE_DETECTED);
                 }
             } else {
                 //robot.delivery.runGripper(0.5);
+                gamepad2.rumble(0,0,500);
                 robot.delivery.closeGripper();
+            }
+
+            if(gamepad1.a){
+                robot.delivery.openGripper();
             }
 
 
