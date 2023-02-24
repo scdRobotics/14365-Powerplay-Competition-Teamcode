@@ -104,7 +104,9 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
-        Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         inputMat.copyTo(contoursMat);
 
@@ -162,7 +164,7 @@ public class YellowPipeline extends OpenCvPipeline {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.height;
                     double correctHeight = rotatedRect.size.width;
-                    //drawRotatedRect(contoursMat, rotatedRect, black, 10);
+                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             } else {
@@ -170,7 +172,7 @@ public class YellowPipeline extends OpenCvPipeline {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.width;
                     double correctHeight = rotatedRect.size.height;
-                    //drawRotatedRect(contoursMat, rotatedRect, black, 10);
+                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             }
