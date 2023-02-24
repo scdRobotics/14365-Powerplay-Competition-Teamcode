@@ -160,7 +160,7 @@ public class YellowPipeline extends OpenCvPipeline {
 
             if (rotatedRect.size.width > rotatedRect.size.height) {
                 //if ( (fixedAngle >= 160 && fixedAngle <= 200) && (x > (1080*0.3) && x < (1080*0.7)) ) {
-                if ( (fixedAngle >= 160 && fixedAngle <= 200)) {
+                if ( (fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.height;
                     double correctHeight = rotatedRect.size.width;
@@ -168,7 +168,7 @@ public class YellowPipeline extends OpenCvPipeline {
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             } else {
-                if (fixedAngle >= 160 && fixedAngle <= 200 ) {
+                if ( (fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>55 && (rotatedRect.size.height>350)) {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.width;
                     double correctHeight = rotatedRect.size.height;

@@ -15,6 +15,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Point3;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.apriltag.AprilTagDetectorJNI;
@@ -65,39 +66,37 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
     enum Stage
     {
         YCbCr,
-        CR,
-        CB,
-        CR_THRESH_1,
-        CR_THRESH_2,
-        CR_THRESH,
-        CB_THRESH,
-        THRESHOLD,
-        CONTOURS_OVERLAYED_ON_FRAME,
+        THRESH,
+        MORPH,
+        CONTOURS,
         RAW_IMAGE
     }
 
     Mat ycbcrMat = new Mat();
-
-    Mat cbMat = new Mat();
-    Mat crMat1 = new Mat();
-    Mat crMat2 = new Mat();
-    Mat crMatThresh = new Mat();
-    Mat crMatThresh1 = new Mat();
-    Mat crMatThresh2 = new Mat();
-    Mat cbMatThresh = new Mat();
-
+    Mat ycbcrThresh = new Mat();
     Mat contoursMat = new Mat();
-
-    Mat weighted = new Mat();
+    Mat ycbcrMorph = new Mat();
 
     ArrayList<RectData> rects = new ArrayList<RectData>();
 
     Mat thresholdMat = new Mat();
 
-    int numContoursFound;
 
-    private Stage stageToRenderToViewport = Stage.CONTOURS_OVERLAYED_ON_FRAME;
-    private Stage[] stages = Stage.values();
+    Scalar pink = new Scalar(255, 105, 180);
+    Scalar black = new Scalar(0, 0, 0);
+
+
+    Scalar lowThresh = new Scalar(0, 130, 0);
+    Scalar highThresh = new Scalar(255, 170, 90);
+
+    Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
+
+    Mat poles = new Mat();
+
+    private YellowPipeline.Stage stageToRenderToViewport = YellowPipeline.Stage.CONTOURS;
+    private YellowPipeline.Stage[] stages = YellowPipeline.Stage.values();
+
+
 
     public AprilTagYellowPipeline(double tagsize, double fx, double fy, double cx, double cy)
     {
@@ -163,17 +162,14 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
     }
 
     @Override
-    public Mat processFrame(Mat input)
-    {
+    public Mat processFrame(Mat input) {
         // Convert to greyscale
 
-        if(runAprilTag){
+        if (runAprilTag) {
             Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY);
 
-            synchronized (decimationSync)
-            {
-                if(needToSetDecimation)
-                {
+            synchronized (decimationSync) {
+                if (needToSetDecimation) {
                     AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeApriltagPtr, decimation);
                     needToSetDecimation = false;
                 }
@@ -182,21 +178,18 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
             // Run AprilTag
             detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
 
-            synchronized (detectionsUpdateSync)
-            {
+            synchronized (detectionsUpdateSync) {
                 detectionsUpdate = detections;
             }
 
             // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
             // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
-            for(AprilTagDetection detection : detections)
-            {
+            for (AprilTagDetection detection : detections) {
                 Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
-                drawAxisMarker(input, tagsizeY/2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
+                drawAxisMarker(input, tagsizeY / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
                 draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
             }
         }
-
 
 
         Scalar white = new Scalar(255, 255, 255);
@@ -207,54 +200,36 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
         Imgproc.cvtColor(input, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
 
-
-        /*Core.extractChannel(ycbcrMat, crMat, 1);
-        Imgproc.threshold(crMat, crMatThresh, 140, 255, THRESH_BINARY_INV);
+        Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
 
 
-        Core.extractChannel(ycbcrMat, cbMat, 2);
-        Imgproc.threshold(cbMat, cbMatThresh, 100, 255, THRESH_BINARY_INV);
+        Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
-        Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
-        Imgproc.threshold(weighted, thresholdMat, 128, 255, THRESH_BINARY_INV);*/
+        //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        Core.extractChannel(ycbcrMat, crMat1, 1);
-        Core.extractChannel(ycbcrMat, crMat2, 1);
-
-        Imgproc.threshold(crMat1, crMatThresh1, 145, 255, THRESH_BINARY); //140
-        Imgproc.threshold(crMat2, crMatThresh2, 167,255, THRESH_BINARY_INV); //163
-
-        Core.addWeighted(crMatThresh1, 0.5, crMatThresh2, 0.5, 0, crMatThresh);
-        Imgproc.threshold(crMatThresh, crMatThresh, 130, 255, THRESH_BINARY);
-
-
-        Core.extractChannel(ycbcrMat, cbMat, 2);
-        Imgproc.threshold(cbMat, cbMatThresh, 90, 255, THRESH_BINARY_INV); //82
-
-        Core.addWeighted(crMatThresh, 0.5, cbMatThresh, 0.5, 0, weighted);
-        Imgproc.threshold(weighted, thresholdMat, 130, 255, THRESH_BINARY);
-
-
-        Imgproc.findContours(thresholdMat, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-
-
+        Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         input.copyTo(contoursMat);
 
         Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
 
-        numContoursFound = contoursList.size();
+        //Imgproc.HoughLinesP(ycbcrThresh, poles, )
 
-        for (MatOfPoint contour: contoursList){
+
+        for (MatOfPoint contour : contoursList) {
             Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
+            for (Point p : contour.toArray()) {
+                Imgproc.circle(contoursMat, p, 10, pink);
+
+
+            }
+
         }
 
-        Scalar black = new Scalar(0, 0, 0);
 
         rects.clear();
 
-        for (MatOfPoint contour: contoursList) {
+        for (MatOfPoint contour : contoursList) {
             RotatedRect rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
 
             double fixedAngle;
@@ -284,7 +259,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
             if (rotatedRect.size.width > rotatedRect.size.height) {
                 //if ( (fixedAngle >= 160 && fixedAngle <= 200) && (x > (1080*0.3) && x < (1080*0.7)) ) {
-                if ( (fixedAngle >= 160 && fixedAngle <= 200)) {
+                if ((fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.height;
                     double correctHeight = rotatedRect.size.width;
@@ -292,7 +267,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             } else {
-                if ( fixedAngle >= 160 && fixedAngle <= 200 ) {
+                if ((fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.width;
                     double correctHeight = rotatedRect.size.height;
@@ -303,70 +278,35 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         }
 
 
-
-
-
-        switch (stageToRenderToViewport)
-        {
-            case YCbCr:
-            {
+        switch (stageToRenderToViewport) {
+            case YCbCr: {
                 return ycbcrMat;
             }
 
-            case CR:
-            {
-                return crMat1;
+            case THRESH: {
+                return ycbcrThresh;
             }
 
-            case CB:
-            {
-                return cbMat;
+            case MORPH: {
+                return ycbcrMorph;
             }
 
-            case CR_THRESH_1:
-            {
-                return crMatThresh1;
-            }
-
-            case CR_THRESH_2:
-            {
-                return crMatThresh2;
-            }
-
-            case CR_THRESH:
-            {
-                return crMatThresh;
-            }
-
-            case CB_THRESH:
-            {
-                return cbMatThresh;
-            }
-
-            case THRESHOLD:
-            {
-                return thresholdMat;
-            }
-
-            case CONTOURS_OVERLAYED_ON_FRAME:
-            {
+            case CONTOURS: {
                 return contoursMat;
             }
 
-            case RAW_IMAGE:
-            {
+            case RAW_IMAGE: {
                 return input;
             }
 
-            default:
-            {
+            default: {
                 return input;
             }
         }
 
-
-
     }
+
+
 
     public void setDecimation(float decimation)
     {
