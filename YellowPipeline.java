@@ -47,8 +47,8 @@ public class YellowPipeline extends OpenCvPipeline {
     Scalar black = new Scalar(0, 0, 0);
 
 
-    Scalar lowThresh = new Scalar(0, 130, 0);
-    Scalar highThresh = new Scalar(255, 170, 90);
+    Scalar lowThresh = new Scalar(0, 130, 0); //0, 130, 0
+    Scalar highThresh = new Scalar(255, 170, 100); //255, 170, 90
 
     Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
 
@@ -168,7 +168,7 @@ public class YellowPipeline extends OpenCvPipeline {
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             } else {
-                if ( (fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>55 && (rotatedRect.size.height>350)) {
+                if ( (fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.width;
                     double correctHeight = rotatedRect.size.height;
