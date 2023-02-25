@@ -29,6 +29,7 @@ public class YellowPipeline extends OpenCvPipeline {
         THRESH,
         MORPH,
         CONTOURS,
+        DST,
         RAW_IMAGE
     }
 
@@ -36,6 +37,8 @@ public class YellowPipeline extends OpenCvPipeline {
     Mat ycbcrThresh = new Mat();
     Mat contoursMat = new Mat();
     Mat ycbcrMorph = new Mat();
+
+    Mat dst = new Mat();
 
     ArrayList<RectData> rects = new ArrayList<RectData>();
 
@@ -51,11 +54,12 @@ public class YellowPipeline extends OpenCvPipeline {
     Scalar highThresh = new Scalar(255, 170, 90);
 
     Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
+    Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
 
     Mat poles = new Mat();
 
 
-    private Stage stageToRenderToViewport = Stage.CONTOURS;
+    private Stage stageToRenderToViewport = Stage.DST;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -100,19 +104,33 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
 
-
-
         Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
+        Imgproc.erode(ycbcrThresh, ycbcrThresh, kernel);
+
         //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 200);
 
         Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         inputMat.copyTo(contoursMat);
 
+        inputMat.copyTo(dst);
+
         Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
 
         //Imgproc.HoughLinesP(ycbcrThresh, poles, )
+
+        for (int x = 0; x < poles.rows(); x++) {
+            double rho = poles.get(x, 0)[0],
+                    theta = poles.get(x, 0)[1];
+            double a = Math.cos(theta), b = Math.sin(theta);
+            double x0 = a*rho, y0 = b*rho;
+            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+            Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+        }
 
 
         for (MatOfPoint contour: contoursList){
@@ -208,6 +226,9 @@ public class YellowPipeline extends OpenCvPipeline {
             {
                 return inputMat;
             }
+
+            case DST:
+                return dst;
 
             default:
             {
