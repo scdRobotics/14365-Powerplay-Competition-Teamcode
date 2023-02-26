@@ -51,15 +51,15 @@ public class YellowPipeline extends OpenCvPipeline {
 
 
     Scalar lowThresh = new Scalar(0, 130, 0);
-    Scalar highThresh = new Scalar(255, 170, 90);
+    Scalar highThresh = new Scalar(255, 170, 100);
 
     Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
-    Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
+    Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 15)); //width was 15, 15
 
     Mat poles = new Mat();
 
 
-    private Stage stageToRenderToViewport = Stage.DST;
+    private Stage stageToRenderToViewport = Stage.MORPH;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -106,11 +106,12 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
-        Imgproc.erode(ycbcrThresh, ycbcrThresh, kernel);
+        Imgproc.erode(ycbcrMorph, ycbcrMorph, kernel2, new Point(-1,-1),3);
 
         //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 200);
+        //Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 200, 300);
+        Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 150, 0, 0, -3*Math.PI/180, 3*Math.PI/180);
 
         Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
@@ -123,13 +124,16 @@ public class YellowPipeline extends OpenCvPipeline {
         //Imgproc.HoughLinesP(ycbcrThresh, poles, )
 
         for (int x = 0; x < poles.rows(); x++) {
-            double rho = poles.get(x, 0)[0],
-                    theta = poles.get(x, 0)[1];
-            double a = Math.cos(theta), b = Math.sin(theta);
-            double x0 = a*rho, y0 = b*rho;
-            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
-            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
-            Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+            double theta = poles.get(x, 0)[1];
+            //if(Math.abs(theta) < Math.toRadians(20)){
+                double rho = poles.get(x, 0)[0];
+                double a = Math.cos(theta), b = Math.sin(theta);
+                double x0 = a*rho, y0 = b*rho;
+                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+                Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+            //}
+
         }
 
 
