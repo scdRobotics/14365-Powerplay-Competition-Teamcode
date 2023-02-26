@@ -43,69 +43,13 @@ public class GamepadTest extends AUTO_PRIME {
 
         while(opModeIsActive() && !isStopRequested()){
 
-                 gamepad1.rumble(0,0,750);
 
-                 robot.pause(1);
+            robot.delivery.openGripper();
 
-                 gamepad1.rumble(0.1,0,750);
-                 robot.pause(1);
-                 gamepad1.rumble(0.2,0,750);
-                 robot.pause(1);
-                 gamepad1.rumble(0.3,0,750);
-                 robot.pause(1);
+            robot.pause(2);
 
-                 gamepad1.rumble(0.4,0,750);
-                 robot.pause(1);
-                 gamepad1.rumble(0.5,0,750);
-                 robot.pause(1);
-                 gamepad1.rumble(0.6,0,750);
-                 robot.pause(1);
+            robot.delivery.closeGripper();
 
-                 gamepad1.rumble(0.7,0,750);
-                 robot.pause(1);
-                 gamepad1.rumble(0.8,0,750);
-                 robot.pause(1);
-                 gamepad1.rumble(0.9,0,750);
-                 robot.pause(1);
-
-                 gamepad1.rumble(1,0,750);
-                 robot.pause(1);
-
-                 gamepad1.rumbleBlips(5);
-                 robot.pause(5);
-
-
-
-
-            gamepad1.rumble(0,0,750);
-
-            robot.pause(1);
-
-            gamepad1.rumble(0.1,0.1,750);
-            robot.pause(1);
-            gamepad1.rumble(0.2,0.2,750);
-            robot.pause(1);
-            gamepad1.rumble(0.3,0.3,750);
-            robot.pause(1);
-
-            gamepad1.rumble(0.4,0.4,750);
-            robot.pause(1);
-            gamepad1.rumble(0.5,0.5,750);
-            robot.pause(1);
-            gamepad1.rumble(0.6,0.6,750);
-            robot.pause(1);
-
-            gamepad1.rumble(0.7,0.7,750);
-            robot.pause(1);
-            gamepad1.rumble(0.8,0.8,750);
-            robot.pause(1);
-            gamepad1.rumble(0.9,0.9,750);
-            robot.pause(1);
-
-            gamepad1.rumble(1,1,750);
-            robot.pause(1);
-
-            gamepad1.rumbleBlips(5);
             robot.pause(5);
         }
 
