@@ -50,7 +50,7 @@ public class GamepadTest extends AUTO_PRIME {
 
             robot.delivery.closeGripper();
 
-            robot.pause(5);
+            robot.pause(20);
         }
 
 
