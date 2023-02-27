@@ -28,14 +28,12 @@ public class YellowPipeline extends OpenCvPipeline {
         YCbCr,
         THRESH,
         MORPH,
-        CONTOURS,
         DST,
         RAW_IMAGE
     }
 
     Mat ycbcrMat = new Mat();
     Mat ycbcrThresh = new Mat();
-    Mat contoursMat = new Mat();
     Mat ycbcrMorph = new Mat();
 
     Mat dst = new Mat();
@@ -59,7 +57,7 @@ public class YellowPipeline extends OpenCvPipeline {
     Mat poles = new Mat();
 
 
-    private Stage stageToRenderToViewport = Stage.MORPH;
+    private Stage stageToRenderToViewport = Stage.DST;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -106,20 +104,20 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
-        Imgproc.erode(ycbcrMorph, ycbcrMorph, kernel2, new Point(-1,-1),3);
+        Imgproc.Canny(ycbcrMorph, ycbcrMorph, 300, 600, 5, true);
+
+        //Imgproc.erode(ycbcrMorph, ycbcrMorph, kernel2, new Point(-1,-1),3);
 
         //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         //Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 200, 300);
-        Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 150, 0, 0, -3*Math.PI/180, 3*Math.PI/180);
+        Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
 
-        Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        inputMat.copyTo(contoursMat);
+        //Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         inputMat.copyTo(dst);
 
-        Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
+        //Imgproc.drawContours(dst, contoursList, -1, white, 3, 4);
 
         //Imgproc.HoughLinesP(ycbcrThresh, poles, )
 
@@ -137,22 +135,22 @@ public class YellowPipeline extends OpenCvPipeline {
         }
 
 
-        for (MatOfPoint contour: contoursList){
-            Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
+        /*for (MatOfPoint contour: contoursList){
+            Imgproc.fillPoly(dst, Arrays.asList(contour), white);
             for(Point p: contour.toArray()){
-                Imgproc.circle(contoursMat, p, 10, pink);
+                Imgproc.circle(dst, p, 10, pink);
 
 
 
             }
 
-        }
+        }*/
 
 
 
         rects.clear();
 
-        for (MatOfPoint contour: contoursList) {
+        /*for (MatOfPoint contour: contoursList) {
             RotatedRect rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
 
             double fixedAngle;
@@ -163,7 +161,7 @@ public class YellowPipeline extends OpenCvPipeline {
                 fixedAngle = rotatedRect.angle + 90;
             }
 
-            /*if(fixedAngle>=170 && fixedAngle<=190){
+            if(fixedAngle>=170 && fixedAngle<=190){
                 if(rotatedRect.size.width>16  && rotatedRect.size.height>200){
                     if(rotatedRect.size.width>rotatedRect.size.height) {
                         drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
@@ -174,7 +172,7 @@ public class YellowPipeline extends OpenCvPipeline {
                         rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height, rotatedRect.center.x, rotatedRect.center.y));
                     }
                 }
-            }*/
+            }
 
             double x = rotatedRect.center.x;
 
@@ -198,7 +196,7 @@ public class YellowPipeline extends OpenCvPipeline {
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             }
-        }
+        }*/
 
 
 
@@ -221,18 +219,15 @@ public class YellowPipeline extends OpenCvPipeline {
                 return ycbcrMorph;
             }
 
-            case CONTOURS:
-            {
-                return contoursMat;
-            }
-
             case RAW_IMAGE:
             {
                 return inputMat;
             }
 
             case DST:
+            {
                 return dst;
+            }
 
             default:
             {

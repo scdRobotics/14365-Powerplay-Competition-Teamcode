@@ -93,8 +93,8 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
     Mat poles = new Mat();
 
-    private YellowPipeline.Stage stageToRenderToViewport = YellowPipeline.Stage.CONTOURS;
-    private YellowPipeline.Stage[] stages = YellowPipeline.Stage.values();
+    private Stage stageToRenderToViewport = Stage.CONTOURS;
+    private Stage[] stages = Stage.values();
 
 
 
