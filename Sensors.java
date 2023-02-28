@@ -128,7 +128,7 @@ public class Sensors extends Subsystem {
 
     public void retractOdo(){
         backOdo.setPosition(0);
-        rightOdo.setPosition(1);
+        rightOdo.setPosition(0.5);
         leftOdo.setPosition(0);
     }
 
