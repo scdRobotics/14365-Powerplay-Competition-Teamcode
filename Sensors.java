@@ -121,15 +121,15 @@ public class Sensors extends Subsystem {
     }
 
     public void deployOdo(){
-        backOdo.setPosition(0);
+        backOdo.setPosition(1);
         rightOdo.setPosition(0);
-        leftOdo.setPosition(0);
+        leftOdo.setPosition(1);
     }
 
     public void retractOdo(){
-        backOdo.setPosition(1);
+        backOdo.setPosition(0);
         rightOdo.setPosition(1);
-        leftOdo.setPosition(1);
+        leftOdo.setPosition(0);
     }
 
 }
