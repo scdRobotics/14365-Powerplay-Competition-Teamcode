@@ -11,6 +11,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,17 +122,35 @@ public class YellowPipeline extends OpenCvPipeline {
 
         //Imgproc.HoughLinesP(ycbcrThresh, poles, )
 
+
+
+        double[] rovioList = new double[poles.rows()];
+        ArrayList<Double> rovioList1 = new ArrayList<>;
+        ArrayList<Double> rovioList2 = new ArrayList<>();
+
         for (int x = 0; x < poles.rows(); x++) {
             double theta = poles.get(x, 0)[1];
-            //if(Math.abs(theta) < Math.toRadians(20)){
-                double rho = poles.get(x, 0)[0];
-                double a = Math.cos(theta), b = Math.sin(theta);
-                double x0 = a*rho, y0 = b*rho;
-                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
-                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
-                Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
-            //}
+            double rho = poles.get(x, 0)[0];
+            double a = Math.cos(theta), b = Math.sin(theta);
+            double x0 = a*rho, y0 = b*rho;
+            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+            Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+            rovioList[x] = x0;
+        }
 
+        Arrays.sort(rovioList);
+
+        for(double d: rovioList){
+            System.out.println(d);
+        }
+
+
+
+
+        for(int i = 0; i < poles.rows(); i++)
+        {
+            //rovioList1.add();
         }
 
 
