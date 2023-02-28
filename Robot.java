@@ -168,9 +168,9 @@ public class Robot {
 
 
 
-        /*backOdo = hardwareMap.get(Servo.class, "backOdo");
+        backOdo = hardwareMap.get(Servo.class, "backOdo");
         leftOdo = hardwareMap.get(Servo.class, "leftOdo");
-        rightOdo = hardwareMap.get(Servo.class, "rightOdo");*/
+        rightOdo = hardwareMap.get(Servo.class, "rightOdo");
 
 
 
