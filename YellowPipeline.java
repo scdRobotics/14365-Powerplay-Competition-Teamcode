@@ -30,6 +30,7 @@ public class YellowPipeline extends OpenCvPipeline {
         THRESH,
         MORPH,
         ERODE,
+        EDGE,
         DST,
         RAW_IMAGE
     }
@@ -38,6 +39,7 @@ public class YellowPipeline extends OpenCvPipeline {
     Mat ycbcrThresh = new Mat();
     Mat ycbcrMorph = new Mat();
     Mat ycbcrErode = new Mat();
+    Mat ycbcrEdge = new Mat();
     Mat dst = new Mat();
 
     ArrayList<RectData> rects = new ArrayList<RectData>();
@@ -51,7 +53,7 @@ public class YellowPipeline extends OpenCvPipeline {
 
 
     Scalar lowThresh = new Scalar(0, 130, 0);
-    Scalar highThresh = new Scalar(255, 170, 100);
+    Scalar highThresh = new Scalar(255, 170, 108);
 
     Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
     Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 15)); //width was 15, 15
@@ -59,7 +61,7 @@ public class YellowPipeline extends OpenCvPipeline {
     Mat poles = new Mat();
 
 
-    private Stage stageToRenderToViewport = Stage.MORPH;
+    private Stage stageToRenderToViewport = Stage.ERODE;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -108,14 +110,14 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),3);
 
-        Imgproc.Canny(ycbcrMorph, ycbcrMorph, 300, 600, 5, true);
+        Imgproc.Canny(ycbcrErode, ycbcrEdge, 300, 600, 5, true);
 
 
 
         //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         //Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 200, 300);
-        Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
+        Imgproc.HoughLines(ycbcrEdge, poles, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
 
         //Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
@@ -245,6 +247,11 @@ public class YellowPipeline extends OpenCvPipeline {
             case ERODE:
             {
                 return ycbcrErode;
+            }
+
+            case EDGE:
+            {
+                return ycbcrEdge;
             }
 
             case RAW_IMAGE:
