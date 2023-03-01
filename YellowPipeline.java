@@ -29,6 +29,7 @@ public class YellowPipeline extends OpenCvPipeline {
         YCbCr,
         THRESH,
         MORPH,
+        ERODE,
         DST,
         RAW_IMAGE
     }
@@ -36,7 +37,7 @@ public class YellowPipeline extends OpenCvPipeline {
     Mat ycbcrMat = new Mat();
     Mat ycbcrThresh = new Mat();
     Mat ycbcrMorph = new Mat();
-
+    Mat ycbcrErode = new Mat();
     Mat dst = new Mat();
 
     ArrayList<RectData> rects = new ArrayList<RectData>();
@@ -58,7 +59,7 @@ public class YellowPipeline extends OpenCvPipeline {
     Mat poles = new Mat();
 
 
-    private Stage stageToRenderToViewport = Stage.DST;
+    private Stage stageToRenderToViewport = Stage.MORPH;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -105,9 +106,11 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
+        Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),3);
+
         Imgproc.Canny(ycbcrMorph, ycbcrMorph, 300, 600, 5, true);
 
-        //Imgproc.erode(ycbcrMorph, ycbcrMorph, kernel2, new Point(-1,-1),3);
+
 
         //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
@@ -125,8 +128,8 @@ public class YellowPipeline extends OpenCvPipeline {
 
 
         double[] rovioList = new double[poles.rows()];
-        ArrayList<Double> rovioList1 = new ArrayList<>;
-        ArrayList<Double> rovioList2 = new ArrayList<>();
+        //ArrayList<Double> rovioList1 = new ArrayList<>;
+        //ArrayList<Double> rovioList2 = new ArrayList<>();
 
         for (int x = 0; x < poles.rows(); x++) {
             double theta = poles.get(x, 0)[1];
@@ -141,8 +144,10 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Arrays.sort(rovioList);
 
+        int count = 0;
         for(double d: rovioList){
-            System.out.println(d);
+            System.out.println("X #" + d + ", Count #" + count);
+            count++;
         }
 
 
@@ -236,6 +241,10 @@ public class YellowPipeline extends OpenCvPipeline {
             case MORPH:
             {
                 return ycbcrMorph;
+            }
+            case ERODE:
+            {
+                return ycbcrErode;
             }
 
             case RAW_IMAGE:
