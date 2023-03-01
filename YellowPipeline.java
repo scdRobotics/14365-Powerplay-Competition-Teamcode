@@ -59,9 +59,10 @@ public class YellowPipeline extends OpenCvPipeline {
     Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 15)); //width was 15, 15
 
     Mat poles = new Mat();
+    Mat polesErode = new Mat();
 
 
-    private Stage stageToRenderToViewport = Stage.ERODE;
+    private Stage stageToRenderToViewport = Stage.DST;
     private Stage[] stages = Stage.values();
 
     @Override
@@ -108,16 +109,19 @@ public class YellowPipeline extends OpenCvPipeline {
 
         Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
-        Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),3);
+        Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),4);
 
-        Imgproc.Canny(ycbcrErode, ycbcrEdge, 300, 600, 5, true);
+        Imgproc.Canny(ycbcrMorph, ycbcrEdge, 300, 600, 5, true);
 
 
 
         //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         //Imgproc.HoughLines(ycbcrMorph, poles, 1, Math.PI/180, 200, 300);
+
         Imgproc.HoughLines(ycbcrEdge, poles, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
+
+        Imgproc.HoughLines(ycbcrErode, polesErode, 1, Math.PI/180, 120, 0, 0, -2*Math.PI/180, 2*Math.PI/180);
 
         //Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
@@ -129,13 +133,13 @@ public class YellowPipeline extends OpenCvPipeline {
 
 
 
-        double[] rovioList = new double[poles.rows()];
+        double[] rovioList = new double[polesErode.rows()];
         //ArrayList<Double> rovioList1 = new ArrayList<>;
         //ArrayList<Double> rovioList2 = new ArrayList<>();
 
-        for (int x = 0; x < poles.rows(); x++) {
-            double theta = poles.get(x, 0)[1];
-            double rho = poles.get(x, 0)[0];
+        for (int x = 0; x < polesErode.rows(); x++) {
+            double theta = polesErode.get(x, 0)[1];
+            double rho = polesErode.get(x, 0)[0];
             double a = Math.cos(theta), b = Math.sin(theta);
             double x0 = a*rho, y0 = b*rho;
             Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
@@ -144,7 +148,24 @@ public class YellowPipeline extends OpenCvPipeline {
             rovioList[x] = x0;
         }
 
-        Arrays.sort(rovioList);
+        double xErodeCenter = 0;
+        if (rovioList.length % 2 == 0)
+            xErodeCenter = (rovioList[rovioList.length/2] + rovioList[rovioList.length/2-1])/2;
+        else
+            xErodeCenter = rovioList[rovioList.length/2];
+
+        /*for (int x = 0; x < poles.rows(); x++) {
+            double theta = poles.get(x, 0)[1];
+            double rho = poles.get(x, 0)[0];
+            double a = Math.cos(theta), b = Math.sin(theta);
+            double x0 = a*rho, y0 = b*rho;
+            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+            Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+            rovioList[x] = x0;
+        }*/
+
+        //Arrays.sort(rovioList);
 
         int count = 0;
         for(double d: rovioList){
@@ -152,10 +173,15 @@ public class YellowPipeline extends OpenCvPipeline {
             count++;
         }
 
+        /*if(Math.abs(rovioList[0] - rovioList[poles.rows()) <)
+        {
+            double xCenter = (rovioList[0] + rovioList[poles.rows() - 1]) / 2;
+            Imgproc.line(dst, new Point(xCenter, 720), new Point(xCenter, 0), new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+        }*/
 
 
 
-        for(int i = 0; i < poles.rows(); i++)
+        /*for(int i = 0; i < poles.rows(); i++)
         {
             //rovioList1.add();
         }
