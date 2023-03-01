@@ -203,6 +203,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
 
 
+
         Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
         //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -216,10 +217,11 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         //Imgproc.HoughLinesP(ycbcrThresh, poles, )
 
 
-        for (MatOfPoint contour : contoursList) {
+        for (MatOfPoint contour: contoursList){
             Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
-            for (Point p : contour.toArray()) {
+            for(Point p: contour.toArray()){
                 Imgproc.circle(contoursMat, p, 10, pink);
+
 
 
             }
@@ -227,9 +229,10 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         }
 
 
+
         rects.clear();
 
-        for (MatOfPoint contour : contoursList) {
+        for (MatOfPoint contour: contoursList) {
             RotatedRect rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
 
             double fixedAngle;
@@ -240,26 +243,13 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
                 fixedAngle = rotatedRect.angle + 90;
             }
 
-            /*if(fixedAngle>=170 && fixedAngle<=190){
-                if(rotatedRect.size.width>16  && rotatedRect.size.height>200){
-                    if(rotatedRect.size.width>rotatedRect.size.height) {
-                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
-                        rects.add(new RectData(rotatedRect.size.height, rotatedRect.size.width, rotatedRect.center.x, rotatedRect.center.y));
-                    }
-                    else{
-                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
-                        rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height, rotatedRect.center.x, rotatedRect.center.y));
-                    }
-                }
-            }*/
-
             double x = rotatedRect.center.x;
 
             double y = rotatedRect.center.y;
 
             if (rotatedRect.size.width > rotatedRect.size.height) {
                 //if ( (fixedAngle >= 160 && fixedAngle <= 200) && (x > (1080*0.3) && x < (1080*0.7)) ) {
-                if ((fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
+                if ( (fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.height;
                     double correctHeight = rotatedRect.size.width;
@@ -267,7 +257,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
                     rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
                 }
             } else {
-                if ((fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
+                if ( (fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
                     //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
                     double correctWidth = rotatedRect.size.width;
                     double correctHeight = rotatedRect.size.height;
@@ -278,28 +268,38 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         }
 
 
-        switch (stageToRenderToViewport) {
-            case YCbCr: {
+
+
+
+        switch (stageToRenderToViewport)
+        {
+            case YCbCr:
+            {
                 return ycbcrMat;
             }
 
-            case THRESH: {
+            case THRESH:
+            {
                 return ycbcrThresh;
             }
 
-            case MORPH: {
+            case MORPH:
+            {
                 return ycbcrMorph;
             }
 
-            case CONTOURS: {
+            case CONTOURS:
+            {
                 return contoursMat;
             }
 
-            case RAW_IMAGE: {
+            case RAW_IMAGE:
+            {
                 return input;
             }
 
-            default: {
+            default:
+            {
                 return input;
             }
         }

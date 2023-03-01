@@ -141,19 +141,6 @@ public class YellowPipeline extends OpenCvPipeline {
                 fixedAngle = rotatedRect.angle + 90;
             }
 
-            /*if(fixedAngle>=170 && fixedAngle<=190){
-                if(rotatedRect.size.width>16  && rotatedRect.size.height>200){
-                    if(rotatedRect.size.width>rotatedRect.size.height) {
-                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
-                        rects.add(new RectData(rotatedRect.size.height, rotatedRect.size.width, rotatedRect.center.x, rotatedRect.center.y));
-                    }
-                    else{
-                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
-                        rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height, rotatedRect.center.x, rotatedRect.center.y));
-                    }
-                }
-            }*/
-
             double x = rotatedRect.center.x;
 
             double y = rotatedRect.center.y;
