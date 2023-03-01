@@ -16,7 +16,6 @@ public class _LEFT_AUTO extends AUTO_PRIME {
     public void runOpMode() throws InterruptedException{
 
         initAuto();
-        robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
@@ -31,10 +30,6 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
 
         TrajectorySequence I_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
-                })
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);

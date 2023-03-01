@@ -213,6 +213,8 @@ public class AUTO_PRIME extends LinearOpMode {
 
         robot.sensors.deployOdo();
 
+        robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+
         //TODO: Test if this actually populates the array properly and its viewable in auto programs
         for(int i = 0; i< validRobotPosConversion.length; i++){
             validRobotPosConversion[i] = ((i*24) + 12) - 72;
