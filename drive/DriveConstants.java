@@ -32,7 +32,7 @@ public class DriveConstants {
      * from DriveVelocityPIDTuner.
      */
     public static final boolean RUN_USING_ENCODER = true;
-    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(29, 0, 17,
+    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(29, 0, 20,
             26);
 
     /*
@@ -45,7 +45,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 3.34; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 11.72; // in
+    public static double TRACK_WIDTH = 11.68; // in
     //Traingularly: 18.89155 in
     //Horizontally: 13.552463 in
 
