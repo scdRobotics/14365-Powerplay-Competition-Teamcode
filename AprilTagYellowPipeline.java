@@ -61,23 +61,12 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
     private boolean needToSetDecimation;
     private final Object decimationSync = new Object();
 
-    List<MatOfPoint> contoursList = new ArrayList<>();
-
-    enum Stage
-    {
-        YCbCr,
-        THRESH,
-        MORPH,
-        CONTOURS,
-        RAW_IMAGE
-    }
-
     Mat ycbcrMat = new Mat();
     Mat ycbcrThresh = new Mat();
-    Mat contoursMat = new Mat();
     Mat ycbcrMorph = new Mat();
-
-    ArrayList<RectData> rects = new ArrayList<RectData>();
+    Mat ycbcrErode = new Mat();
+    Mat ycbcrEdge = new Mat();
+    Mat dst = new Mat();
 
     Mat thresholdMat = new Mat();
 
@@ -87,14 +76,21 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
 
     Scalar lowThresh = new Scalar(0, 130, 0);
-    Scalar highThresh = new Scalar(255, 170, 90);
+    Scalar highThresh = new Scalar(255, 170, 108);
 
     Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 25)); //width was 50, 25
+    Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15, 15)); //width was 15, 15
 
-    Mat poles = new Mat();
+    Mat polesEdges = new Mat();
+    Mat polesErode = new Mat();
 
-    private Stage stageToRenderToViewport = Stage.CONTOURS;
-    private Stage[] stages = Stage.values();
+
+
+    double currentCenterX = -1;
+
+
+    private YellowPipeline.Stage stageToRenderToViewport = YellowPipeline.Stage.DST;
+    private YellowPipeline.Stage[] stages = YellowPipeline.Stage.values();
 
 
 
@@ -141,10 +137,6 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         Imgproc.drawContours(image, Arrays.asList(points), -1, color, thickness);
     }
 
-    public ArrayList<RectData> getRects(){
-        return new ArrayList<RectData>(rects);
-    }
-
     @Override
     public void finalize()
     {
@@ -161,12 +153,16 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
         }
     }
 
+    public double getCurrentCenterX(){
+        return currentCenterX;
+    }
+
     @Override
-    public Mat processFrame(Mat input) {
+    public Mat processFrame(Mat inputMat) {
         // Convert to greyscale
 
         if (runAprilTag) {
-            Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY);
+            Imgproc.cvtColor(inputMat, grey, Imgproc.COLOR_RGBA2GRAY);
 
             synchronized (decimationSync) {
                 if (needToSetDecimation) {
@@ -186,121 +182,126 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
             // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
             for (AprilTagDetection detection : detections) {
                 Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
-                drawAxisMarker(input, tagsizeY / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
-                draw3dCubeMarker(input, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
+                drawAxisMarker(inputMat, tagsizeY / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
+                draw3dCubeMarker(inputMat, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
             }
         }
 
 
-        Scalar white = new Scalar(255, 255, 255);
 
-        Scalar yellow = new Scalar(255, 255, 0);
 
-        contoursList.clear();
 
-        Imgproc.cvtColor(input, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
+
+        Imgproc.cvtColor(inputMat, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
 
         Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
 
 
         Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
-        //Imgproc.findContours(ycbcrThresh, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),4);
 
-        Imgproc.findContours(ycbcrMorph, contoursList, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        input.copyTo(contoursMat);
-
-        Imgproc.drawContours(contoursMat, contoursList, -1, white, 3, 4);
-
-        //Imgproc.HoughLinesP(ycbcrThresh, poles, )
+        Imgproc.Canny(ycbcrMorph, ycbcrEdge, 300, 600, 5, true);
 
 
-        for (MatOfPoint contour : contoursList) {
-            Imgproc.fillPoly(contoursMat, Arrays.asList(contour), white);
-            for (Point p : contour.toArray()) {
-                Imgproc.circle(contoursMat, p, 10, pink);
+        Imgproc.HoughLines(ycbcrEdge, polesEdges, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
+
+        Imgproc.HoughLines(ycbcrErode, polesErode, 1, Math.PI/180, 120, 0, 0, -2*Math.PI/180, 2*Math.PI/180);
 
 
-            }
+        inputMat.copyTo(dst);
 
+
+
+        double[] rovioListEroded = new double[polesErode.rows()];
+        double[] rovioListEdges = new double[polesEdges.rows()];
+
+        for (int x = 0; x < polesErode.rows(); x++) {
+            double theta = polesErode.get(x, 0)[1];
+            double rho = polesErode.get(x, 0)[0];
+            double a = Math.cos(theta), b = Math.sin(theta);
+            double x0 = a*rho, y0 = b*rho;
+            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+            Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+            rovioListEroded[x] = x0;
+        }
+
+        for (int x = 0; x < polesEdges.rows(); x++) {
+            double theta = polesEdges.get(x, 0)[1];
+            double rho = polesEdges.get(x, 0)[0];
+            double a = Math.cos(theta), b = Math.sin(theta);
+            double x0 = a*rho, y0 = b*rho;
+            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+            Imgproc.line(dst, pt1, pt2, new Scalar(0, 255, 0), 3, Imgproc.LINE_AA, 0);
+            rovioListEdges[x] = x0;
         }
 
 
-        rects.clear();
+        Arrays.sort(rovioListEroded);
+        Arrays.sort(rovioListEdges);
 
-        for (MatOfPoint contour : contoursList) {
-            RotatedRect rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(contour.toArray()));
 
-            double fixedAngle;
+        double xErodeCenter = 0;
+        if (rovioListEroded.length % 2 == 0)
+            xErodeCenter = (rovioListEroded[rovioListEroded.length/2] + rovioListEroded[rovioListEroded.length/2-1])/2;
+        else
+            xErodeCenter = rovioListEroded[rovioListEroded.length/2];
 
-            if (rotatedRect.size.width < rotatedRect.size.height) {
-                fixedAngle = rotatedRect.angle + 180;
-            } else {
-                fixedAngle = rotatedRect.angle + 90;
-            }
 
-            /*if(fixedAngle>=170 && fixedAngle<=190){
-                if(rotatedRect.size.width>16  && rotatedRect.size.height>200){
-                    if(rotatedRect.size.width>rotatedRect.size.height) {
-                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
-                        rects.add(new RectData(rotatedRect.size.height, rotatedRect.size.width, rotatedRect.center.x, rotatedRect.center.y));
-                    }
-                    else{
-                        drawRotatedRect(thresholdMat, rotatedRect, yellow, 10);
-                        rects.add(new RectData(rotatedRect.size.width, rotatedRect.size.height, rotatedRect.center.x, rotatedRect.center.y));
-                    }
-                }
-            }*/
+        currentCenterX = -1;
 
-            double x = rotatedRect.center.x;
-
-            double y = rotatedRect.center.y;
-
-            if (rotatedRect.size.width > rotatedRect.size.height) {
-                //if ( (fixedAngle >= 160 && fixedAngle <= 200) && (x > (1080*0.3) && x < (1080*0.7)) ) {
-                if ((fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
-                    //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
-                    double correctWidth = rotatedRect.size.height;
-                    double correctHeight = rotatedRect.size.width;
-                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
-                    rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
-                }
-            } else {
-                if ((fixedAngle >= 160 && fixedAngle <= 200) && rotatedRect.size.height>350) {
-                    //if ( (x > (1080*0.3) && x < (1080*0.7)) ) {
-                    double correctWidth = rotatedRect.size.width;
-                    double correctHeight = rotatedRect.size.height;
-                    drawRotatedRect(contoursMat, rotatedRect, black, 10);
-                    rects.add(new RectData(correctHeight, correctWidth, rotatedRect.center.x, rotatedRect.center.y));
-                }
+        for(int i = 0; i<rovioListEdges.length; i++){
+            if(rovioListEdges[i]>xErodeCenter && i!=0){
+                currentCenterX = (rovioListEdges[i] + rovioListEdges[i-1])/2;
+                break;
             }
         }
 
 
-        switch (stageToRenderToViewport) {
-            case YCbCr: {
+
+
+
+        switch (stageToRenderToViewport)
+        {
+            case YCbCr:
+            {
                 return ycbcrMat;
             }
 
-            case THRESH: {
+            case THRESH:
+            {
                 return ycbcrThresh;
             }
 
-            case MORPH: {
+            case MORPH:
+            {
                 return ycbcrMorph;
             }
-
-            case CONTOURS: {
-                return contoursMat;
+            case ERODE:
+            {
+                return ycbcrErode;
             }
 
-            case RAW_IMAGE: {
-                return input;
+            case EDGE:
+            {
+                return ycbcrEdge;
             }
 
-            default: {
-                return input;
+            case RAW_IMAGE:
+            {
+                return inputMat;
+            }
+
+            case DST:
+            {
+                return dst;
+            }
+
+            default:
+            {
+                return inputMat;
             }
         }
 
