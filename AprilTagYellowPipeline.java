@@ -206,7 +206,7 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
         Imgproc.HoughLines(ycbcrEdge, polesEdges, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
 
-        Imgproc.HoughLines(ycbcrErode, polesErode, 1, Math.PI/180, 120, 0, 0, -2*Math.PI/180, 2*Math.PI/180);
+        Imgproc.HoughLines(ycbcrErode, polesErode, 1, Math.PI/180, 275, 0, 0, -2*Math.PI/180, 2*Math.PI/180);
 
 
         inputMat.copyTo(dst);
@@ -244,7 +244,10 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
 
         double xErodeCenter = 0;
-        if (rovioListEroded.length % 2 == 0)
+        if (rovioListEroded.length==0) {
+            xErodeCenter = -1;
+        }
+        else if (rovioListEroded.length % 2 == 0)
             xErodeCenter = (rovioListEroded[rovioListEroded.length/2] + rovioListEroded[rovioListEroded.length/2-1])/2;
         else
             xErodeCenter = rovioListEroded[rovioListEroded.length/2];
@@ -259,6 +262,11 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
             }
         }
 
+        Imgproc.line(dst, new Point(currentCenterX, 1000), new Point(currentCenterX, -10000), new Scalar(255, 0, 0), 3, Imgproc.LINE_AA, 0);
+
+
+
+        System.out.println(currentCenterX);
 
 
 
