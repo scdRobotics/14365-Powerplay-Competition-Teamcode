@@ -12,13 +12,6 @@ public class AUTO_PRIME extends LinearOpMode {
 
     Robot robot;
 
-    int closestX = 0;
-    double closestTempValX = 100;
-    int closestY = 0;
-    double closestTempValY = 100;
-    int closestAngle = 0;
-    double closestTempValAngle = 500;
-
 
     int SKEW_COUNT = 0;
 
@@ -188,16 +181,6 @@ public class AUTO_PRIME extends LinearOpMode {
 
     int IDEAL_POLE_X = 24;
 
-
-
-
-
-    boolean localizerThetaAccurate = false;
-    boolean camThetaAccurate = false;
-    boolean frontSensorDistAccurate = false;
-    boolean localizerDistAccurate = false;
-    boolean camDistAccurate = false;
-
     
     void initAuto(){
         ElapsedTime timer = new ElapsedTime();
@@ -210,6 +193,10 @@ public class AUTO_PRIME extends LinearOpMode {
         robot.vision.activateAprilTagYellowPipelineCamera2();
 
         //robot.delivery.closeGripper();
+
+        robot.sensors.deployOdo();
+
+        robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
         //TODO: Test if this actually populates the array properly and its viewable in auto programs
         for(int i = 0; i< validRobotPosConversion.length; i++){

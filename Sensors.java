@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -13,10 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Sensors extends Subsystem {
     private DistanceSensor front; //Underbelly Dist Sensor #1 initial declaration
 
-    private DistanceSensor left; //Left Dist Sensor initial declaration
-
-    private DistanceSensor right; //Front Left Dist Sensor initial declaration
-
     private RevBlinkinLedDriver led;
 
 
@@ -24,6 +21,10 @@ public class Sensors extends Subsystem {
 
 
     private double IMU_OFFSET = 0;
+
+    private Servo backOdo;
+    private Servo leftOdo;
+    private Servo rightOdo;
 
 
     public enum LED_STATE{
@@ -39,16 +40,18 @@ public class Sensors extends Subsystem {
     boolean isBlue = PoseTransfer.isBlue;
 
     //"Constructor" object for Sensors
-    public Sensors(BNO055IMU imu, DistanceSensor front, DistanceSensor left, DistanceSensor right, RevBlinkinLedDriver led, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
+    public Sensors(BNO055IMU imu, DistanceSensor front, RevBlinkinLedDriver led, Servo backOdo, Servo leftOdo, Servo rightOdo, Telemetry telemetry, HardwareMap hardwareMap, ElapsedTime timer){
         super(telemetry,hardwareMap,timer); //Map basic, required aspects of robot
 
         this.imu = imu;
 
         this.front=front;
-        this.left=left;
-        this.right=right;
 
         this.led = led;
+
+        this.backOdo = backOdo;
+        this.leftOdo = leftOdo;
+        this.rightOdo = rightOdo;
 
         updateLEDs();
     }
@@ -57,14 +60,6 @@ public class Sensors extends Subsystem {
 
     public double getFrontDist(){
         return front.getDistance(DistanceUnit.INCH);
-    }
-
-    public double getLeftDist(){
-        return left.getDistance(DistanceUnit.INCH);
-    }
-
-    public double getRightDist(){
-        return right.getDistance(DistanceUnit.INCH);
     }
 
     public void setLEDs(RevBlinkinLedDriver.BlinkinPattern b){
@@ -123,6 +118,18 @@ public class Sensors extends Subsystem {
 
     public void setImuOffset(double i){
         IMU_OFFSET = i;
+    }
+
+    public void deployOdo(){
+        backOdo.setPosition(1);
+        rightOdo.setPosition(0);
+        leftOdo.setPosition(1);
+    }
+
+    public void retractOdo(){
+        backOdo.setPosition(0);
+        rightOdo.setPosition(0.5);
+        leftOdo.setPosition(0);
     }
 
 }

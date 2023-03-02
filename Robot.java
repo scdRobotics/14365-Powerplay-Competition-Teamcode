@@ -50,14 +50,18 @@ public class Robot {
 
     public Servo gripper;
 
+
+    public Servo backOdo;
+    public Servo rightOdo;
+    public Servo leftOdo;
+
+
     public OpenCvCamera webcam1;
 
     public OpenCvCamera webcam2;
 
 
     public DistanceSensor front;
-    public DistanceSensor right;
-    public DistanceSensor left;
 
 
 
@@ -164,6 +168,12 @@ public class Robot {
 
 
 
+        backOdo = hardwareMap.get(Servo.class, "backOdo");
+        leftOdo = hardwareMap.get(Servo.class, "leftOdo");
+        rightOdo = hardwareMap.get(Servo.class, "rightOdo");
+
+
+
         /*imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
@@ -176,7 +186,7 @@ public class Robot {
 
         vision = new Vision(webcam1, webcam2, telemetry, hardwareMap, timer);
 
-        sensors = new Sensors(imu, front, left, right, led, telemetry, hardwareMap, timer);
+        sensors = new Sensors(imu, front, led, backOdo, leftOdo, rightOdo, telemetry, hardwareMap, timer);
 
 
 

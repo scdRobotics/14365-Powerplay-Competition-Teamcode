@@ -16,7 +16,6 @@ public class _LEFT_AUTO extends AUTO_PRIME {
     public void runOpMode() throws InterruptedException{
 
         initAuto();
-        robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
 
         // https://learnroadrunner.com/assets/img/field-w-axes-half.cf636a7c.jpg
 
@@ -33,28 +32,12 @@ public class _LEFT_AUTO extends AUTO_PRIME {
         TrajectorySequence I_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
-                })
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
-                .lineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y - 6))
+                .splineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y - 6), Math.toRadians(270))
 
-                .lineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y))
-
-                .build();
-
-        TrajectorySequence I_APPROACH_II = robot.drive.trajectorySequenceBuilder(I_APPROACH.end())
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
-                })
-
-                .turn(Math.toRadians(-I_APPROACH_TURN))
-
-                .forward(I_TOWARDS_POLE)
+                .splineToSplineHeading(new Pose2d(I_APPROACH_X, I_APPROACH_Y, Math.toRadians(225)), Math.toRadians(270))
 
                 .build();
 
@@ -66,9 +49,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                     robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
                 })
 
-                .lineToLinearHeading(new Pose2d(I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .splineToLinearHeading(new Pose2d(I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG)), Math.toRadians(0)) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .lineTo(new Vector2d(I_PKUP_X, I_PKUP_Y))
+                .splineToConstantHeading(new Vector2d(I_PKUP_X, I_PKUP_Y), Math.toRadians(0))
 
                 .waitSeconds(STACK_WAIT_GRAB)
 
@@ -86,9 +69,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
                 .lineTo(new Vector2d(I_PKUP_BKUP_X, I_PKUP_BKUP_Y))
 
-                .lineTo(new Vector2d(II_APPROACH_X, II_APPROACH_Y))
+                .splineToConstantHeading(new Vector2d(II_APPROACH_X + 8, II_APPROACH_Y), Math.toRadians(180))
 
-                .turn(Math.toRadians(-II_APPROACH_TURN))
+                .splineToSplineHeading(new Pose2d(II_APPROACH_X, II_APPROACH_Y, Math.toRadians(225)), Math.toRadians(180))
 
                 .build();
 
@@ -175,253 +158,210 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
         robot.vision.runAprilTag(false);
 
+        robot.drive.followTrajectorySequence(I_APPROACH);
 
-        double frontSensorReadout = 0;
-        double backSensorReadout = 0;
+        robot.pause(1.5);
 
-        robot.timer.startTime();
+        robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
-        robot.drive.followTrajectorySequenceAsync(I_APPROACH);
+        double dTheta = 0;
+        double dist = 0;
 
-        while(opModeIsActive() && !isStopRequested() && robot.drive.isBusy()){ //Should leave loop when async function is done or robot is detected
+        ArrayList<Double>  dThetas = new ArrayList<>();
+        ArrayList<Double>  dists = new ArrayList<>();
 
-            if(robot.timer.time()>1){
-                //frontSensorReadout = robot.sensors.getLeftFrontDist();
-                //backSensorReadout = robot.sensors.getLeftBackDist();
+        int count = 0;
+
+        while(count<20){
+
+            if(dThetas.size() < 10){
+                dTheta = robot.vision.findClosePoleDTheta();
+                if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
+                    dThetas.add(dTheta);
+                }
             }
 
+            if(dists.size() < 10){
+                dist = robot.vision.findClosePoleDist();
+                if(dist!=-1 && dist<23 && dist>8){
+                    dists.add(dist);
+                }
+            }
 
-            if((frontSensorReadout<COLLISION_AVOIDANCE_UPPER_LIMIT && frontSensorReadout>COLLISION_AVOIDANCE_LOWER_LIMIT) && (backSensorReadout<COLLISION_AVOIDANCE_UPPER_LIMIT && backSensorReadout>COLLISION_AVOIDANCE_LOWER_LIMIT)){ //Meaning a robot is approaching the same direction
-                robot.drive.breakFollowing();
-                robot.drive.setDrivePower(new Pose2d());
-                robotDetected=true;
+            if(dThetas.size()==10 && dists.size()==10){
                 break;
             }
 
-            // Update drive localization
-            robot.drive.update();
+            count++;
 
+            telemetry.addData("Loop Count: ", count);
+
+
+            robot.pause(0.075);
         }
 
-
-        if(robotDetected){
-            //TODO: Run alt version of program (go for middle 4 point & park). Still needs programming.
-
-
+        for(Double d: dThetas){
+            telemetry.addData("dTheta val: ", d);
         }
 
+        for(Double d: dists){
+            telemetry.addData("dist val: ", d);
+        }
+
+        telemetry.update();
+
+        Collections.sort(dThetas);
+        Collections.sort(dists);
+
+        //We only take median rn, is there a better way? Probably.
+
+        if (dThetas.size() % 2 == 0)
+            dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
+        else
+            dTheta = (dThetas.get(dThetas.size()/2));
 
 
+        if (dists.size() % 2 == 0)
+            dist = (dists.get(dists.size()/2) + (dists.get(dists.size()/2-1)))/2;
+        else
+            dist = (dists.get(dists.size()/2));
 
-        else {
 
+        TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH.end())
 
-            robot.drive.followTrajectorySequence(I_APPROACH_II);
+                //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-            robot.pause(1.5);
+                .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-            robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
+                .forward(dist - 7 + 1.75)
 
-            double dTheta = 0;
-            double dist = 0;
+                .waitSeconds(POLE_WAIT_DROP)
 
-            ArrayList<Double>  dThetas = new ArrayList<>();
-            ArrayList<Double>  dists = new ArrayList<>();
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
 
-            int count = 0;
+                .waitSeconds(POLE_WAIT_RELEASE)
 
-            while(count<20){
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
 
-                if(dThetas.size() < 10){
-                    dTheta = robot.vision.findClosePoleDTheta();
-                    if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
-                        dThetas.add(dTheta);
-                    }
+                .build();
+
+        robot.drive.followTrajectorySequence(I_DROP);
+
+        telemetry.addData("X Pos: ", robot.drive.getPoseEstimate().getX());
+        telemetry.addData("Y Pos: ", robot.drive.getPoseEstimate().getY());
+        telemetry.addData("Heading: ", robot.drive.getPoseEstimate().getHeading());
+        telemetry.update();
+
+        robot.drive.followTrajectorySequence(II_APPROACH);
+
+        robot.pause(1.5);
+
+        robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
+
+        dTheta = 0;
+        dist = 0;
+
+        dThetas.clear();
+        dists.clear();
+
+        count = 0;
+
+        while(count<20){
+
+            if(dThetas.size() < 10){
+                dTheta = robot.vision.findClosePoleDTheta();
+                if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
+                    dThetas.add(dTheta);
                 }
+            }
 
-                if(dists.size() < 10){
-                    dist = robot.vision.findClosePoleDist();
-                    if(dist!=-1 && dist<23 && dist>8){
-                        dists.add(dist);
-                    }
+            if(dists.size() < 10){
+                dist = robot.vision.findClosePoleDist();
+                if(dist!=-1 && dist<23 && dist>8){
+                    dists.add(dist);
                 }
-
-                if(dThetas.size()==10 && dists.size()==10){
-                    break;
-                }
-
-                count++;
-
-                telemetry.addData("Loop Count: ", count);
-
-
-                robot.pause(0.075);
             }
 
-            for(Double d: dThetas){
-                telemetry.addData("dTheta val: ", d);
+            if(dThetas.size()==10 && dists.size()==10){
+                break;
             }
 
-            for(Double d: dists){
-                telemetry.addData("dist val: ", d);
-            }
+            count++;
 
-            telemetry.update();
-
-            Collections.sort(dThetas);
-            Collections.sort(dists);
-
-            //We only take median rn, is there a better way? Probably.
-
-            if (dThetas.size() % 2 == 0)
-                dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
-            else
-                dTheta = (dThetas.get(dThetas.size()/2));
-            
-
-            if (dists.size() % 2 == 0)
-                dist = (dists.get(dists.size()/2) + (dists.get(dists.size()/2-1)))/2;
-            else
-                dist = (dists.get(dists.size()/2));
+            telemetry.addData("Loop Count: ", count);
 
 
-            TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH_II.end())
+            robot.pause(0.075);
+        }
 
-                    //.turn(dTheta * Math.abs(Math.cos(dTheta)))
+        for(Double d: dThetas){
+            telemetry.addData("dTheta val: ", d);
+        }
 
-                    .turn(dTheta * Math.abs(Math.cos(dTheta)))
+        for(Double d: dists){
+            telemetry.addData("dist val: ", d);
+        }
 
-                    .forward(dist - 7 + 1.75)
+        telemetry.update();
 
-                    .waitSeconds(POLE_WAIT_DROP)
+        Collections.sort(dThetas);
+        Collections.sort(dists);
 
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                    })
-
-                    .waitSeconds(POLE_WAIT_RELEASE)
-
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        robot.delivery.openGripper();
-                    })
-
-                    .build();
-
-            robot.drive.followTrajectorySequence(I_DROP);
-
-            telemetry.addData("X Pos: ", robot.drive.getPoseEstimate().getX());
-            telemetry.addData("Y Pos: ", robot.drive.getPoseEstimate().getY());
-            telemetry.addData("Heading: ", robot.drive.getPoseEstimate().getHeading());
-            telemetry.update();
-
-            robot.drive.followTrajectorySequence(II_APPROACH);
-
-            robot.pause(1.5);
-
-            robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
-
-            dTheta = 0;
-            dist = 0;
-
-            dThetas.clear();
-            dists.clear();
-
-            count = 0;
-
-            while(count<20){
-
-                if(dThetas.size() < 10){
-                    dTheta = robot.vision.findClosePoleDTheta();
-                    if(dTheta!=-1 && dTheta>Math.toRadians(-30) && dTheta<Math.toRadians(30)){
-                        dThetas.add(dTheta);
-                    }
-                }
-
-                if(dists.size() < 10){
-                    dist = robot.vision.findClosePoleDist();
-                    if(dist!=-1 && dist<23 && dist>8){
-                        dists.add(dist);
-                    }
-                }
-
-                if(dThetas.size()==10 && dists.size()==10){
-                    break;
-                }
-
-                count++;
-
-                telemetry.addData("Loop Count: ", count);
+        if (dThetas.size() % 2 == 0)
+            dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
+        else
+            dTheta = (dThetas.get(dThetas.size()/2));
 
 
-                robot.pause(0.075);
-            }
-
-            for(Double d: dThetas){
-                telemetry.addData("dTheta val: ", d);
-            }
-
-            for(Double d: dists){
-                telemetry.addData("dist val: ", d);
-            }
-
-            telemetry.update();
-
-            Collections.sort(dThetas);
-            Collections.sort(dists);
-
-            if (dThetas.size() % 2 == 0)
-                dTheta = (dThetas.get(dThetas.size()/2) + (dThetas.get(dThetas.size()/2-1)))/2;
-            else
-                dTheta = (dThetas.get(dThetas.size()/2));
+        if (dists.size() % 2 == 0)
+            dist = (dists.get(dists.size()/2) + (dists.get(dists.size()/2-1)))/2;
+        else
+            dist = (dists.get(dists.size()/2));
 
 
-            if (dists.size() % 2 == 0)
-                dist = (dists.get(dists.size()/2) + (dists.get(dists.size()/2-1)))/2;
-            else
-                dist = (dists.get(dists.size()/2));
+        TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
 
+                //.turn(dTheta - Math.toRadians(3.5))
+                //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-            TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
+                .turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                    //.turn(dTheta - Math.toRadians(3.5))
-                    //.turn(dTheta * Math.abs(Math.cos(dTheta)))
+                .forward(dist - 7 + 1.75)
 
-                    .turn(dTheta * Math.abs(Math.cos(dTheta)))
+                .waitSeconds(POLE_WAIT_DROP)
 
-                    .forward(dist - 7 + 1.75)
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
+                })
 
-                    .waitSeconds(POLE_WAIT_DROP)
+                .waitSeconds(POLE_WAIT_RELEASE)
 
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                    })
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.openGripper();
+                })
 
-                    .waitSeconds(POLE_WAIT_RELEASE)
+                .build();
 
-                    .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                        robot.delivery.openGripper();
-                    })
-
-                    .build();
-
-            robot.drive.followTrajectorySequence(II_DROP);
+        robot.drive.followTrajectorySequence(II_DROP);
 
 
 
 
-            if(park==2){
+        if(park==2){
 
-                robot.drive.followTrajectorySequence(parkTwo);
-            }
-            else if(park == 3){
+            robot.drive.followTrajectorySequence(parkTwo);
+        }
+        else if(park == 3){
 
-                robot.drive.followTrajectorySequence(parkThree);
-            }
-            else{
+            robot.drive.followTrajectorySequence(parkThree);
+        }
+        else{
 
-                robot.drive.followTrajectorySequence(parkOne);
-            }
-
+            robot.drive.followTrajectorySequence(parkOne);
         }
 
         PoseTransfer.currentPose = robot.drive.getPoseEstimate();

@@ -96,6 +96,11 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
 
+        robot.sensors.retractOdo();
+
+
+
+
 
         waitForStart();
 
