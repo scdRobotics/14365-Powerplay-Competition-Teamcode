@@ -37,12 +37,12 @@ public class AUTO_PRIME extends LinearOpMode {
     double I_DROP_Y = 6.19;
 
 
-    int I_BACK_POLE_X = 36;
+    int I_BACK_POLE_X = 30;
     int I_BACK_POLE_Y = 12;
     int I_BACK_POLE_ANG = 360;
 
 
-    double I_PKUP_X = 62.5;
+    double I_PKUP_X = 67.5;
     int I_PKUP_Y = 12;
 
 
@@ -60,17 +60,17 @@ public class AUTO_PRIME extends LinearOpMode {
 
 
 
-    int POLE_WAIT_DROP = 1;
-    double POLE_WAIT_RELEASE = 0.5;
-    double STACK_WAIT_GRAB = 0.75;
-    double STACK_WAIT_UP = 1;
+    double POLE_WAIT_DROP = 0.75;
+    double POLE_WAIT_RELEASE = 0.25;
+    double STACK_WAIT_GRAB = 0.5;
+    double STACK_WAIT_UP = 1.25;
 
-    int II_BACK_POLE_X = 38;
+    int II_BACK_POLE_X = 30;
     int II_BACK_POLE_Y = 12;
     int II_BACK_POLE_ANG = 360;
 
 
-    double II_PKUP_X = 61.25;
+    double II_PKUP_X = 67.5;
     int II_PKUP_Y = 12;
 
 
@@ -192,7 +192,7 @@ public class AUTO_PRIME extends LinearOpMode {
 
         robot.vision.activateAprilTagYellowPipelineCamera2();
 
-        //robot.delivery.closeGripper();
+        robot.delivery.closeGripper();
 
         robot.sensors.deployOdo();
 
