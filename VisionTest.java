@@ -106,9 +106,11 @@ public class VisionTest extends AUTO_PRIME {
 
                 //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                .turn(dTheta * Math.abs(Math.cos(dTheta)))
+                //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                .forward(dist - 8.5)
+                .turn(dTheta)
+
+                .forward(dist - 7) //6
 
                 .waitSeconds(POLE_WAIT_DROP)
 

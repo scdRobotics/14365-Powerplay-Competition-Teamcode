@@ -27,6 +27,17 @@ import java.util.List;
 
 public class AprilTagYellowPipeline extends OpenCvPipeline {
 
+    enum Stage
+    {
+        YCbCr,
+        THRESH,
+        MORPH,
+        ERODE,
+        EDGE,
+        DST,
+        RAW_IMAGE
+    }
+
     private boolean runAprilTag = true;
 
     public void setRunAprilTag(boolean runAprilTag){
@@ -89,8 +100,8 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
     double currentCenterX = -1;
 
 
-    private YellowPipeline.Stage stageToRenderToViewport = YellowPipeline.Stage.DST;
-    private YellowPipeline.Stage[] stages = YellowPipeline.Stage.values();
+    private Stage stageToRenderToViewport = Stage.DST;
+    private Stage[] stages = Stage.values();
 
 
 
