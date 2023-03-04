@@ -68,10 +68,10 @@ public class DriveConstants {
      */
 
     //TODO: Find out how much we can increase these by >:) (SAFELY, of course)
-    public static double MAX_VEL = 90; //70
-    public static double MAX_ACCEL = 50; //40
-    public static double MAX_ANG_VEL = Math.toRadians(360); //300
-    public static double MAX_ANG_ACCEL = Math.toRadians(180); //60
+    public static double MAX_VEL = 70; //70
+    public static double MAX_ACCEL = 40; //40
+    public static double MAX_ANG_VEL = Math.toRadians(300); //300
+    public static double MAX_ANG_ACCEL = Math.toRadians(90); //60
 
 
     public static double encoderTicksToInches(double ticks) {

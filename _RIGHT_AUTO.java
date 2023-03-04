@@ -49,7 +49,8 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                     robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
                 })
 
-                .splineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)), Math.toRadians(180)) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                //.splineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)), Math.toRadians(180)) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)))
 
                 .splineToConstantHeading(new Vector2d(-I_PKUP_X, I_PKUP_Y), Math.toRadians(180))
 
@@ -71,7 +72,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 .splineToConstantHeading(new Vector2d(-(II_APPROACH_X + 8), II_APPROACH_Y), Math.toRadians(180))
 
-                .splineToSplineHeading(new Pose2d(-II_APPROACH_X, II_APPROACH_Y, Math.toRadians(225)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-II_APPROACH_X, II_APPROACH_Y, Math.toRadians(315)), Math.toRadians(180))
 
                 .build();
 
@@ -196,6 +197,8 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                     robot.delivery.openGripper();
                 })
 
+                .forward(-6)
+
                 .build();
 
         robot.drive.followTrajectorySequence(I_DROP);
@@ -217,9 +220,6 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
 
-                //.turn(dTheta - Math.toRadians(3.5))
-                //.turn(dTheta * Math.abs(Math.cos(dTheta)))
-
                 .turn(dTheta + Math.toRadians(5))
 
                 .forward(dist - 7)
@@ -235,48 +235,13 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.openGripper();
                 })
+
+
+                .forward(-6)
 
                 .build();
 
         robot.drive.followTrajectorySequence(II_DROP);
-
-        robot.drive.followTrajectorySequence(III_APPROACH);
-
-        robot.pause(1);
-
-        robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
-
-        dTheta = robot.vision.findClosePoleDTheta();
-        dist = robot.vision.findClosePoleDist();
-
-
-        TrajectorySequence III_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
-
-                //.turn(dTheta - Math.toRadians(3.5))
-                //.turn(dTheta * Math.abs(Math.cos(dTheta)))
-
-                .turn(dTheta + Math.toRadians(5))
-
-                .forward(dist - 7)
-
-                .waitSeconds(POLE_WAIT_DROP)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT, SLIDE_POWER);
-                })
-
-                .waitSeconds(POLE_WAIT_RELEASE)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.openGripper();
-                })
-
-                .build();
-
-
-        robot.drive.followTrajectorySequence(III_DROP);
-
-
 
 
         if(park==2){

@@ -37,7 +37,7 @@ public class AUTO_PRIME extends LinearOpMode {
     double I_DROP_Y = 6.19;
 
 
-    int I_BACK_POLE_X = 30;
+    int I_BACK_POLE_X = 36;
     int I_BACK_POLE_Y = 12;
     int I_BACK_POLE_ANG = 360;
 
@@ -65,7 +65,7 @@ public class AUTO_PRIME extends LinearOpMode {
     double STACK_WAIT_GRAB = 0.5;
     double STACK_WAIT_UP = 1.25;
 
-    int II_BACK_POLE_X = 30;
+    int II_BACK_POLE_X = 36;
     int II_BACK_POLE_Y = 12;
     int II_BACK_POLE_ANG = 360;
 
@@ -101,7 +101,7 @@ public class AUTO_PRIME extends LinearOpMode {
     int I_CONE_STACK_PICKUP_HEIGHT = 575;
     int II_CONE_STACK_PICKUP_HEIGHT = 475;
 
-    double SLIDE_POWER = 0.65;
+    double SLIDE_POWER = 1;
 
 
 

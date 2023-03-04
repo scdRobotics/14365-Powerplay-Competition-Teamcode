@@ -133,12 +133,21 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
             //TODO: FIND OUT WHERE /SLOW GOES & TEST
             //TODO: HAVE CHECK AGAINST IMU FOR IF/WHEN "GET HEADING" IS NOT ACCURATE
 
-            //Pose2d poseEstimate = robot.drive.getPoseEstimate();
-            Vector2d input = new Vector2d(
-                    gamepad1.left_stick_x,
-                    -gamepad1.left_stick_y
-            )//.rotated(-poseEstimate.getHeading());
-                    .rotated(-robot.sensors.getIMUReadout());
+
+            Vector2d input = new Vector2d();
+            if(gamepad1.right_bumper){
+                input = new Vector2d(
+                        -gamepad1.left_stick_y,
+                        -gamepad1.left_stick_x
+                );
+
+            }
+            else{
+                input = new Vector2d(
+                        gamepad1.left_stick_x,
+                        -gamepad1.left_stick_y
+                ).rotated(-robot.sensors.getIMUReadout());
+            }
 
 
 
@@ -199,7 +208,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
             if (gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < -0.1) {
-                slidePos += -gamepad2.left_stick_y * 37;
+                slidePos += -gamepad2.left_stick_y * 30;
             }
 
 
@@ -268,7 +277,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
 
-                if(isEqual(dTheta, Math.toRadians(20), 0) && isEqual(dist, 7, 5)){
+                if(isEqual(dTheta, Math.toRadians(20), 0) && isEqual(dist, 7, 6)){
                     robot.sensors.setLEDState(Sensors.LED_STATE.POLE_GOOD);
                     telemetry.addData("Pole Good! ", "");
                     gamepad1.rumble(1, 1, 500);
