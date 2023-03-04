@@ -172,16 +172,25 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
+        int loopCount = 0;
+
         double dTheta = robot.vision.findClosePoleDTheta();
 
         double dist = robot.vision.findClosePoleDist();
+
+        while(loopCount<10 && (dTheta == -1 || dist == -1)){
+            dTheta = robot.vision.findClosePoleDTheta();
+            dist = robot.vision.findClosePoleDist();
+            loopCount++;
+            robot.pause(.175);
+        }
 
 
         TrajectorySequence I_DROP = robot.drive.trajectorySequenceBuilder(I_APPROACH.end())
 
                 //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                .turn(dTheta + Math.toRadians(5))
+                .turn(dTheta - Math.toRadians(5))
 
                 .forward(dist - 7)
 
@@ -214,13 +223,23 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
+        loopCount = 0;
+
         dTheta = robot.vision.findClosePoleDTheta();
+
         dist = robot.vision.findClosePoleDist();
+
+        while(loopCount<10 && (dTheta == -1 || dist == -1)){
+            dTheta = robot.vision.findClosePoleDTheta();
+            dist = robot.vision.findClosePoleDist();
+            loopCount++;
+            robot.pause(.175);
+        }
 
 
         TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
 
-                .turn(dTheta + Math.toRadians(5))
+                .turn(dTheta - Math.toRadians(5))
 
                 .forward(dist - 7)
 

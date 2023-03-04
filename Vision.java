@@ -89,6 +89,10 @@ public class Vision extends Subsystem {
         double cam1CurrentX = yellowPipeline.getCurrentCenterX();
         double cam2CurrentX = aprilTagYellowPipeline.getCurrentCenterX();
 
+        if(cam1CurrentX==-1 || cam2CurrentX==-1){
+            return -1;
+        }
+
         double theta1 = Math.toRadians(142.5 - (cam1CurrentX*5.5/128)); //Camera 1 Theta
         double theta2 = Math.toRadians(92.5 - (cam2CurrentX*5.5/128)); //Camera 2 Theta
 
@@ -124,6 +128,10 @@ public class Vision extends Subsystem {
 
         double cam1CurrentX = yellowPipeline.getCurrentCenterX();
         double cam2CurrentX = aprilTagYellowPipeline.getCurrentCenterX();
+
+        if(cam1CurrentX==-1 || cam2CurrentX==-1){
+            return -1;
+        }
 
         double theta1 = Math.toRadians(142.5 - (cam1CurrentX*5.5/128)); //Camera 1 Theta
         double theta2 = Math.toRadians(92.5 - (cam2CurrentX*5.5/128)); //Camera 2 Theta
