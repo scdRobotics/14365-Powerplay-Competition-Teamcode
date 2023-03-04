@@ -180,9 +180,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
                 //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                .turn(dTheta * Math.abs(Math.cos(dTheta)))
+                .turn(dTheta + Math.toRadians(5))
 
-                .forward(dist - 6)
+                .forward(dist - 7)
 
                 .waitSeconds(POLE_WAIT_DROP)
 
@@ -220,9 +220,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                 //.turn(dTheta - Math.toRadians(3.5))
                 //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                .turn(dTheta * Math.abs(Math.cos(dTheta)))
+                .turn(dTheta + Math.toRadians(5))
 
-                .forward(dist - 6)
+                .forward(dist - 7)
 
                 .waitSeconds(POLE_WAIT_DROP)
 
@@ -255,9 +255,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                 //.turn(dTheta - Math.toRadians(3.5))
                 //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                .turn(dTheta * Math.abs(Math.cos(dTheta)))
+                .turn(dTheta + Math.toRadians(5))
 
-                .forward(dist - 6)
+                .forward(dist - 7)
 
                 .waitSeconds(POLE_WAIT_DROP)
 
