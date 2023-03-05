@@ -101,7 +101,7 @@ public class AUTO_PRIME extends LinearOpMode {
     int I_CONE_STACK_PICKUP_HEIGHT = 575;
     int II_CONE_STACK_PICKUP_HEIGHT = 475;
 
-    double SLIDE_POWER = 1;
+    double SLIDE_POWER = 0.7;
 
 
 

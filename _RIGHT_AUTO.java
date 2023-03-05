@@ -25,19 +25,23 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         robot.drive.setPoseEstimate(startPose);
 
-        Pose2d DROP_POSE_ESTIMATE = new Pose2d(-26, 3, Math.toRadians(270+45));
+        Pose2d DROP_POSE_ESTIMATE = new Pose2d(-32, 9, Math.toRadians(270+45));
 
 
 
         TrajectorySequence I_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
+                    robot.delivery.slideControl(300, SLIDE_POWER);
                 })
 
                 .splineTo(new Vector2d(-I_APPROACH_X, I_APPROACH_Y - 6), Math.toRadians(270))
 
                 .splineToSplineHeading(new Pose2d(-I_APPROACH_X, I_APPROACH_Y, Math.toRadians(315)), Math.toRadians(270))
+
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
+                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
+                })
 
                 .build();
 
@@ -50,7 +54,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                 })
 
                 //.splineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)), Math.toRadians(180)) //Need to make sure this doesn't cause odo wheels to go on ground junction
-                .lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)))
+                .lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 185)))
 
                 .splineToConstantHeading(new Vector2d(-I_PKUP_X, I_PKUP_Y), Math.toRadians(180))
 
@@ -63,53 +67,24 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                 .waitSeconds(STACK_WAIT_UP)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
+                    robot.delivery.slideControl(I_CONE_STACK_PICKUP_HEIGHT+700, SLIDE_POWER);
                 })
 
                 //May need to swap these two?? Maybe, play with it a little
 
                 .lineTo(new Vector2d(-I_PKUP_BKUP_X, I_PKUP_BKUP_Y))
 
-                .splineToConstantHeading(new Vector2d(-(II_APPROACH_X + 8), II_APPROACH_Y), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-(II_APPROACH_X + 1), II_APPROACH_Y), Math.toRadians(180))
 
                 .splineToSplineHeading(new Pose2d(-II_APPROACH_X, II_APPROACH_Y, Math.toRadians(315)), Math.toRadians(180))
-
-                .build();
-
-        //Live build for drop off!
-
-        TrajectorySequence III_APPROACH = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE) //Need to have estimate for startPose
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
-                })
-
-                .splineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG-180)), Math.toRadians(180)) //Need to make sure this doesn't cause odo wheels to go on ground junction
-
-                .splineToConstantHeading(new Vector2d(-II_PKUP_X, II_PKUP_Y), Math.toRadians(180))
-
-                .waitSeconds(STACK_WAIT_GRAB)
-
-                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
-                    robot.delivery.closeGripper();
-                })
-
-                .waitSeconds(STACK_WAIT_UP)
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
                 })
 
-                //May need to swap these two?? Maybe, play with it a little
-
-                .lineTo(new Vector2d(-II_PKUP_BKUP_X, II_PKUP_BKUP_Y))
-
-                .splineToConstantHeading(new Vector2d(-(III_APPROACH_X + 8), III_APPROACH_Y), Math.toRadians(180))
-
-                .splineToSplineHeading(new Pose2d(-III_APPROACH_X, III_APPROACH_Y, Math.toRadians(315)), Math.toRadians(180))
-
                 .build();
 
+        //Live build for drop off!
 
 
         TrajectorySequence parkTwo = robot.drive.trajectorySequenceBuilder(DROP_POSE_ESTIMATE)
@@ -192,7 +167,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 .turn(dTheta - Math.toRadians(5))
 
-                .forward(dist - 7)
+                .forward(dist - 6)
 
                 .waitSeconds(POLE_WAIT_DROP)
 
@@ -241,7 +216,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 .turn(dTheta - Math.toRadians(5))
 
-                .forward(dist - 7)
+                .forward(dist - 6)
 
                 .waitSeconds(POLE_WAIT_DROP)
 
