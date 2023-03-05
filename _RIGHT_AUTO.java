@@ -25,7 +25,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         robot.drive.setPoseEstimate(startPose);
 
-        Pose2d DROP_POSE_ESTIMATE = new Pose2d(-29, 6, Math.toRadians(270+45));
+        Pose2d DROP_POSE_ESTIMATE = new Pose2d(-26, 3, Math.toRadians(270+45));
 
 
 
