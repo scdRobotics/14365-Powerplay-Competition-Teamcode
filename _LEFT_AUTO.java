@@ -35,9 +35,13 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                     robot.delivery.slideControl(300, SLIDE_POWER);
                 })
 
-                .splineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y - 6), Math.toRadians(270))
+                //.splineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y - 6), Math.toRadians(270))
 
-                .splineToSplineHeading(new Pose2d(I_APPROACH_X, I_APPROACH_Y, Math.toRadians(225)), Math.toRadians(270))
+                .lineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y - 6))
+
+                //.splineToSplineHeading(new Pose2d(I_APPROACH_X, I_APPROACH_Y, Math.toRadians(225)), Math.toRadians(270))
+
+                .lineToLinearHeading(new Pose2d(I_APPROACH_X, I_APPROACH_Y, Math.toRadians(225)))
 
                 .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.delivery.slideControl(HIGH_POLE_DROP_HEIGHT, SLIDE_POWER);
@@ -76,7 +80,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
                 .lineTo(new Vector2d(I_PKUP_BKUP_X, I_PKUP_BKUP_Y))
 
-                .splineToConstantHeading(new Vector2d(II_APPROACH_X + 1, II_APPROACH_Y), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(II_APPROACH_X + 6, II_APPROACH_Y), Math.toRadians(180))
 
                 .splineToSplineHeading(new Pose2d(II_APPROACH_X, II_APPROACH_Y, Math.toRadians(225)), Math.toRadians(180))
 
@@ -96,7 +100,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                     robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
                 })
 
-                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .lineTo(new Vector2d(PARK_II_X, PARK_Y))
 
@@ -109,7 +113,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                     robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
                 })
 
-                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .lineTo(new Vector2d(LEFT_PARK_III_X, PARK_Y))
 
@@ -121,7 +125,7 @@ public class _LEFT_AUTO extends AUTO_PRIME {
                     robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
                 })
 
-                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 1e-6))) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                .lineToLinearHeading(new Pose2d(II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
                 .lineTo(new Vector2d(LEFT_PARK_I_X, PARK_Y))
 
@@ -139,6 +143,9 @@ public class _LEFT_AUTO extends AUTO_PRIME {
 
         robot.vision.runAprilTag(false); //Hopefully this will decrease pipeline overhead time
         robot.vision.pauseCamera();
+
+        telemetry.addData("April Tag Detected: ", park);
+        telemetry.update();
 
         robot.drive.followTrajectorySequence(I_APPROACH);
 
@@ -217,6 +224,8 @@ public class _LEFT_AUTO extends AUTO_PRIME {
             loopCount++;
             robot.pause(.175);
         }
+
+        robot.vision.pauseCamera();
 
 
         TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())

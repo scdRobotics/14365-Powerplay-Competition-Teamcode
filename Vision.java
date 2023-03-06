@@ -84,13 +84,13 @@ public class Vision extends Subsystem {
     }
 
     public void pauseCamera(){
-        yellowPipeline.setPause(true);
-        aprilTagYellowPipeline.setPause(true);
+        //yellowPipeline.setPause(true);
+        //aprilTagYellowPipeline.setPause(true);
     }
 
     public void resumeCamera(){
-        yellowPipeline.setPause(false);
-        aprilTagYellowPipeline.setPause(false);
+        //yellowPipeline.setPause(false);
+        //aprilTagYellowPipeline.setPause(false);
     }
 
     @SuppressLint("NewApi")

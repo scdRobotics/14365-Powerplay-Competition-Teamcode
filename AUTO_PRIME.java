@@ -42,7 +42,7 @@ public class AUTO_PRIME extends LinearOpMode {
     int I_BACK_POLE_ANG = 360;
 
 
-    double I_PKUP_X = 67.5;
+    double I_PKUP_X = 62;
     int I_PKUP_Y = 12;
 
 
