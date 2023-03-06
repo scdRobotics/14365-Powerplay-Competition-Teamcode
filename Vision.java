@@ -83,6 +83,16 @@ public class Vision extends Subsystem {
         aprilTagYellowPipeline.setRunAprilTag(runAprilTag);
     }
 
+    public void pauseCamera(){
+        yellowPipeline.setPause(true);
+        aprilTagYellowPipeline.setPause(true);
+    }
+
+    public void resumeCamera(){
+        yellowPipeline.setPause(false);
+        aprilTagYellowPipeline.setPause(false);
+    }
+
     @SuppressLint("NewApi")
     public double findClosePoleDTheta(){
 

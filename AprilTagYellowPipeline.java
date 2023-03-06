@@ -40,8 +40,14 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
 
     private boolean runAprilTag = true;
 
+    private boolean pause = false;
+
     public void setRunAprilTag(boolean runAprilTag){
         this.runAprilTag=runAprilTag;
+    }
+
+    public void setPause(boolean pause){
+        this.pause=pause;
     }
 
     private long nativeApriltagPtr;
@@ -172,112 +178,114 @@ public class AprilTagYellowPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat inputMat) {
         // Convert to greyscale
 
-        if (runAprilTag) {
-            Imgproc.cvtColor(inputMat, grey, Imgproc.COLOR_RGBA2GRAY);
+        if(!pause){
+            if (runAprilTag) {
+                Imgproc.cvtColor(inputMat, grey, Imgproc.COLOR_RGBA2GRAY);
 
-            synchronized (decimationSync) {
-                if (needToSetDecimation) {
-                    AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeApriltagPtr, decimation);
-                    needToSetDecimation = false;
+                synchronized (decimationSync) {
+                    if (needToSetDecimation) {
+                        AprilTagDetectorJNI.setApriltagDetectorDecimation(nativeApriltagPtr, decimation);
+                        needToSetDecimation = false;
+                    }
+                }
+
+                // Run AprilTag
+                detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
+
+                synchronized (detectionsUpdateSync) {
+                    detectionsUpdate = detections;
+                }
+
+                // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
+                // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
+                for (AprilTagDetection detection : detections) {
+                    Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
+                    drawAxisMarker(inputMat, tagsizeY / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
+                    draw3dCubeMarker(inputMat, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
                 }
             }
 
-            // Run AprilTag
-            detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
 
-            synchronized (detectionsUpdateSync) {
-                detectionsUpdate = detections;
+
+
+
+
+            Imgproc.cvtColor(inputMat, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
+
+            Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
+
+
+            Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
+
+            Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),4);
+
+            Imgproc.Canny(ycbcrMorph, ycbcrEdge, 300, 600, 5, true);
+
+
+            Imgproc.HoughLines(ycbcrEdge, polesEdges, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
+
+            Imgproc.HoughLines(ycbcrErode, polesErode, 1, Math.PI/180, 275, 0, 0, -2*Math.PI/180, 2*Math.PI/180);
+
+
+            inputMat.copyTo(dst);
+
+
+
+            double[] rovioListEroded = new double[polesErode.rows()];
+            double[] rovioListEdges = new double[polesEdges.rows()];
+
+            for (int x = 0; x < polesErode.rows(); x++) {
+                double theta = polesErode.get(x, 0)[1];
+                double rho = polesErode.get(x, 0)[0];
+                double a = Math.cos(theta), b = Math.sin(theta);
+                double x0 = a*rho, y0 = b*rho;
+                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+                Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+                rovioListEroded[x] = x0;
             }
 
-            // For fun, use OpenCV to draw 6DOF markers on the image. We actually recompute the pose using
-            // OpenCV because I haven't yet figured out how to re-use AprilTag's pose in OpenCV.
-            for (AprilTagDetection detection : detections) {
-                Pose pose = poseFromTrapezoid(detection.corners, cameraMatrix, tagsizeX, tagsizeY);
-                drawAxisMarker(inputMat, tagsizeY / 2.0, 6, pose.rvec, pose.tvec, cameraMatrix);
-                draw3dCubeMarker(inputMat, tagsizeX, tagsizeX, tagsizeY, 5, pose.rvec, pose.tvec, cameraMatrix);
+            for (int x = 0; x < polesEdges.rows(); x++) {
+                double theta = polesEdges.get(x, 0)[1];
+                double rho = polesEdges.get(x, 0)[0];
+                double a = Math.cos(theta), b = Math.sin(theta);
+                double x0 = a*rho, y0 = b*rho;
+                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+                Imgproc.line(dst, pt1, pt2, new Scalar(0, 255, 0), 3, Imgproc.LINE_AA, 0);
+                rovioListEdges[x] = x0;
             }
-        }
 
 
+            Arrays.sort(rovioListEroded);
+            Arrays.sort(rovioListEdges);
 
 
-
-
-        Imgproc.cvtColor(inputMat, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
-
-        Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
-
-
-        Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
-
-        Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),4);
-
-        Imgproc.Canny(ycbcrMorph, ycbcrEdge, 300, 600, 5, true);
-
-
-        Imgproc.HoughLines(ycbcrEdge, polesEdges, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
-
-        Imgproc.HoughLines(ycbcrErode, polesErode, 1, Math.PI/180, 275, 0, 0, -2*Math.PI/180, 2*Math.PI/180);
-
-
-        inputMat.copyTo(dst);
-
-
-
-        double[] rovioListEroded = new double[polesErode.rows()];
-        double[] rovioListEdges = new double[polesEdges.rows()];
-
-        for (int x = 0; x < polesErode.rows(); x++) {
-            double theta = polesErode.get(x, 0)[1];
-            double rho = polesErode.get(x, 0)[0];
-            double a = Math.cos(theta), b = Math.sin(theta);
-            double x0 = a*rho, y0 = b*rho;
-            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
-            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
-            Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
-            rovioListEroded[x] = x0;
-        }
-
-        for (int x = 0; x < polesEdges.rows(); x++) {
-            double theta = polesEdges.get(x, 0)[1];
-            double rho = polesEdges.get(x, 0)[0];
-            double a = Math.cos(theta), b = Math.sin(theta);
-            double x0 = a*rho, y0 = b*rho;
-            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
-            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
-            Imgproc.line(dst, pt1, pt2, new Scalar(0, 255, 0), 3, Imgproc.LINE_AA, 0);
-            rovioListEdges[x] = x0;
-        }
-
-
-        Arrays.sort(rovioListEroded);
-        Arrays.sort(rovioListEdges);
-
-
-        double xErodeCenter = 0;
-        if (rovioListEroded.length==0) {
-            xErodeCenter = -1;
-        }
-        else if (rovioListEroded.length % 2 == 0)
-            xErodeCenter = (rovioListEroded[rovioListEroded.length/2] + rovioListEroded[rovioListEroded.length/2-1])/2;
-        else
-            xErodeCenter = rovioListEroded[rovioListEroded.length/2];
-
-
-        currentCenterX = -1;
-
-        for(int i = 0; i<rovioListEdges.length; i++){
-            if(rovioListEdges[i]>xErodeCenter && i!=0){
-                currentCenterX = (rovioListEdges[i] + rovioListEdges[i-1])/2;
-                break;
+            double xErodeCenter = 0;
+            if (rovioListEroded.length==0) {
+                xErodeCenter = -1;
             }
+            else if (rovioListEroded.length % 2 == 0)
+                xErodeCenter = (rovioListEroded[rovioListEroded.length/2] + rovioListEroded[rovioListEroded.length/2-1])/2;
+            else
+                xErodeCenter = rovioListEroded[rovioListEroded.length/2];
+
+
+            currentCenterX = -1;
+
+            for(int i = 0; i<rovioListEdges.length; i++){
+                if(rovioListEdges[i]>xErodeCenter && i!=0){
+                    currentCenterX = (rovioListEdges[i] + rovioListEdges[i-1])/2;
+                    break;
+                }
+            }
+
+            Imgproc.line(dst, new Point(currentCenterX, 1000), new Point(currentCenterX, -10000), new Scalar(255, 0, 0), 3, Imgproc.LINE_AA, 0);
+
+
+
+            System.out.println(currentCenterX);
         }
-
-        Imgproc.line(dst, new Point(currentCenterX, 1000), new Point(currentCenterX, -10000), new Scalar(255, 0, 0), 3, Imgproc.LINE_AA, 0);
-
-
-
-        System.out.println(currentCenterX);
 
 
 

@@ -138,13 +138,11 @@ public class _LEFT_AUTO extends AUTO_PRIME {
         int park = robot.vision.readAprilTagCamera2() + 1;
 
         robot.vision.runAprilTag(false); //Hopefully this will decrease pipeline overhead time
-
-        telemetry.addData("April Tag Detected: ", park);
-        telemetry.update();
-
-        robot.vision.runAprilTag(false);
+        robot.vision.pauseCamera();
 
         robot.drive.followTrajectorySequence(I_APPROACH);
+
+        robot.vision.resumeCamera();
 
         robot.pause(1);
 
@@ -162,6 +160,8 @@ public class _LEFT_AUTO extends AUTO_PRIME {
             loopCount++;
             robot.pause(.175);
         }
+
+        robot.vision.pauseCamera();
 
 
 
@@ -198,6 +198,8 @@ public class _LEFT_AUTO extends AUTO_PRIME {
         telemetry.update();
 
         robot.drive.followTrajectorySequence(II_APPROACH);
+
+        robot.vision.resumeCamera();
 
         robot.pause(1);
 
