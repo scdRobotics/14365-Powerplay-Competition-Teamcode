@@ -34,19 +34,19 @@ public class MotorTest extends AUTO_PRIME {
 
         initAuto();
 
-        robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
+        Pose2d startPose = new Pose2d(START_X, START_Y, Math.toRadians(START_ANG));
 
-        robot.vision.runAprilTag(false);
+        robot.drive.setPoseEstimate(startPose);
+
+        TrajectorySequence I_APPROACH = robot.drive.trajectorySequenceBuilder(startPose)
+
+                .lineTo(new Vector2d(I_APPROACH_X, I_APPROACH_Y - 6))
+
+                .build();
 
         waitForStart();
 
-        while(!isStopRequested()){
-                robot.drive.setMotorPowers(0.05,0.05,0.05,0.05);
-                telemetry.addData("Motor Power: ", 0.05);
-                telemetry.update();
-                robot.pause(0.75);
-
-        }
+        robot.drive.followTrajectorySequence(I_APPROACH);
 
 
 

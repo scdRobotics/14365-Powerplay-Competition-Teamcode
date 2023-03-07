@@ -45,7 +45,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 3.34; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 11.68; // in
+    public static double TRACK_WIDTH = 11.75; // in
     //Traingularly: 18.89155 in
     //Horizontally: 13.552463 in
 
