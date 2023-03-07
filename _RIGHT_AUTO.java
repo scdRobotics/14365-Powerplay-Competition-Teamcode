@@ -108,7 +108,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 180))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .lineTo(new Vector2d(-LEFT_PARK_III_X, PARK_Y))
+                .lineTo(new Vector2d(-LEFT_PARK_I_X, PARK_Y))
 
                 .build();
 
@@ -120,7 +120,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 .lineToLinearHeading(new Pose2d(-II_BACK_POLE_X, II_BACK_POLE_Y, Math.toRadians(II_BACK_POLE_ANG - 180))) //Need to make sure this doesn't cause odo wheels to go on ground junction
 
-                .lineTo(new Vector2d(-LEFT_PARK_I_X, PARK_Y))
+                .lineTo(new Vector2d(-LEFT_PARK_III_X, PARK_Y))
 
                 .build();
 
