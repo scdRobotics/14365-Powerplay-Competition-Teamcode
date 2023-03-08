@@ -33,6 +33,12 @@ public class YellowPipeline extends OpenCvPipeline {
         RAW_IMAGE
     }
 
+    private boolean pause = false;
+
+    public void setPause(boolean pause){
+        this.pause=pause;
+    }
+
     Mat ycbcrMat = new Mat();
     Mat ycbcrThresh = new Mat();
     Mat ycbcrMorph = new Mat();
@@ -99,81 +105,85 @@ public class YellowPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat inputMat) {
 
-        Imgproc.cvtColor(inputMat, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
+        if(!pause){
+            Imgproc.cvtColor(inputMat, ycbcrMat, Imgproc.COLOR_RGB2YCrCb);
 
-        Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
-
-
-        Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
-
-        Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),4);
-
-        Imgproc.Canny(ycbcrMorph, ycbcrEdge, 300, 600, 5, true);
+            Core.inRange(ycbcrMat, lowThresh, highThresh, ycbcrThresh);
 
 
-        Imgproc.HoughLines(ycbcrEdge, polesEdges, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
+            Imgproc.morphologyEx(ycbcrThresh, ycbcrMorph, Imgproc.MORPH_OPEN, kernel);
 
-        Imgproc.HoughLines(ycbcrErode, polesErode, 1, Math.PI/180, 275, 0, 0, -2*Math.PI/180, 2*Math.PI/180);
+            Imgproc.erode(ycbcrMorph, ycbcrErode, kernel2, new Point(-1,-1),4);
 
-
-        inputMat.copyTo(dst);
-
+            Imgproc.Canny(ycbcrMorph, ycbcrEdge, 300, 600, 5, true);
 
 
-        double[] rovioListEroded = new double[polesErode.rows()];
-        double[] rovioListEdges = new double[polesEdges.rows()];
+            Imgproc.HoughLines(ycbcrEdge, polesEdges, 1, Math.PI/180, 120, 0, 0, -5*Math.PI/180, 5*Math.PI/180);
 
-        for (int x = 0; x < polesErode.rows(); x++) {
-            double theta = polesErode.get(x, 0)[1];
-            double rho = polesErode.get(x, 0)[0];
-            double a = Math.cos(theta), b = Math.sin(theta);
-            double x0 = a*rho, y0 = b*rho;
-            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
-            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
-            Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
-            rovioListEroded[x] = x0;
-        }
-
-        for (int x = 0; x < polesEdges.rows(); x++) {
-            double theta = polesEdges.get(x, 0)[1];
-            double rho = polesEdges.get(x, 0)[0];
-            double a = Math.cos(theta), b = Math.sin(theta);
-            double x0 = a*rho, y0 = b*rho;
-            Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
-            Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
-            Imgproc.line(dst, pt1, pt2, new Scalar(0, 255, 0), 3, Imgproc.LINE_AA, 0);
-            rovioListEdges[x] = x0;
-        }
+            Imgproc.HoughLines(ycbcrErode, polesErode, 1, Math.PI/180, 275, 0, 0, -2*Math.PI/180, 2*Math.PI/180);
 
 
-        Arrays.sort(rovioListEroded);
-        Arrays.sort(rovioListEdges);
+            inputMat.copyTo(dst);
 
 
-        double xErodeCenter = 0;
-        if (rovioListEroded.length==0) {
-            xErodeCenter = -1;
-        }
-        else if (rovioListEroded.length % 2 == 0)
-            xErodeCenter = (rovioListEroded[rovioListEroded.length/2] + rovioListEroded[rovioListEroded.length/2-1])/2;
-        else
-            xErodeCenter = rovioListEroded[rovioListEroded.length/2];
 
+            double[] rovioListEroded = new double[polesErode.rows()];
+            double[] rovioListEdges = new double[polesEdges.rows()];
 
-        currentCenterX = -1;
-
-        for(int i = 0; i<rovioListEdges.length; i++){
-            if(rovioListEdges[i]>xErodeCenter && i!=0){
-                currentCenterX = (rovioListEdges[i] + rovioListEdges[i-1])/2;
-                break;
+            for (int x = 0; x < polesErode.rows(); x++) {
+                double theta = polesErode.get(x, 0)[1];
+                double rho = polesErode.get(x, 0)[0];
+                double a = Math.cos(theta), b = Math.sin(theta);
+                double x0 = a*rho, y0 = b*rho;
+                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+                Imgproc.line(dst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+                rovioListEroded[x] = x0;
             }
+
+            for (int x = 0; x < polesEdges.rows(); x++) {
+                double theta = polesEdges.get(x, 0)[1];
+                double rho = polesEdges.get(x, 0)[0];
+                double a = Math.cos(theta), b = Math.sin(theta);
+                double x0 = a*rho, y0 = b*rho;
+                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+                Imgproc.line(dst, pt1, pt2, new Scalar(0, 255, 0), 3, Imgproc.LINE_AA, 0);
+                rovioListEdges[x] = x0;
+            }
+
+
+            Arrays.sort(rovioListEroded);
+            Arrays.sort(rovioListEdges);
+
+
+            double xErodeCenter = 0;
+            if (rovioListEroded.length==0) {
+                xErodeCenter = -1;
+            }
+            else if (rovioListEroded.length % 2 == 0)
+                xErodeCenter = (rovioListEroded[rovioListEroded.length/2] + rovioListEroded[rovioListEroded.length/2-1])/2;
+            else
+                xErodeCenter = rovioListEroded[rovioListEroded.length/2];
+
+
+            currentCenterX = -1;
+
+            for(int i = 0; i<rovioListEdges.length; i++){
+                if(rovioListEdges[i]>xErodeCenter && i!=0){
+                    currentCenterX = (rovioListEdges[i] + rovioListEdges[i-1])/2;
+                    break;
+                }
+            }
+
+            Imgproc.line(dst, new Point(currentCenterX, 1000), new Point(currentCenterX, -10000), new Scalar(255, 0, 0), 3, Imgproc.LINE_AA, 0);
+
+
+
+            System.out.println(currentCenterX);
         }
 
-        Imgproc.line(dst, new Point(currentCenterX, 1000), new Point(currentCenterX, -10000), new Scalar(255, 0, 0), 3, Imgproc.LINE_AA, 0);
 
-
-
-        System.out.println(currentCenterX);
 
 
 
