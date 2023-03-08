@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -53,8 +54,8 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
                     robot.sensors.setLEDState(Sensors.LED_STATE.DEFAULT);
                 })
 
-                //.splineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)), Math.toRadians(180)) //Need to make sure this doesn't cause odo wheels to go on ground junction
-                .lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)))
+                .splineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)), Math.toRadians(180)) //Need to make sure this doesn't cause odo wheels to go on ground junction
+                //.lineToLinearHeading(new Pose2d(-I_BACK_POLE_X, I_BACK_POLE_Y, Math.toRadians(I_BACK_POLE_ANG - 180)))
 
                 .splineToConstantHeading(new Vector2d(-I_PKUP_X, I_PKUP_Y), Math.toRadians(180))
 
@@ -144,7 +145,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         robot.vision.resumeCamera();
 
-        robot.pause(1);
+        robot.pause(1.5);
 
         robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
@@ -168,9 +169,10 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
                 //.turn(dTheta * Math.abs(Math.cos(dTheta)))
 
-                .turn(dTheta - Math.toRadians(5))
+                ////.turn(dTheta - Math.toRadians(5))
+                .turn(dTheta)
 
-                .forward(dist - 6)
+                .forward(dist - 6.25)
 
                 .waitSeconds(POLE_WAIT_DROP)
 
@@ -199,7 +201,7 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         robot.vision.resumeCamera();
 
-        robot.pause(1);
+        robot.pause(1.5);
 
         robot.sensors.setLEDState(Sensors.LED_STATE.DESYNCED);
 
@@ -221,9 +223,10 @@ public class _RIGHT_AUTO extends AUTO_PRIME {
 
         TrajectorySequence II_DROP = robot.drive.trajectorySequenceBuilder(II_APPROACH.end())
 
-                .turn(dTheta - Math.toRadians(5))
+                //.turn(dTheta - Math.toRadians(5))
+                .turn(dTheta)
 
-                .forward(dist - 6)
+                .forward(dist - 6.25)
 
                 .waitSeconds(POLE_WAIT_DROP)
 
