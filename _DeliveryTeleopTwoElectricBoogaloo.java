@@ -190,10 +190,18 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
                 slidePosIdx++;
                 dpadUpHeld = true;
 
+                if(slidePosIdx>4){
+                    slidePosIdx=4;
+                }
+
                 slidePos = robot.delivery.slideIdxToEncoderVal(slidePosIdx);
             } else if (gamepad2.dpad_down && !dpadDownHeld) {
                 slidePosIdx--;
                 dpadDownHeld = true;
+
+                if(slidePosIdx<0){
+                    slidePosIdx=0;
+                }
 
                 slidePos = robot.delivery.slideIdxToEncoderVal(slidePosIdx);
             }
@@ -210,6 +218,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
             if (gamepad2.left_stick_y > 0.1 || gamepad2.left_stick_y < -0.1) {
                 slidePos += -gamepad2.left_stick_y * 30;
             }
+
 
 
             robot.delivery.runSlide((int) (slidePos), 0.9);

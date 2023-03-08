@@ -58,25 +58,20 @@ public class Delivery extends Subsystem {
 
     public int slideIdxToEncoderVal(int idx){
 
-        //Probably redundant, buuut better safe than sorry
-        if(idx<0){
-            idx=0;
-        }
-        else if(idx>3){
-            idx=3;
-        }
-
 
         if(idx==0){
             return 0;
         }
         else if(idx==1){
-            return 1776;
+            return 500;
         }
         else if(idx==2){
-            return 2900;
+            return 1776;
         }
         else if(idx==3){
+            return 2900;
+        }
+        else if(idx==4){
             return 4000;
         }
 
