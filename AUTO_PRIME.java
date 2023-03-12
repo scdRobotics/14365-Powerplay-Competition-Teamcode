@@ -142,12 +142,12 @@ public class AUTO_PRIME extends LinearOpMode {
 
 
 
-    double PARK_II_X = 36+0.01;
+    double PARK_II_X = 36+0.01+1.5;
 
-    int LEFT_PARK_III_X = 12;
+    double LEFT_PARK_III_X = 12+1.5;
     int RIGHT_PARK_III_X = 60;
 
-    int LEFT_PARK_I_X = 60;
+    double LEFT_PARK_I_X = 60+1.5;
     int RIGHT_PARK_I_X = 12;
 
     int PARK_Y = 12;

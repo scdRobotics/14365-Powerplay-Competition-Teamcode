@@ -41,7 +41,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
         Pose2d startPos = new Pose2d();
         if(PoseTransfer.isBlue){
-            startPos = PoseTransfer.currentPose;
+            startPos = PoseTransfer.currentPose.plus(new Pose2d(0,0,Math.toRadians(180)));
         }
         else{
             startPos = PoseTransfer.currentPose.plus(new Pose2d(0,0,Math.toRadians(180)));
