@@ -63,15 +63,12 @@ public class Delivery extends Subsystem {
             return 0;
         }
         else if(idx==1){
-            return 500;
-        }
-        else if(idx==2){
             return 1776;
         }
-        else if(idx==3){
+        else if(idx==2){
             return 2900;
         }
-        else if(idx==4){
+        else if(idx==3){
             return 4000;
         }
 

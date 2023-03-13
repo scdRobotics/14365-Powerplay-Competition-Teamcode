@@ -41,7 +41,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
         Pose2d startPos = new Pose2d();
         if(PoseTransfer.isBlue){
-            startPos = PoseTransfer.currentPose;
+            startPos = PoseTransfer.currentPose.plus(new Pose2d(0,0,Math.toRadians(180)));
         }
         else{
             startPos = PoseTransfer.currentPose.plus(new Pose2d(0,0,Math.toRadians(180)));
@@ -96,7 +96,7 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
 
-        robot.sensors.retractOdo();
+
 
 
 
@@ -108,6 +108,8 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
 
 
         while(!isStopRequested() && opModeIsActive()) {
+
+            robot.sensors.retractOdo();
 
             /*
 
@@ -190,8 +192,8 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
                 slidePosIdx++;
                 dpadUpHeld = true;
 
-                if(slidePosIdx>4){
-                    slidePosIdx=4;
+                if(slidePosIdx>3){
+                    slidePosIdx=3;
                 }
 
                 slidePos = robot.delivery.slideIdxToEncoderVal(slidePosIdx);
@@ -204,6 +206,11 @@ public class _DeliveryTeleopTwoElectricBoogaloo extends LinearOpMode {
                 }
 
                 slidePos = robot.delivery.slideIdxToEncoderVal(slidePosIdx);
+            }
+
+            if(gamepad2.right_trigger>0.75){
+                slidePos=500;
+                slidePosIdx=0;
             }
 
             if (!gamepad2.dpad_up) {
